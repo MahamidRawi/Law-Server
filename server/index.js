@@ -1,0 +1,12 @@
+const express = require('express');
+const server = express();
+const cors = require('cors');
+server.use(cors());
+const AuthRouter = require('./API/auth/auth.api');
+const loadDb = require('./DB/load.db');
+server.use(express.json());
+server.use(express.urlencoded({extended: true}))
+
+server.use('/auth/', AuthRouter);
+
+server.listen(3000, () => loadDb());
