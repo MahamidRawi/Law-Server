@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 require('../../DB/models/user.model');
 const user = mongoose.model('userModel');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs');
+const joi = require('joi');
+const { authSchema } = require('../../schemas/joi.schema');
 
 const alreadyExists = async (req, res, next) => {
     try {
@@ -27,17 +29,26 @@ const enc = async (pass) => {
 const signUp = async (req, res, next) => {
     const cred = req.body;
 
+    const formvalidation = authSchema.validate(cred);
+    console.log(formvalidation.error)
+    if (formvalidation.error) {
+        return res.status(400).json({
+            success: false, 
+            message: formvalidation.error.details
+        });
+    }
+
     try {
         cred.password = await enc(cred.password);
         console.log(cred);
         const newUser = new user(cred);
         await newUser.save();
         req.newUser = newUser;
-        next(); // Send back the created user
+        return next(); // Send back the created user
     } catch (err) {
         console.error("Error creating user:", err);
-        res.status(500).json({success: false, err});
+        return res.status(500).json({success: false, err});
     }
 }
 
-module.exports = {alreadyExists, signUp, hasEmptyOrUndefined, signUp}
+module.exports = {alreadyExists, signUp, signUp}

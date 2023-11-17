@@ -9,4 +9,6 @@ server.use(express.urlencoded({extended: true}))
 
 server.use('/auth/', AuthRouter);
 
-server.listen(3000, () => loadDb());
+server.listen(3200, () => loadDb());
+
+//test

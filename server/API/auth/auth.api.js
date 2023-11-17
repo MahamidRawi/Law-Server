@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.post('/signup', alreadyExists, signUp, (req, res) => {
     // console.log(req.body)
-    signUp(req.body)
+    return res.json(req.newUser);
 });
 
 module.exports = router
