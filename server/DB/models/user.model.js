@@ -11,6 +11,15 @@ const UserSchema = Schema({
         maxlength: [20, 'Username must be less than 20 characters long']
     },
 
+    email: {
+        type: String,
+        required: [true, 'Email is required'],
+        unique: true,
+        trim: true,
+        lowercase: true,
+        match: [/.+\@.+\..+/, 'Please use a valid email address'] 
+    },
+
     firstName: {
         type: String,
         required: [true, 'First name is required'],

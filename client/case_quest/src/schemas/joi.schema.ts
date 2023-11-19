@@ -1,15 +1,15 @@
-const Joi = require('joi');
+import Joi from 'joi'
 
-const authSchema = Joi.object({
+const signUpSchema = Joi.object({
   firstName: Joi.string()
   .min(1)
-  .max(50)
+  .max(100)
   .required(),
 
   lastName: Joi.string()
   .min(1)
-  .max(50)
-  .required(),
+  .max(100)
+  .required(),  
   
   username: Joi.string()
     .alphanum()
@@ -21,17 +21,17 @@ const authSchema = Joi.object({
     .min(8).max(150)
     .required(),
     email: Joi.string()
-  .email({ tlds: { allow: false } }) // 'tlds' option can be adjusted as needed
-  .required(),
+    .email({ tlds: { allow: false } }) // 'tlds' option can be adjusted as needed
+    .required()
 });
 
-const inAuthSchema = Joi.object({
+const signInSchema = Joi.object({
   email: Joi.string()
   .email({ tlds: { allow: false } }) // 'tlds' option can be adjusted as needed
   .required(),
   password: Joi.string()
     .min(8).max(150)
     .required(),
-})
+});
 
-module.exports = {authSchema, inAuthSchema}
+export {signInSchema, signUpSchema}

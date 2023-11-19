@@ -1,0 +1,73 @@
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2b2d3e 0%, #242639 100%); /* Lighter and more vibrant background */
+}
+
+.auth-form {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+}
+
+.auth-header {
+    font-size: 1.75em; /* Slightly larger font size */
+    text-align: center;
+    color: #003366; /* Deep blue for a stronger contrast */
+    margin-bottom: 25px; /* More spacing */
+}
+
+.form-label {
+    font-weight: bold;
+    color: #36454F; /* Charcoal gray for a modern look */
+    margin-bottom: 5px; /* Added space below label */
+}
+
+.form-input {
+    border-radius: 5px; /* Slightly more rounded corners */
+    border: 1px solid #B0BEC5; /* Lighter border color */
+    padding: 12px; /* More padding for better aesthetics */
+    font-size: 1em;
+    transition: border-color 0.3s; /* Smooth transition for focus */
+}
+
+.form-input:focus {
+    border-color: #1C75BC; /* Highlight color on focus */
+}
+
+.submit-button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    border: none;
+    background-color: #4e5283; /* Deep Plum */
+    color: white;
+    font-size: 1em;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #3d4066; /* A slightly darker shade for hover */
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.auth-switch a {
+    color: #4e5283; /* Or any color that matches your theme */
+    text-decoration: none;
+}
+
+.auth-switch a:hover {
+    text-decoration: none;
+    color: #7d87d5;
+}

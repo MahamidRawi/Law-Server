@@ -6,6 +6,7 @@ const AuthRouter = require('./API/auth/auth.api');
 const loadDb = require('./DB/load.db');
 server.use(express.json());
 server.use(express.urlencoded({extended: true}))
+require('dotenv').config();
 
 server.use('/auth/', AuthRouter);
 
