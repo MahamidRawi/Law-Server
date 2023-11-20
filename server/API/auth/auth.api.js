@@ -22,7 +22,9 @@ router.post('/signIn', async (req, res) => {
     }
 });
 
-router.post('/protectedRoute', validate, async (req, res) => {
+router.post('/validate', validate, async (req, res) => res.json({success: true, message: 'Validated'}));
+
+router.post('/dashboard', validate, async (req, res) => {
     res.json("YOU REACHED A PROTECTED ROUTE")
 });
 

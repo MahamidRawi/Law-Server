@@ -1,4 +1,5 @@
 import React, { useState, ReactNode } from 'react';
+import { userValidate } from '../actions/auth.actions';
 
 interface Props {
     children?: ReactNode
@@ -27,7 +28,8 @@ export const AuthProvider = ({children}: Props) => {
                 return localStorage.removeItem('user_token');
             },
             validate: () => {
-                return 'validated'
+                const token = localStorage.getItem('user_token');
+                userValidate(token).then(res => setUser(token)).catch(err => {setUser(null)});
             }
 
         }}>{children}</AuthContext.Provider> 

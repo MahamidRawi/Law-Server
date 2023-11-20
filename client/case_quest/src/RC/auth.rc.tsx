@@ -1,21 +1,18 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { AuthContext } from '../Providers/auth.provider';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import '../App.css'
 import '../styling.css'
-
 import { SignInArray, SignUpArray } from '../data/data';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useNavigation } from 'react-router-dom';
 import { signInSchema, signUpSchema } from '../schemas/joi.schema';
 import { cleanRes } from '../helper/res.helper';
 import { signIn, signUp } from '../actions/auth.actions';
+import { ActivityIncicator } from './acitivity.incdicator';
 
 export interface AuthFormProps {
     formType: 'Sign In' | 'Sign Up';
 }
-
-
 
 export const AuthForm = ({ formType }: AuthFormProps) => {
     const [formData, setFormData] = useState<any>({
@@ -25,6 +22,10 @@ export const AuthForm = ({ formType }: AuthFormProps) => {
         email: '',
         password: '',
     });
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const {login} = useContext(AuthContext)
 
     
     const [error, setError] = useState<string>('');
@@ -39,30 +40,24 @@ export const AuthForm = ({ formType }: AuthFormProps) => {
 
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
+        setLoading(true);
         setError('');
         setSuccessMessage('');
 
-        const userCredentials = {
-            firstName: formData.firstName, 
-            lastName: formData.lastName,
-            username: formData.username,
-            email: formData.email,
-            password: formData.password
-        }
-
         formType === 'Sign In' ? signInSchema.validateAsync({ email: formData.email, password: formData.password })
         .then(() => {
-            signIn({credentials: {email: formData.email, password: formData.password}}).then((res) => setSuccessMessage(res.message)).catch(err => setError(cleanRes(err.message)));
-            // Handle successful sign in
-        }).catch(err => setError(cleanRes(err.message))) : signUpSchema.validateAsync(formData)
+            signIn({credentials: {email: formData.email, password: formData.password}}).then((res) => {setLoading(false); setSuccessMessage(res.message); login(res.token); navigate('/')}).catch(err => setError(cleanRes(err.message)));
+
+        }).catch(err => {setError(cleanRes(err.message)); setLoading(false)}) : signUpSchema.validateAsync(formData)
         .then(() => {
-            signUp(formData).then((res) => setSuccessMessage(res.message)).catch(err => setError(cleanRes(err.message)));
+            signUp(formData).then((res) => {setLoading(false); navigate('/SignIn')}).catch(err => setError(cleanRes(err.message)));
             // Handle successful sign up
-        }).catch(err => setError(cleanRes(err.message)));
+        }).catch(err => {setError(cleanRes(err.message)); setLoading(false)});
     };
 
     return (
         <div className="auth-container">
+            {loading ? <ActivityIncicator /> : (
     <div className="auth-form">
         <h2 className="auth-header">{formType}</h2>
         <Form>
@@ -92,6 +87,7 @@ export const AuthForm = ({ formType }: AuthFormProps) => {
                 </div>
         </Form>
     </div>
+    )}
 </div>
     );
 };
