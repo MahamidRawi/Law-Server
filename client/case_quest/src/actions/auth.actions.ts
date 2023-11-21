@@ -44,7 +44,7 @@ const signUp = async (credentials: credentialsProps): Promise<SignUpResponse> =>
     return resolve({success: true, message: res.data.message});
 } catch (err) {
     const axiosError = err as AxiosError<ErrorResponse>;
-    console.warn(axiosError.response?.data.message);
+    console.error(axiosError.response?.data.message)
     return reject({success: false, message: axiosError.response?.data.message})
 }
 })

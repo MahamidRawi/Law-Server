@@ -7,9 +7,8 @@ const user = mongoose.model('userModel');
 const alreadyExists = async (req, res, next) => {
     const {username,email} = req.body.credentials
     try {
-        const userFound = await user.find({$or: [{username}, {email}]});
-        console.log('Found User:', userFound)
-        userFound.length == 0 ? next() : res.status(400).json({success: false, message: username == userFound.email ? 'Username Already in Use' : 'Email Already in Use'});
+        const userFound = await user.find({$or: [{username}, {email}]});;
+        userFound.length == 0 ? next() : res.status(400).json({success: false, message: username == userFound[0].username ? 'Username Already in Use' : 'Email Already in Use'});
     } catch (err) {
         return res.status(500).json({success: false, message: 'An Error Occured', err})
     }

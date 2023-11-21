@@ -26,7 +26,7 @@ const MainRoutes = () => {
     </Container>
   </Navbar>
                 <Routes>
-                    <Route index path='/' element={<>HOME PAGE</>}/>
+                    <Route index path='/' element={<>Home Page</>}/>
                     <Route path='/SECONDPAGE' element={<>SECOND PAGE</>}/>
                     <Route path='/THIRSPAGE' element={<>THIRD PAGE</>}/>
                 </Routes>
