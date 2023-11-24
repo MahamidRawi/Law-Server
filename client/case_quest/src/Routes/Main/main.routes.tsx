@@ -3,6 +3,7 @@ import { BrowserRouter, Link, Route, Routes, useLocation, useNavigate } from 're
 import { AuthContext } from '../../Providers/auth.provider';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import '../../styling.css'
+import Home from '../../Screens/home.screen';
 
 
 const MainRoutes = () => {
@@ -26,7 +27,7 @@ const MainRoutes = () => {
     </Container>
   </Navbar>
                 <Routes>
-                    <Route index path='/' element={<>Home Page</>}/>
+                    <Route index path='/' element={<Home />}/>
                     <Route path='/SECONDPAGE' element={<>SECOND PAGE</>}/>
                     <Route path='/THIRSPAGE' element={<>THIRD PAGE</>}/>
                 </Routes>
