@@ -28,4 +28,4 @@ const CaseSchema = new Schema({
     }
 });
 
-mongoose.model('caseModel', CaseSchema);
+mongoose.model('casesModel', CaseSchema);
