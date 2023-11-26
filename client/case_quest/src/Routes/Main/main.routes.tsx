@@ -20,16 +20,17 @@ const MainRoutes = () => {
     <Container>
     <Link className="link" to="/"><Navbar.Brand href="/">CaseQuest</Navbar.Brand></Link>
     <Nav className="me-auto">
-      <Nav.Link href="#home">Deliverers</Nav.Link>
-      <Nav.Link href="#features">Distribution</Nav.Link>
-      <Nav.Link href="#pricing">Profile</Nav.Link>
+      <Link className='nav-link' to="/secondPage">Deliverers</Link>
+      <Link className='nav-link' to="/thirdPage">Distribution</Link>
+      <Link className='nav-link' to="/fourthPage">Profile</Link>
     </Nav>
     </Container>
   </Navbar>
                 <Routes>
                     <Route index path='/' element={<Home />}/>
-                    <Route path='/SECONDPAGE' element={<>SECOND PAGE</>}/>
-                    <Route path='/THIRSPAGE' element={<>THIRD PAGE</>}/>
+                    <Route path='/secondPage' element={<>SECOND PAGE</>}/>
+                    <Route path='/thirdPage' element={<>THIRD PAGE</>}/>
+                    <Route path='/fourthPage' element={<>FOURTH PAGE</>}/>
                 </Routes>
                 </div>
     )

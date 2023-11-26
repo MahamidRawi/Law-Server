@@ -44,7 +44,6 @@ const signUp = async (credentials: credentialsProps): Promise<SignUpResponse> =>
     return resolve({success: true, message: res.data.message});
 } catch (err) {
     const axiosError = err as AxiosError<ErrorResponse>;
-    console.error(axiosError.response?.data.message)
     return reject({success: false, message: axiosError.response?.data.message})
 }
 })
@@ -59,7 +58,6 @@ const signIn = async (credentials: inCredentialProps): Promise<SignInResponse> =
     return resolve({success: true, message: res.data.message, token: res.data.token});
 } catch (err) {
     const axiosError = err as AxiosError<ErrorResponse>;
-    console.log(axiosError.response?.data);
     return reject({success: false, message: axiosError.response?.data.message})
 }
 })

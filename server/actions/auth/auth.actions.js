@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 require('../../DB/models/user.model');
 const user = mongoose.model('userModel');
 const bcrypt = require('bcryptjs');
-const joi = require('joi');
 const { authSchema, inAuthSchema } = require('../../schemas/joi.schema');
 const { cleanRes } = require('../../helper/res.helper');
 const enc = require('../../helper/auth.helper');
