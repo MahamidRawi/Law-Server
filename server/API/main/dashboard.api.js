@@ -1,15 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { validate } = require('../../middleware/auth/auth.middleware');
-const { createCase, getCases, getUser } = require('../../actions/main/fetch.actions');
+const { createCase, getCases, getUser, getUsers } = require('../../actions/main/fetch.actions');
 
 router.get('/fetchHomePage', validate, async (req, res) => {
-    getUser(req.userId);
-    
     const data = {
-        userInfo: await getUser(req.userId),
-        userCases: await getCases(req.userId),
-        success: (await getUser(req.userId)).success && (await getCases(req.userId)).success
+        userInfo: await getUser(req.userId).catch(err => res.status(500).json(err)),
+        userCases: await getCases(req.userId).catch(err => res.status(500).json(err)),
     }
 
     return res.json(data);

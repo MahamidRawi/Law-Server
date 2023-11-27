@@ -1,0 +1,1 @@
+module.exports = Err500 = 'An Error Occured'

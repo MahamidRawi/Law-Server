@@ -1,18 +1,20 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const { Err500 } = require('../../vars/vars');
 require('../../DB/models/cases.model');
 require('../../DB/models/user.model');
 const cases = mongoose.model('casesModel');
-const users = mongoose.model('userModel')
+const users = mongoose.model('userModel');
+
 
 const getCases = (uid) => {
     return new Promise(async (resolve, reject) => {
     try {
         const response = await cases.find({owners: {$in: [uid]}})
-        console.log(response);
-        return {success: true, cases: response};
+        return resolve({success: true, cases: response});
     } catch(err) {
-        return {success: false, message: 'An Error has Occured', err};
+        console.log(err);
+        return reject({success: false, message: Err500, err});
     }
 });
 }
@@ -27,30 +29,28 @@ const createCase = () => {
         owners: ['123456', 'Owner 2'],
       })
 
-    newCase.save().then(res => console.log(res)).catch(err => 'An Error Occured')
+    newCase.save().then(res => console.log(res)).catch(err => Err500)
 }
 
-const getUser = async (uid) => {
-    return new Promise((resolve, reject) => {
-        
+const getUser = async (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const userFound = await users.findOne({id}).select('-password');
+            return resolve(userFound);
+    } catch (err) {
+            return reject({success: false, message: Err500, err});
+        }
     })
-    try {
-    if (!uid) {
-        return {success: true, users: await users.findById({uid})}
-    } else {
-        return {success: true, users: await users.find({})}
-    }
-} catch (err){
-    return {success: false, message: 'An Error has Occured'}
-}
 }
 
 const getUsers = async () => {
-    try {
-
-    } catch (err) {
-        
-    }
+    return new Promise(async (resolve, reject) => {
+        try {
+            return resolve(await users.find({}).select('-password'));
+        } catch (err) {
+            return reject({success: false, message: Err500, err})
+        }
+    })
 }
 
-module.exports = {getCases, createCase, getUser}
+module.exports = {getCases, createCase, getUser, getUsers}
