@@ -20,24 +20,19 @@ const Home = () => {
     const [userInfo, setUserInfo] = useState<UserInfo>({});
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-              const res = await fetchHomePage();
-              const data: HomePageResponse = (res as any).data; // Correct type assertion
-      
-              setUserCases(data.userCases);
-              setUserInfo(data.userInfo);
-            } catch (error) {
-              console.error("Error fetching data:", error);
-            }
-          };
-      
-          fetchData();
+        console.log('called')
+        fetchHomePage().then(res => {
+            console.log('reached here')
+            setUserInfo(res.info.userInfo);
+            setUserCases(res.info.userCases);
+        })
       }, []);
     return (
         <div>
+            <br />
+            <br /><br />
             <button onClick={() => {console.log(userInfo)}}>Render</button>
-            This is not the home page
+            {/* This is not the home page */}
         </div>
     )
 }

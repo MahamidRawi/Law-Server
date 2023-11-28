@@ -15,8 +15,7 @@ export const Routes = () => {
         const token = localStorage.getItem('user_token');
 
         if (token) {
-            console.error(validate())
-            // if (Boolean(validate().success)) return login(token)
+            validate();
         } else {logout()};
         return setLoading(false);
     }, []);
