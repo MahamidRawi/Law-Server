@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import { AuthContext } from '../Providers/auth.provider';
 import AuthRoutes from './auth.routes';
 import MainRoutes from './Main/main.routes';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, useNavigate, useNavigation } from 'react-router-dom';
 import '../styling.css';
 import { ActivityIncicator } from '../RC/acitivity.incdicator';
 
@@ -11,16 +11,18 @@ export const Routes = () => {
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
+        setLoading(true);
         const token = localStorage.getItem('user_token');
 
-        if (token) validate(); else return logout();
+        token ? validate() : logout();
+        console.log(user)
         
         return setLoading(false);
     }, []);
 
-    if (loading) return <div className='spinner' />
+    if (loading) return <center><div className='spinner' /></center>
 
     return (
-        loading ? <ActivityIncicator fullScreen={true} /> : user ? <BrowserRouter><MainRoutes /></BrowserRouter> : <AuthRoutes />
+        user ? <BrowserRouter><MainRoutes /></BrowserRouter> : <AuthRoutes />
     )
 }

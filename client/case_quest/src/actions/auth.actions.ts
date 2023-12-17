@@ -3,16 +3,12 @@ import axios, { AxiosError } from 'axios';
 import config from '../config';
 
 interface credentialsProps {
-    credentials: {
         firstName: string, lastName: string, email: any, password: string, username : string
-    }
 }
 
 interface inCredentialProps {
-    credentials: {
         email: string,
         password: string
-    }
 }
 
 interface SignUpResponse {
@@ -34,7 +30,6 @@ interface ErrorResponse {
 }
 
 const signUp = async (credentials: credentialsProps): Promise<SignUpResponse> => {
-    console.warn('Reached here')
     return new Promise(async (resolve, reject) => {
     try {
         const res = await axios.post(config.API_BASE_URL+'/auth/signup', {

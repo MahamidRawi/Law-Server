@@ -3,10 +3,10 @@ import ScrollWindow from '../RC/scroll.window';
 import { NotificationsProps } from '../data/types';
 
 interface NotProps {
-    content: NotificationsProps
+    content: Array<NotificationsProps>
 }
 
-const NotificationScreen = (content: NotProps) => {
+const NotificationScreen: React.FC<NotProps> = ({content}) => {
     const not = [
         {
             title: 'A new Title',
@@ -74,7 +74,7 @@ const NotificationScreen = (content: NotProps) => {
     return (
         <div className="header-decoration">
         <div className="p-container">
-            {not.length > 0 ? <ScrollWindow content={not} /> : 
+            {content?.length > 0 ? <ScrollWindow type='Notification' content={not} /> : 
                 <div className='testerror'>
                     <p className="alert alert-light text-center">No Notifications</p>
                 </div>

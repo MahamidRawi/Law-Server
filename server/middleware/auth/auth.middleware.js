@@ -5,6 +5,7 @@ const user = mongoose.model('userModel');
 
 
 const alreadyExists = async (req, res, next) => {
+    console.log(req)
     const {username,email} = req.body.credentials
     try {
         const userFound = await user.find({$or: [{username}, {email}]});;

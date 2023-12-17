@@ -21,6 +21,11 @@ router.get('/getMyCases', validate, async (req, res) => {
     return res.status(cases === true ? 200 : 500).json({cases, success: cases ? true : false});
 });
 
+router.get('/getLawyers', validate, async (req, res) => {
+    const cases = getUsers();
+    return res.status(cases === true ? 200 : 500).json({cases, success: cases ? true : false});
+});
+
 router.get('/getUserInfo', validate, async (req, res) => {
     try {
         const resp = await getUser(req.userId);

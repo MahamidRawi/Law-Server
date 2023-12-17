@@ -45,7 +45,7 @@ export const AuthForm = ({ formType }: AuthFormProps) => {
 
         formType === 'Sign In' ? signInSchema.validateAsync({ email: formData.email, password: formData.password })
         .then(() => {
-            signIn({credentials: {email: formData.email, password: formData.password}}).then((res) => {setLoading(false); setSuccessMessage(res.message); login(res.token); navigate('/')}).catch(err => {setLoading(false); setError(cleanRes(err.message))});
+            signIn({email: formData.email, password: formData.password}).then((res) => {setLoading(false); setSuccessMessage(res.message); login(res.token); navigate('/')}).catch(err => {setLoading(false); setError(cleanRes(err.message))});
         }).catch(err => {setError(cleanRes(err.message)); setLoading(false)}) : signUpSchema.validateAsync(formData)
         .then(() => {
             signUp(formData).then((res) => {setLoading(false); navigate('/SignIn')}).catch(err => {setLoading(false); setError(cleanRes(err.message))});

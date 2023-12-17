@@ -9,6 +9,7 @@ import { fetchUserInfo } from '../../actions/main/home.actions';
 import { UserInfo } from '../../data/types';
 import { balanceParser } from '../../helper/res.helper';
 import NotificationScreen from '../../Screens/notifications.screen';
+import Lawyers from '../../Screens/lawyers.screen';
 
 
 const MainRoutes = () => {
@@ -42,10 +43,10 @@ const MainRoutes = () => {
             <Routes>
                 <Route index path='/' element={<Home />}/>
                 <Route path='/Cases' element={<>Cases</>}/>
-                <Route path='/Lawyers' element={<>Lawyers</>}/>
+                <Route path='/Lawyers' element={<Lawyers />}/>
                 <Route path='/Firms' element={<>Firms</>}/>
                 <Route path='/My-Firm' element={<>My Firm</>}/>
-                <Route path='/Notifications' element={<NotificationScreen content={[]}/>}/>
+                {userInfo ? <Route path='/Notifications' element={<NotificationScreen content={userInfo.notifications}/>}/> : null}
             </Routes>
         </div>
     )

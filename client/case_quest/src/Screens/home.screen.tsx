@@ -69,7 +69,7 @@ const Home = () => {
                 </div>
             }  */}
 
-            <ScrollWindow content={mockCases} />
+            <ScrollWindow type="Case" content={mockCases} />
                 
         </div>
         </div>
