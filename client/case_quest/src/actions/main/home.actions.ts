@@ -1,31 +1,46 @@
-import { useContext } from 'react';
-import axios, { AxiosResponse } from "axios";
-import { AuthContext } from '../../Providers/auth.provider';
+import axios from "axios";
 import config from '../../config';
+import { UserCase, UserInfo } from "../../data/types";
 
 interface resProps {
     success: boolean,
     info: {
-        userInfo: object,
-        userCases: object
+        userInfo: UserInfo,
+        userCases: UserCase
     }
 }
 
-const fetchHomePage = (): Promise<resProps> => {
-    return new Promise(async (resolve, reject) => {
-        const {user, logout} = useContext(AuthContext);
-        const token = localStorage.getItem('user_token');
-        if (!token || !user) return logout();
+interface UserInformationProps {
+    success: boolean,
+    userInfo: UserInfo
+}
 
-//     try {
-//         const {userInfo, userCases} = (await axios.get(config.API_BASE_URL+'/main/fetchHomePage', {headers: {'x-access-token': token}})).data; 
-//         console.log(userInfo, userCases)
-//         return resolve({success: true, info: {userInfo, userCases}});
-// } catch (err) {
-//     return logout();
-// }
-return axios.get(config.API_BASE_URL+'/main/fetchHomePage', {headers: {'x-access-token': token}}).then(res => resolve({success: true, info: {userInfo: res.data.userInfo, userCases: res.data.userCases}})).catch(err => logout());
+const fetchHomePage = (user: any): Promise<resProps> => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token || !user) return reject({success: false, message: 'Failed'})
+
+    try {
+        const {userInfo, userCases} = (await axios.get(config.API_BASE_URL+'/main/fetchHomePage', {headers: {'x-access-token': token}})).data; 
+        return resolve({success: true, info: {userInfo: userInfo.info, userCases}});
+} catch (err) {
+    return reject({success: false, message: 'Failed'});
+}
 })
 }
 
-export {fetchHomePage}
+const fetchUserInfo = (user: any): Promise<UserInformationProps> => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token || !user) return reject({success: false, message: 'Failed'})
+
+    try {
+        const userInfo = await axios.get(config.API_BASE_URL+'/main/getUserInfo', {headers: {'x-access-token': token}}); 
+        return resolve({success: true, userInfo: userInfo.data.info});
+} catch (err) {
+    return reject({success: false, message: 'Failed'});
+}
+})
+}
+
+export {fetchHomePage, fetchUserInfo}

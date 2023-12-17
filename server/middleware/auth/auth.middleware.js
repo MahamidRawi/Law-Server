@@ -24,7 +24,7 @@ const validate = (req, res, next) => {
         
         if (err) return res.status(401).json({success: false, message: "Failed To Authenticate"});
 
-        req.userId = decoded.id
+        req.userId = decoded.UID
 
         return next();
     });

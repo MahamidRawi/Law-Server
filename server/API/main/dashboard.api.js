@@ -17,7 +17,16 @@ router.post('/createCase', async (req, res) => {
 });
 
 router.get('/getMyCases', validate, async (req, res) => {
-    getCases(req.userId);
+    const cases = getCases();
+    return res.status(cases === true ? 200 : 500).json({cases, success: cases ? true : false});
 });
 
+router.get('/getUserInfo', validate, async (req, res) => {
+    try {
+        const resp = await getUser(req.userId);
+        return res.status(resp.stc || 200).json(resp);
+    } catch (err) {
+        return res.status(500)
+    }
+})
 module.exports = router;

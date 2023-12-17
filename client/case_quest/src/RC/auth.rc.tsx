@@ -23,10 +23,9 @@ export const AuthForm = ({ formType }: AuthFormProps) => {
         password: '',
     });
     const navigate = useNavigate();
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const {login} = useContext(AuthContext)
-
     
     const [error, setError] = useState<string>('');
     const [successMessage, setSuccessMessage] = useState<string>('');
@@ -36,7 +35,7 @@ export const AuthForm = ({ formType }: AuthFormProps) => {
     const handleChange = (e: any, field: string) => setFormData({...formData, [field]: e.target.value});
 
 
-    useEffect(() => {setError(''); setSuccessMessage('');}, [formType])
+    useEffect(() => {setError(''); setSuccessMessage(''); setLoading(false)}, [formType])
 
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
@@ -78,9 +77,9 @@ export const AuthForm = ({ formType }: AuthFormProps) => {
             </Button>
             <div className="auth-switch">
                     {formType === 'Sign In' ? (
-                        <p className='lnk'>New to CaseQuest? <Link to="/signup">Sign Up for Free</Link></p>
+                        <p className='lnk2'>New to CaseQuest? <Link to="/signup">Sign Up for Free</Link></p>
                     ) : (
-                        <p className='lnk'>Already have an account? <Link to="/signin">Sign In</Link></p>
+                        <p className='lnk2'>Already have an account? <Link to="/signin">Sign In</Link></p>
                     )}
                 </div>
         </Form>

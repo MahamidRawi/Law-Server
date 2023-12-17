@@ -31,11 +31,10 @@ const signUp = async (creds) => {
 }
 
 const signIn = async (creds) => {
-    console.log(creds)
+
     const {email, password} = creds
     return new Promise(async (resolve, reject) => {
         inAuthSchema.validateAsync({email, password}).catch(err => reject({success: false, message: cleanRes(err.details[0].message), stc : 400}));
-
         try {
             const foundUser= await user.findOne({email});
             console.log(foundUser)

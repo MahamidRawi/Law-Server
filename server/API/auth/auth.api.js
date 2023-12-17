@@ -18,7 +18,7 @@ router.post('/signIn', async (req, res) => {
         const signed = await signIn(req.body.credentials.credentials);
         return res.status(signed.stc).json(signed);
     } catch (err) {
-        return res.status(err.stc).json(err)
+        return res.status(signed.stc).json(err)
     }
 });
 

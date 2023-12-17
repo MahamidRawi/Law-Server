@@ -1,7 +1,6 @@
 import { AxiosResponse } from './../../node_modules/axios/index.d';
 import axios, { AxiosError } from 'axios';
 import config from '../config';
-import { type } from 'os';
 
 interface credentialsProps {
     credentials: {

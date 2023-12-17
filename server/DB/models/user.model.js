@@ -55,7 +55,12 @@ const UserSchema = Schema({
     balance: {
         type: Number,
         default: 10000
-    }
+    },
+
+    notifications: {
+        type: Array,
+        default: []
+    },
 });
 
 mongoose.model('userModel', UserSchema);

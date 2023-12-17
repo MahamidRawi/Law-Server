@@ -1,5 +1,8 @@
 import React, { useState, ReactNode } from 'react';
 import { userValidate } from '../actions/auth.actions';
+import { UserInfo } from '../data/types';
+import { userInfo } from 'os';
+import { any, number } from 'joi';
 
 interface Props {
     children?: ReactNode

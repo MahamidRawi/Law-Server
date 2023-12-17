@@ -13,7 +13,6 @@ const getCases = (uid) => {
         const response = await cases.find({owners: {$in: [uid]}})
         return resolve({success: true, cases: response});
     } catch(err) {
-        console.log(err);
         return reject({success: false, message: Err500, err});
     }
 });
@@ -29,14 +28,15 @@ const createCase = () => {
         owners: ['123456', 'Owner 2'],
       })
 
-    newCase.save().then(res => console.log(res)).catch(err => Err500)
+    newCase.save().then(res => true).catch(err => Err500)
 }
 
 const getUser = async (id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const userFound = await users.findOne({id}).select('-password');
-            return resolve(userFound);
+            const userFound = await users.findOne({_id: id}).select('-password');
+            if (!userFound) return reject({success: false, stc: 404, message: 'No User Found'})
+            return resolve({success: true, info: userFound});
     } catch (err) {
             return reject({success: false, message: Err500, err});
         }

@@ -3,4 +3,10 @@ const cleanRes = (res: string) => {
     return cleanRes.charAt(0).toUpperCase() + cleanRes.slice(1);
 }
 
-export {cleanRes}
+const balanceParser = (balance: number) => {
+    return balance.toLocaleString() + ' $';
+}
+
+console.log(balanceParser(1002034.30))
+
+export {cleanRes, balanceParser}

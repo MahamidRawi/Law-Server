@@ -1,38 +1,53 @@
-import React, {useState, useEffect, useContext} from 'react';
-import { BrowserRouter, Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useContext, useState } from 'react';
+import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { IoMailOutline, IoMailOpenOutline } from "react-icons/io5";
 import { AuthContext } from '../../Providers/auth.provider';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import '../../styling.css'
 import Home from '../../Screens/home.screen';
+import { fetchUserInfo } from '../../actions/main/home.actions';
+import { UserInfo } from '../../data/types';
+import { balanceParser } from '../../helper/res.helper';
+import NotificationScreen from '../../Screens/notifications.screen';
 
 
 const MainRoutes = () => {
 
-    const {user} = useContext(AuthContext);
+    const {user, logout} = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
+    const [userInfo, setUserInfo] = useState<UserInfo>();
+
+
 
   useEffect(() => {
-    if (user && (location.pathname.toLowerCase() == '/signin' || location.pathname == '/signup')) navigate('/');}, [user, location, navigate]);
+    if (user && (location.pathname.toLowerCase() == '/signin' || location.pathname == '/signup')) navigate('/');
+    fetchUserInfo(user).then(res => {setUserInfo(res.userInfo); console.log(res.userInfo)}).catch(err => logout());  
+}, [user, location, navigate]);
     return (
-        <div className="parent-container">
-        <Navbar bg="dark" variant="dark">
-    <Container>
-    <Link className="link" to="/"><Navbar.Brand href="/">CaseQuest</Navbar.Brand></Link>
-    <Nav className="me-auto">
-      <Link className='nav-link' to="/secondPage">Deliverers</Link>
-      <Link className='nav-link' to="/thirdPage">Distribution</Link>
-      <Link className='nav-link' to="/fourthPage">Profile</Link>
-    </Nav>
-    </Container>
-  </Navbar>
-                <Routes>
-                    <Route index path='/' element={<Home />}/>
-                    <Route path='/secondPage' element={<>SECOND PAGE</>}/>
-                    <Route path='/thirdPage' element={<>THIRD PAGE</>}/>
-                    <Route path='/fourthPage' element={<>FOURTH PAGE</>}/>
-                </Routes>
-                </div>
+<div className="parent-container">
+            <Navbar bg="dark" className='navbarfix' variant="dark" expand="lg">
+                <Container className="justify-content-center">
+                    <Link to="/Notifications" className='nav-link'>{userInfo?.notifications ? <IoMailOutline className='mail-icon' /> :<IoMailOpenOutline className='mail-icon' />}</Link>
+            <p className='balance-header'>{userInfo?.balance ? balanceParser(userInfo?.balance) : ''}</p>
+                    <Nav className="justify-content-center w-100">
+                        <Link to="/" className="navbar-brand ml-25">CaseQuest</Link>
+                        <Link className='nav-link' to="/Cases">Cases</Link>
+                        <Link className='nav-link' to="/Lawyers">Lawyers</Link>
+                        <Link className='nav-link' to="/Firms">Firms</Link>
+                        <Link className='nav-link' to="/My-Firm">My Firm</Link>
+                    </Nav>
+                </Container>
+            </Navbar>
+            <Routes>
+                <Route index path='/' element={<Home />}/>
+                <Route path='/Cases' element={<>Cases</>}/>
+                <Route path='/Lawyers' element={<>Lawyers</>}/>
+                <Route path='/Firms' element={<>Firms</>}/>
+                <Route path='/My-Firm' element={<>My Firm</>}/>
+                <Route path='/Notifications' element={<NotificationScreen content={[]}/>}/>
+            </Routes>
+        </div>
     )
 }
 
