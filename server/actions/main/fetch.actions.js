@@ -31,10 +31,11 @@ const createCase = () => {
     newCase.save().then(res => true).catch(err => Err500)
 }
 
-const getUser = async (id) => {
+const getUser = async (id, removeproperty) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const userFound = await users.findOne({_id: id}).select('-password');
+            const userFound = await users.findOne({_id: id}).select(`-password -${removeproperty}`)
+            console.log(userFound)
             if (!userFound) return reject({success: false, stc: 404, message: 'No User Found'})
             return resolve({success: true, info: userFound});
     } catch (err) {
@@ -46,8 +47,9 @@ const getUser = async (id) => {
 const getUsers = async () => {
     return new Promise(async (resolve, reject) => {
         try {
-            return resolve(await users.find({}).select('-password'));
+            return resolve({users: await users.find({}).select('-password'), success: true});
         } catch (err) {
+            console.log(err)
             return reject({success: false, message: Err500, err})
         }
     })

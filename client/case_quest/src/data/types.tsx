@@ -9,6 +9,17 @@ export type UserCase = Array<{
         _id: string 
     }>
 
+    export type IndCase = {
+        title: string,
+        defense: string,
+        prosecution: string,
+        summary: string,
+        participants: Array<string> ,
+        difficulty: string,
+        owners: Array<string>
+        _id: string 
+    }
+
 export type UserInfo = {
     firstName: string,
     lastName: string,
@@ -20,4 +31,4 @@ export type UserInfo = {
     notifications: Array<any>
 }
 
-export type NotificationsProps = Array<{ title: string, body: string, viewMore?: boolean }>
+export type NotificationsProps = Array<{sender: boolean, senderId: string, senderMail: string, targetMail: string, subject: string, body: string, viewMore?: boolean }>

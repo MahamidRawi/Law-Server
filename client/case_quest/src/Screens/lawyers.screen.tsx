@@ -1,19 +1,42 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
+import { getLawyers } from '../actions/main/lawyers.actions';
+import { Icon } from '@iconify/react';
+import { User } from '../RC/cards.rc';
+import { UserInfo } from '../data/types';
+import { AuthContext } from '../Providers/auth.provider';
+import ScrollWindow from '../RC/scroll.window';
+import { Button, Form, InputGroup } from 'react-bootstrap';
 
 interface LawyersProps {
 
 }
 
 const Lawyers: React.FC<LawyersProps> = () => {
+    const {logout} = useContext(AuthContext);
+    const [lawyers, setLawyers] = useState<UserInfo[]>([]);
+    const [searchTerm, setSearchTerm] = useState('')
+    useEffect(() => {
+        getLawyers().then(res => setLawyers(res.lawyers)).catch(err => logout());
+        return
+    }, []);
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value.toLowerCase());
+    };
+
+    const filteredLawyers = lawyers.filter(lawyer =>
+        `${lawyer.firstName} ${lawyer.lastName}`.toLowerCase().includes(searchTerm) ||
+        lawyer.username.toLowerCase().includes(searchTerm) ||
+        lawyer.email.toLowerCase().includes(searchTerm)
+    );
     return (
-        <div className="header-decoration">
+        <div>
+        <div className="searchbar">
+        <input type="text" className='searchinput' placeholder="Search for lawyers" onChange={handleSearchChange} />
+        </div>
         <div className="p-container">
-                <div className='testerror'>
-                    <p className="alert alert-light text-center">Lawyers</p>
-                </div>
-                
+            <ScrollWindow type='User' content={filteredLawyers} />
         </div>
-        </div>
+    </div>
     )
 }
 

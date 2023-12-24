@@ -23,7 +23,7 @@
 }
 
 .p-container {
-    width: 100%;
+    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -41,27 +41,59 @@
     background: linear-gradient(135deg, #2b2d3e 0%, #242639 100%); 
 }
 
+@media (max-width: 655.98px) {
+    .mail-icon,
+    .balance-header {
+        display: none;
+    }
+}
+
+@media (max-width: 930px) {
+    .scroll-window {
+        width: 90% !important;
+    }
+}
+
+@media (max-width: 806px) {
+    hr {
+        display: none;
+    }
+}
+
 .item-card {
-    width: 50%
+    width: 80%
 }
 
 .scroll-window {
-    flex-direction: column;
-    display: flex;
     position: absolute;
-    top: 75px;
-    padding-top: 35px; /* Adjust this value based on your header's height */
-    bottom: 25px; /* Aligns the bottom of the element with its parent */
-    overflow-y: auto;
-    background-color: transparent;
+    overflow: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    height: 70vh;
+    border-radius: 10px;
+    justify-self: center;
+    align-self: center;
+    display: flex;
+    border-color: white;
+    flex-direction: column;
+    background: transparent;
+    border-style: solid;
+    width: 60%;
     align-items: center;
-    padding-bottom: 8vh;
-    width: 100vw;
-    box-sizing: border-box;
-    z-index: 1;
-    background-color: green;
+}
+
+.c-sw {
+    display: flex;
     justify-content: center;
     align-items: center;
+    height: fit-content; 
+}
+
+.vertical-line {
+    border-left: 2px solid #000; /* Adjust color as needed */
+    height: auto; /* This should be adjusted based on content height */
+    margin-right: 1rem; /* Spacing to the right of the line */
+    margin-left: 1rem; /* Spacing to the left of the line */
 }
 
 
@@ -89,6 +121,29 @@
     border-radius: 8px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
 }
+
+.m-form {
+    position: absolute;
+    max-width: 80%;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+}
+
+.ntfn {
+    white-space: 'pre-wrap';
+}
+
+.p-m-c {
+    position: absolute;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
 
 .auth-header {
     font-size: 1.75em; /* Slightly larger font size */
@@ -148,8 +203,15 @@
 }
 
 .header-decoration {
-    padding: 50px;
+    /* padding: 50px; */
+    padding-top: 5%;
     color: white;
+}
+
+.mail-button {
+    position: absolute;
+    top: 100px;
+    left: 0;
 }
 
 .spinner {
@@ -171,6 +233,39 @@
     }
 }
 
+.searchbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; /* Relative to the parent container */
+    width: 100%; /* Full width of its parent */
+    margin-top: 20px; /* Space from the top */
+    padding: 10px; 
+    top: 120px;
+}
+
+.searchinput {
+    width: 50%; 
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    margin-left: 10px; 
+    outline: none;
+}
+
+.searchbutton {
+    padding: 10px 20px;
+    border: none;
+    background-color: #0E6EFD; /* Deep Plum */
+    color: white;
+    border-radius: .25rem; /* Bootstrap's border-radius for buttons */
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.searchbutton:hover {
+    background-color: #0E6EFD; /* A slightly darker shade for hover */
+}
 
 .balance-header {
     position: absolute;
@@ -187,6 +282,73 @@
     top: 18px;
     color: white;
     transform: scale(1.5);
+}
+
+.f-content {
+    width: fit-content !important;
+}
+
+.outer-container {
+    display: flex;
+    flex-shrink: 0;
+    padding: 10px;
+    min-height: 30%;
+    z-index: 20;
+    top: 0; /* Adjust padding if necessary */
+    /* Add other styles to match the layout requirements */
+}
+
+.card {
+    position: relative;
+    width: 80%;
+    height: fit-content;
+}
+
+.card-header {
+    background-color: blue;
+}
+
+.mini-scr {
+    overflow-y: auto;
+}
+
+.casescontainer {
+    position: absolute;
+    left: 0;
+    /* bottom: 0; */
+    top: 25vh;
+    width: 100%; /* This will now refer to 100% of the .card element */
+    border-radius: 7px;
+    background: blue;
+    /* height: calc(100% - 26.5vh); */
+    z-index: 0;
+}
+
+/* .cardPad {
+    padding-top: 7vh;
+} */
+
+hr {
+    left: 0;
+    position: absolute;
+    width: 100%; /* Length of the horizontal line */
+    border-top: 2px solid #000; /* Thickness and color of the line */
+}
+
+
+.p-law-container {
+    position: absolute;
+    /* justify-content: center; */
+    width: 100%;
+    top: 10%;
+    height: 90%;
+    background-color: green;
+}
+
+.law-container {
+    position: absolute;
+    width: 80%;
+    height: 80%;
 }
 
 .mail-icon:hover {

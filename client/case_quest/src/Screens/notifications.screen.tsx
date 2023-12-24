@@ -1,12 +1,27 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import ScrollWindow from '../RC/scroll.window';
-import { NotificationsProps } from '../data/types';
+import { NotificationsProps, UserInfo } from '../data/types';
+import { Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../Providers/auth.provider';
+import { fetchHomePage } from '../actions/main/home.actions';
 
 interface NotProps {
     content: Array<NotificationsProps>
 }
 
 const NotificationScreen: React.FC<NotProps> = ({content}) => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
+    const [notifications, setNotifications] = useState<NotificationsProps>([]);
+    const { user, logout } = useContext(AuthContext);
+
+    useEffect(() => {
+        fetchHomePage(user).then(res => {
+            return setNotifications(res.info.userInfo.notifications);
+            // return console.log(res.info.userInfo)
+        }).catch(err => logout());
+    }, []);
     const not = [
         {
             title: 'A new Title',
@@ -65,16 +80,37 @@ const NotificationScreen: React.FC<NotProps> = ({content}) => {
             body: 'The Body of this notification is at follows, We order you to go here and there'
         },{
             title: 'A new Title',
-            body: 'The Body of this notification is at follows, We order you to go here and there'
+            body: 'hello Body of this notification is at follows, We order you to go here and there'
         },{
             title: 'A new Title',
             body: 'The Body of this notification is at follows, We order you to go here and there'
         }
     ]
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value.toLowerCase());
+    };
+
+    console.log(notifications[0]);
+
+    // Filter lawyers based on the search term
+    const filteredLawyers = notifications.filter(not =>
+        not.body.toLowerCase().includes(searchTerm) ||
+        not.subject.toLowerCase().includes(searchTerm) ||
+        not.targetMail.toLowerCase().includes(searchTerm) ||
+        not.senderMail.toLowerCase().includes(searchTerm)
+        // not.sender ? not.targetMail.toLowerCase().includes(searchTerm) : not.senderMail.toLowerCase().includes(searchTerm),
+    );
+
+    
     return (
-        <div className="header-decoration">
+        <div>
+            <div className="searchbar">
+            <button type="button" className="searchbutton" onClick={() => navigate('/Mail')}>+ New Mail</button>
+        <input type="text" className='searchinput' placeholder="Search for Notification" onChange={handleSearchChange} />
+        </div>
         <div className="p-container">
-            {content?.length > 0 ? <ScrollWindow type='Notification' content={not} /> : 
+            {not?.length > 0 ? <ScrollWindow type='Notification' content={filteredLawyers} /> : 
                 <div className='testerror'>
                     <p className="alert alert-light text-center">No Notifications</p>
                 </div>

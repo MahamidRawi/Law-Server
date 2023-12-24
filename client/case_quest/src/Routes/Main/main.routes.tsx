@@ -10,6 +10,8 @@ import { UserInfo } from '../../data/types';
 import { balanceParser } from '../../helper/res.helper';
 import NotificationScreen from '../../Screens/notifications.screen';
 import Lawyers from '../../Screens/lawyers.screen';
+import LawyerInformationScreen from '../../Screens/lawyer.information.screen';
+import MailScreen from '../../Screens/mail.screen';
 
 
 const MainRoutes = () => {
@@ -27,7 +29,7 @@ const MainRoutes = () => {
 }, [user, location, navigate]);
     return (
 <div className="parent-container">
-            <Navbar bg="dark" className='navbarfix' variant="dark" expand="lg">
+            <Navbar bg="dark" className='navbarfix' variant="dark">
                 <Container className="justify-content-center">
                     <Link to="/Notifications" className='nav-link'>{userInfo?.notifications ? <IoMailOutline className='mail-icon' /> :<IoMailOpenOutline className='mail-icon' />}</Link>
             <p className='balance-header'>{userInfo?.balance ? balanceParser(userInfo?.balance) : ''}</p>
@@ -46,6 +48,9 @@ const MainRoutes = () => {
                 <Route path='/Lawyers' element={<Lawyers />}/>
                 <Route path='/Firms' element={<>Firms</>}/>
                 <Route path='/My-Firm' element={<>My Firm</>}/>
+                <Route path='/MoreInfo' element={<LawyerInformationScreen />}/>
+                <Route path='/Mail' element={<MailScreen />} />
+                <Route path='/ViewMail' element={<LawyerInformationScreen mail/>}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen content={userInfo.notifications}/>}/> : null}
             </Routes>
         </div>

@@ -32,6 +32,14 @@ const inAuthSchema = Joi.object({
   password: Joi.string()
     .min(8).max(150)
     .required(),
+});
+
+const mailSchema = Joi.object({
+  targetMail: Joi.string()
+  .email({ tlds: { allow: false } }) // 'tlds' option can be adjusted as needed
+  .required(),
+  subject: Joi.string().required(),
+  body: Joi.string().required()
 })
 
-module.exports = {authSchema, inAuthSchema}
+module.exports = {authSchema, inAuthSchema, mailSchema}

@@ -6,11 +6,6 @@ import { UserCase, UserInfo } from "../data/types";
 import '../styling.css';
 import { Link } from "react-router-dom";
 
-interface HomePageResponse {
-    userCases: UserCase[];
-    userInfo: UserInfo;
-}
-
 const Home = () => {
     const [userCases, setUserCases] = useState<UserCase>([]); // Initialize with an empty array
     const [userInfo, setUserInfo] = useState<UserInfo>();
@@ -69,7 +64,7 @@ const Home = () => {
                 </div>
             }  */}
 
-            <ScrollWindow type="Case" content={mockCases} />
+            <ScrollWindow type="Case" center="c-sw" content={mockCases} />
                 
         </div>
         </div>
