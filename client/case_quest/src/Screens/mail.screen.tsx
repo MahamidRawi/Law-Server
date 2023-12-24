@@ -21,7 +21,6 @@ const ContactForm = () => {
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    console.log(message);
     try {
         await sendMail(emailAddress, subject, message);
         return setSubmitted(true);

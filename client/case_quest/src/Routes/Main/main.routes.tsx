@@ -12,6 +12,7 @@ import NotificationScreen from '../../Screens/notifications.screen';
 import Lawyers from '../../Screens/lawyers.screen';
 import LawyerInformationScreen from '../../Screens/lawyer.information.screen';
 import MailScreen from '../../Screens/mail.screen';
+import { ViewMail } from '../../RC/cards.rc';
 
 
 const MainRoutes = () => {
@@ -50,7 +51,7 @@ const MainRoutes = () => {
                 <Route path='/My-Firm' element={<>My Firm</>}/>
                 <Route path='/MoreInfo' element={<LawyerInformationScreen />}/>
                 <Route path='/Mail' element={<MailScreen />} />
-                <Route path='/ViewMail' element={<LawyerInformationScreen mail/>}/>
+                <Route path='/ViewMail' element={<ViewMail/>}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen content={userInfo.notifications}/>}/> : null}
             </Routes>
         </div>

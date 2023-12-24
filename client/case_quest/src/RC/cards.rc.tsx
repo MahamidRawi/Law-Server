@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { IndCase, NotificationsProps, UserCase } from '../data/types';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
 import { Icon } from '@iconify/react';
 
@@ -46,20 +46,6 @@ const Case: React.FC<CaseProps> = ({data, viewMore = false}) => {
 const User: React.FC<UserProps> = ({data, viewMore = false, resize=false}) => {
     const navigate = useNavigate();
     return (
-    //     <Card style={{ width: '18rem' }}>
-    //         <Card.Header>
-    //         <Icon icon="solar:user-linear" width={100} height={100}/>
-                
-    //         </Card.Header>
-    //   <Card.Body>
-    //     <Card.Title>John Doe</Card.Title>
-    //     <Card.Text>
-    //       Some quick example text to build on the card title and make up the
-    //       bulk of the card's content.
-    //     </Card.Text>
-    //     <Button variant="primary">Go somewhere</Button>
-    //   </Card.Body>
-    // </Card>
     <div className={`container py-3 ${resize ? 'f-content' : ''}`}>
     <div className="row">
       {/* <div className="col-md-6 mx-auto"> */}
@@ -86,4 +72,35 @@ const User: React.FC<UserProps> = ({data, viewMore = false, resize=false}) => {
     )
 }
 
-export {Notification, Case, User}
+const ViewMail: React.FC = () => {
+  const location = useLocation();
+  const data = location.state.data
+  const navigate = useNavigate();
+  return (
+  <div className={`container py-3`}>
+  <div className="row">
+    {/* <div className="col-md-6 mx-auto"> */}
+      {/* <div className="card"> */}
+        <div className="card-body d-flex align-items-center">
+          <div className="me-3">
+            <Icon icon="solar:user-linear" width={100} height={100}/>
+          </div>
+          {/* <div className="vertical-line"></div>  */}
+          <div className="flex-grow-1">
+            <p className="mb-2">From: {data.senderMail}</p>
+            <p className="mb-2">To: {data.targetMail}</p>
+          </div>
+          <div className="d-flex flex-column">
+            <button className="btn btn-primary mb-2" onClick={() => navigate("/MoreInfo", {state: { uId: data._id }})}>View User</button>
+            <button className="btn btn-outline-primary" onClick={() => navigate('/Mail', {state: {targetMail: data.email}})}>Reply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  // </div>
+//   </div>
+  
+  )
+}
+
+export {Notification, Case, User, ViewMail}
