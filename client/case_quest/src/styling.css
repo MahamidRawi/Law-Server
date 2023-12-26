@@ -60,6 +60,15 @@
     }
 }
 
+.scrollable-div {
+    position: absolute;
+    width: 98%;
+    height: 40vh;
+    margin-top: 3%;
+    overflow-y: auto;
+    bottom: 0;
+}
+
 .item-card {
     width: 80%
 }
@@ -133,6 +142,25 @@
 
 .ntfn {
     white-space: 'pre-wrap';
+}
+
+.f-height {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100% !important;
+    background-color: blue;
+    width: 80% !important;
+}
+
+.p-c-c {
+    position: absolute;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
 }
 
 .p-m-c {
@@ -296,6 +324,10 @@
     z-index: 20;
     top: 0; /* Adjust padding if necessary */
     /* Add other styles to match the layout requirements */
+}
+
+.cardmail {
+    height: 70% !important;
 }
 
 .card {

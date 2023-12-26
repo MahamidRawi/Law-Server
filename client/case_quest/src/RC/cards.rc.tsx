@@ -1,12 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { IndCase, NotificationsProps, UserCase } from '../data/types';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
 import { Icon } from '@iconify/react';
+import { formatDate } from '../helper/res.helper';
+import { openMail } from '../actions/main/mail.actions';
+import { AuthContext } from '../Providers/auth.provider';
 
 interface NotificationProps {
     data: any,
-    viewMore?: boolean
+    viewMore?: boolean,
+    ud?: string
 }
 
 interface CaseProps {
@@ -20,14 +24,14 @@ interface UserProps {
     resize?: boolean
 }
 
-const Notification: React.FC<NotificationProps> = ({ data }) => {
+const Notification: React.FC<NotificationProps> = ({ data, ud }) => {
     const navigate = useNavigate();
     return (
         <>
-                                <h4 className="card-title">{data.sender ? `To : ${data.targetMail}` : `From : ${data.senderMail}`}</h4>
+                                <h4 className="card-title">{data.sender ? `To : ${data.to}` : `From : ${data.from}`}</h4>
                                 <h5 className="card-title">Subject : {data.subject}</h5>
                                 <br />
-                                <button onClick={() => navigate('/ViewMail', {state: {data}})} className="btn btn-primary">Open</button>
+                                <button onClick={() => navigate('/ViewMail', {state: {data, isSender: ud == data.senderId ? true : false}})} className="btn btn-primary">Open</button>
                                 
                             </>
     )
@@ -74,32 +78,39 @@ const User: React.FC<UserProps> = ({data, viewMore = false, resize=false}) => {
 
 const ViewMail: React.FC = () => {
   const location = useLocation();
+  const {logout} = useContext(AuthContext);
   const data = location.state.data
+  const isSender = location.state.isSender
   const navigate = useNavigate();
+  useEffect(() => {
+    openMail(data.id).catch(err => err.AR == true ? logout() : alert('An Error Has Occured'));
+  });
   return (
-  <div className={`container py-3`}>
+    <div className="p-c-c">
+    <div className="cardmail card">
+  <div className="container py-3">
   <div className="row">
     {/* <div className="col-md-6 mx-auto"> */}
       {/* <div className="card"> */}
         <div className="card-body d-flex align-items-center">
-          <div className="me-3">
-            <Icon icon="solar:user-linear" width={100} height={100}/>
-          </div>
+          
           {/* <div className="vertical-line"></div>  */}
           <div className="flex-grow-1">
-            <p className="mb-2">From: {data.senderMail}</p>
-            <p className="mb-2">To: {data.targetMail}</p>
+            <p className="mb-2"><b>From : </b>{data.from}</p>
+            <p className="mb-2"><b>To : </b>{data.to}</p>
+            <p className='mb-2'><b>Date : </b>{formatDate(data.date)}</p>
+            <br />
+            <div className="d-flex flex-column">
+            <button className="btn btn-primary mb-2" onClick={() => navigate("/MoreInfo", {state: { uId: data.senderId }})}>View User</button>
+            <button className="btn btn-outline-primary" onClick={() => navigate('/Mail', {state: {targetMail: data.sender ? data.to : data.from}})}>{isSender ? 'Contact' : 'Reply'}</button>
           </div>
-          <div className="d-flex flex-column">
-            <button className="btn btn-primary mb-2" onClick={() => navigate("/MoreInfo", {state: { uId: data._id }})}>View User</button>
-            <button className="btn btn-outline-primary" onClick={() => navigate('/Mail', {state: {targetMail: data.email}})}>Reply</button>
+            <div className='scrollable-div' dangerouslySetInnerHTML={{ __html: data.body.replace(/\n/g, '<br />') }} />
           </div>
         </div>
       </div>
     </div>
-  // </div>
-//   </div>
-  
+    </div>
+    </div>
   )
 }
 

@@ -4,22 +4,28 @@ import { NotificationsProps, UserInfo } from '../data/types';
 import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../Providers/auth.provider';
-import { fetchHomePage } from '../actions/main/home.actions';
+import { fetchHomePage, getMails } from '../actions/main/home.actions';
 
 interface NotProps {
-    content: Array<NotificationsProps>
+    content: Array<NotificationsProps>,
 }
 
 const NotificationScreen: React.FC<NotProps> = ({content}) => {
     const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState<NotificationsProps>([]);
+    const [myid, setmyid] = useState('');
     const { user, logout } = useContext(AuthContext);
 
     useEffect(() => {
-        fetchHomePage(user).then(res => {
-            return setNotifications(res.info.userInfo.notifications);
-            // return console.log(res.info.userInfo)
+        // fetchHomePage(user).then(res => {
+        //     return setNotifications(res.info.userInfo.notifications);
+        //     // return console.log(res.info.userInfo)
+        // }).catch(err => logout());
+        getMails().then(res => {
+            setmyid(res.ud);
+            console.log(res)
+            return setNotifications(res.mails);
         }).catch(err => logout());
     }, []);
     const not = [
@@ -110,7 +116,7 @@ const NotificationScreen: React.FC<NotProps> = ({content}) => {
         <input type="text" className='searchinput' placeholder="Search for Notification" onChange={handleSearchChange} />
         </div>
         <div className="p-container">
-            {not?.length > 0 ? <ScrollWindow type='Notification' content={filteredLawyers} /> : 
+            {not?.length > 0 ? <ScrollWindow type='Notification' ud={myid} content={filteredLawyers} /> : 
                 <div className='testerror'>
                     <p className="alert alert-light text-center">No Notifications</p>
                 </div>

@@ -47,16 +47,11 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                                     <p>Last Name: {information.lastName}</p>
                                     <p>Data: {information.username}</p>
                                 </div>
-                                    <div className="col-6">
-                                    <p>From : {uid.senderMail}</p>
-                                    <p>To : {uid.targetMail}</p>
-                                    <p>Username: {uid.date}</p>
-                                </div>
-                                {<div className="col-6">
+                                <div className="col-6">
                                     <p>Email: {information.email}</p>
                                     <p>Lawyer Since: 20/2/2023</p>
                                     <p>Net Worth: Private</p>
-                                </div>}
+                                </div>
                             </div>
                             
                         </div>

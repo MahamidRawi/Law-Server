@@ -29,6 +29,18 @@ const fetchHomePage = (user: any): Promise<resProps> => {
 })
 }
 
+const getMails = async () => {
+    try {
+        const token = localStorage.getItem('user_token');
+        if (!token) throw {success: false, message: 'Failed'}
+        const res = await axios.get(config.API_BASE_URL+'/main/mail/getMails', {headers: {'x-access-token': token}});
+        return {success: true, mails: res.data.notifications, ud:res.data.ud};
+    } catch (err) {
+        console.log('AN ERROR HAS OCCURED ', err)
+        throw {success: false, info: null}
+    }
+}
+
 const fetchUserInfo = (user: any): Promise<UserInformationProps> => {
     return new Promise(async (resolve, reject) => {
         const token = localStorage.getItem('user_token');
@@ -57,4 +69,4 @@ const getLawyerInformation = (user: string): Promise<UserInformationProps> => {
 })
 }
 
-export {fetchHomePage, fetchUserInfo, getLawyerInformation}
+export {fetchHomePage, fetchUserInfo, getMails, getLawyerInformation}

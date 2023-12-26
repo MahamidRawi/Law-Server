@@ -21,6 +21,7 @@ const ContactForm = () => {
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
+    setSubmitError('');
     try {
         await sendMail(emailAddress, subject, message);
         return setSubmitted(true);
@@ -51,13 +52,13 @@ const ContactForm = () => {
 
         {submitted && !submitError && (
           <div className="alert alert-success" role="alert" id="submitSuccessMessage">
-            <center>Maik Sent Successfully !</center>
+            <center>Mail Sent Successfully !</center>
           </div>
         )}
 
         {submitError && (
           <div className="alert alert-danger" role="alert" id="submitErrorMessage">
-            {submitError}
+            <center>{submitError}</center>
           </div>
         )}
 
