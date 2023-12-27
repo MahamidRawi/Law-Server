@@ -18,14 +18,10 @@ const NotificationScreen: React.FC<NotProps> = ({content}) => {
     const { user, logout } = useContext(AuthContext);
 
     useEffect(() => {
-        // fetchHomePage(user).then(res => {
-        //     return setNotifications(res.info.userInfo.notifications);
-        //     // return console.log(res.info.userInfo)
-        // }).catch(err => logout());
         getMails().then(res => {
             setmyid(res.ud);
             console.log(res)
-            return setNotifications(res.mails);
+            return setNotifications(res.mails.reverse());
         }).catch(err => logout());
     }, []);
     const not = [
@@ -97,14 +93,14 @@ const NotificationScreen: React.FC<NotProps> = ({content}) => {
         setSearchTerm(event.target.value.toLowerCase());
     };
 
-    console.log(notifications[0]);
+    console.log(notifications);
 
     // Filter lawyers based on the search term
     const filteredLawyers = notifications.filter(not =>
         not.body.toLowerCase().includes(searchTerm) ||
         not.subject.toLowerCase().includes(searchTerm) ||
-        not.targetMail.toLowerCase().includes(searchTerm) ||
-        not.senderMail.toLowerCase().includes(searchTerm)
+        not.to.toLowerCase().includes(searchTerm) ||
+        not.from.toLowerCase().includes(searchTerm)
         // not.sender ? not.targetMail.toLowerCase().includes(searchTerm) : not.senderMail.toLowerCase().includes(searchTerm),
     );
 

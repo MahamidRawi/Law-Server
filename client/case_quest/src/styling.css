@@ -12,6 +12,27 @@
     text-decoration: none;
 }
 
+/* Add this to your existing .css file */
+
+.notification-dot {
+    position: absolute;
+    top: 12px;  /* Adjust as necessary for correct positioning */
+    right: 4.7%;  /* Adjust as necessary for correct positioning */
+    height: 10px;  /* Size of the dot */
+    width: 10px;  /* Size of the dot */
+    background-color: red;  /* Red dot */
+    border-radius: 50%;  /* Make it round */
+    z-index: 1;  /* Ensure it's above the mail icon */
+}
+
+.mail-icon {
+    position: absolute;
+    right: 5%;
+    top: 18px;
+    color: white;
+    transform: scale(1.5);
+}
+
 .lnk2 {
     color: black;
     text-decoration: none;

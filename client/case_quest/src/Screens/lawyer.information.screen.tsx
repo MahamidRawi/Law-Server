@@ -4,6 +4,7 @@ import { getLawyerInformation } from '../actions/main/home.actions';
 import { AuthContext } from '../Providers/auth.provider';
 import { Icon } from '@iconify/react';
 import { ActivityIncicator } from '../RC/acitivity.incdicator';
+import { formatDate } from '../helper/res.helper';
 
 interface LawyerInformationProps {}
 
@@ -45,11 +46,11 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                                 <div className="col-6">
                                     <p>First Name: {information.firstName}</p>
                                     <p>Last Name: {information.lastName}</p>
-                                    <p>Data: {information.username}</p>
+                                    <p>Username: {information.username}</p>
                                 </div>
                                 <div className="col-6">
                                     <p>Email: {information.email}</p>
-                                    <p>Lawyer Since: 20/2/2023</p>
+                                    <p>Lawyer Since : {formatDate(information.date).split(' ')[0]}</p>
                                     <p>Net Worth: Private</p>
                                 </div>
                             </div>

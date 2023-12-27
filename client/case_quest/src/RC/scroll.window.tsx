@@ -11,7 +11,7 @@ interface ScrollWindowProps {
 }
 
 const ScrollWindow: React.FC<ScrollWindowProps> = ({ content, type, center, ud }) => {
-    console.log(content)
+    console.log('HERE IS CONTENT', content)
     return (
          <div className={`${center} overflow-auto scroll-window`}>
             {content?.map((element, index) => (

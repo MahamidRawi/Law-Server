@@ -7,7 +7,7 @@ const balanceParser = (balance: number) => {
     return balance.toLocaleString() + ' $';
 }
 
-const formatDate = (date: string) => {
+const formatDate = (date: string): string => {
     const now = new Date(date);
     const day = now.getDate().toString().padStart(2, '0');
     const month = (now.getMonth() + 1).toString().padStart(2, '0'); // +1 because months are 0-indexed

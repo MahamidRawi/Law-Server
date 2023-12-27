@@ -58,23 +58,16 @@ const getMails = async (uid) => {
 }
 
 const openMail = async (uid, targetMailId) => {
-    console.log(uid, targetMailId)
         try {
-        const userFound = await user.findOne({_id: uid});
-        if (!userFound) throw {success: false, message: 'No User Found', stc: 404};
-        if (!userFound.notifications) throw {success: false, message: 'No Notifications Found', stc: 404};
-        let notificationFound = false;
-        for (let notification of userFound.notifications) {
-            if (notification.id === targetMailId) {
-                notification.opened = true;
-                notificationFound = true;
-                break; // Stop the loop once we've found and updated the notification
-            }
+        const foundMail = await Mail.findById(targetMailId);
+        if (!foundMail || !targetMailId) throw {success: false, message: !foundMail ? 'Mail Not Found' : 'No Mail Id Provided', stc: 404}
+
+        if (foundMail.targetId === uid) {
+            foundMail.opened = true
+            await foundMail.save();
+            return {success: true}
         }
-        await userFound.save();
-        return {success: true, message: 'Message Opened'};
         } catch (err) {
-            console.log(err);
             throw {success: false, message: Err500, stc: 500, err}
         }
 }

@@ -31,4 +31,4 @@ export type UserInfo = {
     notifications: Array<any>
 }
 
-export type NotificationsProps = Array<{sender: boolean, senderId: string, senderMail: string, targetMail: string, subject: string, body: string, viewMore?: boolean }>
+export type NotificationsProps = Array<{sender: boolean, senderId: string, from: string, to: string, subject: string, body: string, viewMore?: boolean }>

@@ -28,10 +28,11 @@ const Notification: React.FC<NotificationProps> = ({ data, ud }) => {
     const navigate = useNavigate();
     return (
         <>
-                                <h4 className="card-title">{data.sender ? `To : ${data.to}` : `From : ${data.from}`}</h4>
+                                <h4 className="card-title">{ud == data.senderId ? `To : ${data.to}` : `From : ${data.from}`}</h4>
                                 <h5 className="card-title">Subject : {data.subject}</h5>
+                                <p className='card-title'>Status : {data.opened ? 'Read' : 'Not Read'}</p>
                                 <br />
-                                <button onClick={() => navigate('/ViewMail', {state: {data, isSender: ud == data.senderId ? true : false}})} className="btn btn-primary">Open</button>
+                                <button onClick={() => navigate('/ViewMail', {state: {data, isSender: ud == data.senderId}})} className="btn btn-primary">{data.targetId !== ud ? 'View Mail' : data.opened && data.targetId == ud ? 'Re-Open' : 'Open'}</button>
                                 
                             </>
     )
@@ -83,7 +84,7 @@ const ViewMail: React.FC = () => {
   const isSender = location.state.isSender
   const navigate = useNavigate();
   useEffect(() => {
-    openMail(data.id).catch(err => err.AR == true ? logout() : alert('An Error Has Occured'));
+    openMail(data._id).catch(err => err.AR == true ? logout() : alert('An Error Has Occured'));
   });
   return (
     <div className="p-c-c">
@@ -102,7 +103,7 @@ const ViewMail: React.FC = () => {
             <br />
             <div className="d-flex flex-column">
             <button className="btn btn-primary mb-2" onClick={() => navigate("/MoreInfo", {state: { uId: data.senderId }})}>View User</button>
-            <button className="btn btn-outline-primary" onClick={() => navigate('/Mail', {state: {targetMail: data.sender ? data.to : data.from}})}>{isSender ? 'Contact' : 'Reply'}</button>
+            <button className="btn btn-outline-primary" onClick={() => navigate('/Mail', {state: {targetMail: isSender ? data.to : data.from}})}>{isSender ? 'Contact' : 'Reply'}</button>
           </div>
             <div className='scrollable-div' dangerouslySetInnerHTML={{ __html: data.body.replace(/\n/g, '<br />') }} />
           </div>
