@@ -1,0 +1,49 @@
+.wallet-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    width: 75%;
+    background: linear-gradient(135deg, #2b2d3e 0%, #242639 100%);
+    padding-top: 20px; /* Adjust as needed */
+}
+
+.balance-display {
+    color: white;
+    margin-bottom: 20px; /* Adjust as needed */
+    font-size: 2rem; /* Adjust as needed */
+}
+
+.navigation-buttons button {
+    margin: 0 10px; /* Space between buttons */
+    padding: 10px 20px; /* Padding inside buttons */
+    border: none;
+    border-radius: 5px;
+    background-color: #0E6EFD; /* Adjust to match the button color in the image */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.navigation-buttons button:hover {
+    background-color: #0C5EFD; /* Slightly darker on hover */
+}
+
+.content-area {
+    background-color: white;
+    width: 80%; /* Adjust as needed */
+    min-height: 50vh; /* Adjust as needed */
+    margin-top: 20px; /* Space below the buttons */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.p-p-c {
+    position: relative; /* Changed from absolute to relative */
+    min-height: 100vh; /* Full height of the viewport */
+    width: 100%; /* Full width */
+    padding: 75px 0; 
+    display: flex; /* To center child elements vertically and horizontally */
+    justify-content: center;
+    align-items: center;
+}

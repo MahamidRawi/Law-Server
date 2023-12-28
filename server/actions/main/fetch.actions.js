@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const { Err500 } = require('../../vars/vars');
 require('../../DB/models/cases.model');
 require('../../DB/models/user.model');
+require('../../DB/models/wallet.model');
+const wallet = mongoose.model('walletModel');
 const cases = mongoose.model('casesModel');
 const users = mongoose.model('userModel');
 
@@ -13,7 +15,8 @@ const getCases = (uid) => {
         const response = await cases.find({owners: {$in: [uid]}})
         return resolve({success: true, cases: response});
     } catch(err) {
-        return reject({success: false, message: Err500, err});
+        console.log('ERRRRRR;m', err)
+        return reject({success: false, stc:500, message: Err500, err});
     }
 });
 }
@@ -34,12 +37,23 @@ const createCase = () => {
 const getUser = async (id, removeproperty) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const userFound = await users.findOne({_id: id}).select(`-password -${removeproperty}`)
-            console.log(userFound)
-            if (!userFound) return reject({success: false, stc: 404, message: 'No User Found'})
+            const userFound = await users.findOne({_id: id}).select(`-password -${removeproperty}`);
+            if (!userFound) return reject({success: false, stc: 404, message: 'No User Found'});
             return resolve({success: true, info: userFound});
     } catch (err) {
-            return reject({success: false, message: Err500, err});
+            return reject({success: false, stc: 500, message: Err500, err});
+        }
+    })
+}
+
+const getWallet = async (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const userWallet = await wallet.findOne({owner: id});
+            if (!userWallet) return reject({success: false, stc: 404, message: 'No Wallet Found'})
+            return resolve({success: true, wallet: userWallet});
+    } catch (err) {
+            return reject({success: false, stc: 500, message: Err500, err});
         }
     })
 }
@@ -55,4 +69,4 @@ const getUsers = async () => {
     })
 }
 
-module.exports = {getCases, createCase, getUser, getUsers}
+module.exports = {getCases, createCase, getUser, getUsers, getWallet}

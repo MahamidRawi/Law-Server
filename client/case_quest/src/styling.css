@@ -25,6 +25,15 @@
     z-index: 1;  /* Ensure it's above the mail icon */
 }
 
+.wallet-icon {
+    position: absolute;
+    right: 10%;
+    margin-left: 20px;
+    top: 18px;
+    color: white;
+    transform: scale(1.5); 
+}
+
 .mail-icon {
     position: absolute;
     right: 5%;
@@ -64,7 +73,8 @@
 
 @media (max-width: 655.98px) {
     .mail-icon,
-    .balance-header {
+    .balance-header,
+    .wallet-icon {
         display: none;
     }
 }
@@ -178,6 +188,7 @@
 .p-c-c {
     position: absolute;
     display: flex;
+    flex-direction: column;
     height: 100%;
     width: 100%;
     justify-content: center;
@@ -293,6 +304,33 @@
     top: 120px;
 }
 
+.sp button {
+    margin-left: 10px;
+}
+
+.sp {
+    /* Removed the absolute positioning and top property */
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 10px;
+    border: 3px solid #ced4da;
+    margin-bottom: 20px; /* This will add space between your buttons and the green container */
+}
+
+.green-content-container {
+    background-color: green;
+    border: 3px solid red;
+    padding: 20px;
+    border-radius: 10px;
+    margin: auto; /* Center the container horizontally */
+    width: 80%; /* Adjust the width as necessary */
+    min-height: 200px; /* Adjust the height as necessary */
+    /* Additional styles if needed */
+}
+
 .searchinput {
     width: 50%; 
     padding: 10px;
@@ -300,6 +338,35 @@
     border-radius: .25rem;
     margin-left: 10px; 
     outline: none;
+}
+
+.center-element {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.walletwindow {
+    /* position: absolute; */
+    border: 1px solid #ced4da;
+    height: 60%;
+    width: 80%;
+}
+
+.green-content-container {
+    background-color: green; /* Green background color */
+    border: 3px solid red; /* Red border as per your image outline */
+    position: absolute; /* Position absolutely within the relative parent */
+    top: 20%; /* Position below the search bar */
+    left: 50%; /* Start from the middle */
+    transform: translateX(-50%); /* Center align the container */
+    width: 80%; /* Width of the container */
+    min-height: 200px; /* Minimum height of the container */
+    z-index: 2; /* Higher z-index to be above other elements */
+    border-radius: 10px; /* Rounded corners */
 }
 
 .searchbutton {
@@ -318,7 +385,7 @@
 
 .balance-header {
     position: absolute;
-    right: 10%;
+    right: 13%;
     top: 15px;
     color: white;
     width: fit-content;
@@ -349,6 +416,13 @@
 
 .cardmail {
     height: 70% !important;
+    background-color: green;
+}
+
+.top {
+    position: absolute;
+    bottom: 0;
+    z-index: 4;
 }
 
 .card {

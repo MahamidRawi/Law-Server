@@ -12,7 +12,7 @@ interface resProps {
 
 interface UserInformationProps {
     success: boolean,
-    userInfo: UserInfo
+    userInfo: UserInfo,
 }
 
 const fetchHomePage = (user: any): Promise<resProps> => {

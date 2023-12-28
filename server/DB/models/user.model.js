@@ -43,18 +43,13 @@ const UserSchema = new Schema({
     },
 
     wallet: {
-        type: Array,
-        default: []
+        type: String,
+        required: true
     },
     
     score : {
         type: Number, 
         default: 0
-    },
-
-    balance: {
-        type: Number,
-        default: 10000
     },
 
     notifications: {

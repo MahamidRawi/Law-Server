@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { IoMailOutline, IoMailOpenOutline } from "react-icons/io5";
+import { IoMailOutline, IoMailOpenOutline, IoWalletOutline } from "react-icons/io5";
 import { AuthContext } from '../../Providers/auth.provider';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import '../../styling.css'
@@ -13,6 +13,8 @@ import Lawyers from '../../Screens/lawyers.screen';
 import LawyerInformationScreen from '../../Screens/lawyer.information.screen';
 import MailScreen from '../../Screens/mail.screen';
 import { ViewMail } from '../../RC/cards.rc';
+import Wallet from '../../Screens/wallet.screen';
+import { getWallet } from '../../actions/main/wallet.actions';
 
 
 const MainRoutes = () => {
@@ -22,11 +24,12 @@ const MainRoutes = () => {
     const location = useLocation();
     const [userInfo, setUserInfo] = useState<UserInfo>();
     const [notifications, setNotifications] = useState<any>([]);
-    
+    const [wallet, setWallet] = useState<any>({})
 
   useEffect(() => {
     if (user && (location.pathname.toLowerCase() == '/signin' || location.pathname == '/signup')) navigate('/');
-    fetchUserInfo(user).then(res => {setUserInfo(res.userInfo); console.log(res.userInfo)}).catch(err => logout());  
+    fetchUserInfo(user).then(res => setUserInfo(res.userInfo)).catch(err => logout());
+    getWallet().then(res => setWallet(res.wallet)).catch(err => err.AR ? logout() : alert('An Error has Occured'))  
     getMails().then(res => {
         const filtered = res.mails.filter((mail: { senderId: any; id: any; opened: boolean; }) => {
             return mail.opened === false && mail.senderId !== res.ud;
@@ -43,7 +46,10 @@ const MainRoutes = () => {
                         {notifications.length > 0 && <div className="notification-dot"></div>}
                         <IoMailOutline className='mail-icon' />
                     </Link>
-            <p className='balance-header'>{userInfo?.balance ? balanceParser(userInfo?.balance) : ''}</p>
+                        <Link to="/Wallet" className='nav-link'>
+                    <IoWalletOutline className='wallet-icon' />
+                    </Link>
+            <p className='balance-header'>{wallet?.balance && balanceParser(wallet?.balance)}</p>
                     <Nav className="justify-content-center w-100">
                         <Link to="/" className="navbar-brand ml-25">CaseQuest</Link>
                         <Link className='nav-link' to="/Cases">Cases</Link>
@@ -62,6 +68,7 @@ const MainRoutes = () => {
                 <Route path='/MoreInfo' element={<LawyerInformationScreen />}/>
                 <Route path='/Mail' element={<MailScreen />} />
                 <Route path='/ViewMail' element={<ViewMail/>}/>
+                <Route path='/Wallet' element={<Wallet/>}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen content={userInfo.notifications}/>}/> : null}
             </Routes>
         </div>

@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 require('../../DB/models/user.model');
+require('../../DB/models/wallet.model');
+const wallet = mongoose.model('walletModel');
 const user = mongoose.model('userModel');
 const bcrypt = require('bcryptjs');
 const { authSchema, inAuthSchema } = require('../../schemas/joi.schema');
@@ -21,7 +23,12 @@ const signUp = async (creds) => {
 
     try {
         creds.password = await enc(password);
-        await new user(creds).save();
+        const newWallet = await new wallet().save();
+        creds.wallet = newWallet._id;
+        const newUser = await new user(creds).save();
+        newWallet.owner = newUser._id;
+        await newWallet.save();
+        // newWallet.owner = newUser._id;
         return resolve({stc: 200, success: true, message: 'You have been Signed Up Successfully'})
     } catch (err) {
         console.error("Error creating user:", err);

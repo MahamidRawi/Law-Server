@@ -1,18 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const MailRouter = require('../mail/mail.api');
+const WalletRouter = require('../wallet/wallet.api');
 const { validate } = require('../../middleware/auth/auth.middleware');
 const { createCase, getCases, getUser, getUsers } = require('../../actions/main/fetch.actions');
 
 router.use('/mail', MailRouter);
+router.use('/wallet', WalletRouter)
 
 router.get('/fetchHomePage', validate, async (req, res) => {
-    const data = {
-        userInfo: await getUser(req.userId).catch(err => res.status(500).json(err)),
-        userCases: await getCases(req.userId).catch(err => res.status(500).json(err)),
+    try {
+        const userInfo = await getUser(req.userId);
+        const userCases = await getCases(req.userId);
+        const data = { userInfo, userCases };
+        console.log(data);
+        return res.json(data);
+    } catch (err) {
+        console.error(err);
+        // Send back a generic error message to avoid leaking any sensitive error info
+        return res.status(500).json({ message: 'An error occurred' });
     }
-
-    return res.json(data);
 });
 
 router.post('/createCase', async (req, res) => {
