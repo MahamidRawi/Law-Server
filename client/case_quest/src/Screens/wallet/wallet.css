@@ -1,0 +1,26 @@
+.occupy-screen {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: green;
+}
+
+.scroll-wallet {
+    overflow: scroll;
+    height: 100%;
+    width: 100%;
+    border: 2px solid #ced4da;
+    border-radius: 10px;
+}
+
+.record-dimension {
+    padding: 30px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    bottom: 0;
+    width: 80%;
+    background: white;
+    border-radius: 10px;
+}

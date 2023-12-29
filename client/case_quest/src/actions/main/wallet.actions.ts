@@ -12,7 +12,7 @@ const getWallet = (): Promise<{success: boolean, wallet: object, AR?: boolean}> 
         } catch (err) {
             const axiosErr = err as AxiosError<{message: string}>;
             const stc = axiosErr.status;
-            return reject({success: false, message: axiosErr.response?.data.message, AR: stc === 401 ? true :  false});
+            return reject({success: false, message: axiosErr.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false});
         }
     })
 }

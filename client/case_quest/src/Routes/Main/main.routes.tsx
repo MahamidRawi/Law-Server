@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { IoMailOutline, IoMailOpenOutline, IoWalletOutline } from "react-icons/io5";
+import { IoMailOutline, IoMailOpenOutline, IoWalletOutline, IoLogOut, IoLogOutOutline } from "react-icons/io5";
 import { AuthContext } from '../../Providers/auth.provider';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import '../../styling.css'
@@ -42,6 +42,9 @@ const MainRoutes = () => {
 <div className="parent-container">
             <Navbar bg="dark" className='navbarfix' variant="dark">
                 <Container className="justify-content-center">
+                <button className='logoutbutton' onClick={() => logout()}>
+                    <IoLogOutOutline className='logout-icon'/>
+                </button>
                 <Link to="/Notifications" className='nav-link'>
                         {notifications.length > 0 && <div className="notification-dot"></div>}
                         <IoMailOutline className='mail-icon' />

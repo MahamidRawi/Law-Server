@@ -30,10 +30,18 @@
 }
 
 .content-area {
-    background-color: white;
+    border: #0C5EFD;
     width: 80%; /* Adjust as needed */
-    min-height: 50vh; /* Adjust as needed */
+    height: 50vh; /* Adjust as needed */
     margin-top: 20px; /* Space below the buttons */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content-area2 {
+    display: flex;
+    width: 100%; /* Adjust as needed */
+    height: 50vh; /* Adjust as needed */ /* Space below the buttons */
     border-radius: 10px; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }

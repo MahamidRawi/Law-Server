@@ -34,6 +34,7 @@ const sendMail = (uid, targetMail, subject, body) => {
                 targetId: userFound._id,
                 subject,
                 body,
+                date: Date.now()
             };
 
             const createdNotification = new Mail(notification);

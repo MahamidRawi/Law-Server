@@ -7,6 +7,19 @@
     background: linear-gradient(135deg, #2b2d3e 0%, #242639 100%); /* Lighter and more vibrant background */
 }
 
+.spinner-parent {
+    position: fixed;
+    top: 55px;
+    left: 0;
+    background-color:#2b2d3e;
+    height: calc(100% - 55px);
+    width: 100%;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .lnk {
     color: white;
     text-decoration: none;
@@ -321,7 +334,6 @@
 }
 
 .green-content-container {
-    background-color: green;
     border: 3px solid red;
     padding: 20px;
     border-radius: 10px;
@@ -330,6 +342,7 @@
     min-height: 200px; /* Adjust the height as necessary */
     /* Additional styles if needed */
 }
+
 
 .searchinput {
     width: 50%; 
@@ -357,7 +370,6 @@
 }
 
 .green-content-container {
-    background-color: green; /* Green background color */
     border: 3px solid red; /* Red border as per your image outline */
     position: absolute; /* Position absolutely within the relative parent */
     top: 20%; /* Position below the search bar */
@@ -416,7 +428,17 @@
 
 .cardmail {
     height: 70% !important;
-    background-color: green;
+}
+
+.logoutbutton {
+    outline: none;
+    border: none;
+    background: transparent;
+}
+
+.logout-icon {
+    color: darkred;
+    transform: scale(1.75);
 }
 
 .top {

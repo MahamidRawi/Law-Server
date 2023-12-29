@@ -1,14 +1,24 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { ReactElement, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../Providers/auth.provider';
 import '../wallet.css';
 import { getWallet } from '../actions/main/wallet.actions';
 import { balanceParser } from '../helper/res.helper';
 import { ActivityIncicator } from '../RC/acitivity.incdicator';
+import { IncomeScreen } from './wallet/wallet.income';
 
 interface WalletProps {}
 
+interface ContentMap {
+    [key: string]: ReactElement;
+}
 
+type incomeParams = {
+    from: string, 
+    amount: number,
+    date: Date, 
+    senderId: string,
+}
 
 const Wallet: React.FC<WalletProps> = () => {
     const navigate = useNavigate();
@@ -16,6 +26,65 @@ const Wallet: React.FC<WalletProps> = () => {
     const [activeContent, setActiveContent] = useState('Income');
     const [wallet, setWallet] = useState<any>({})
     const [loading, setLoading] = useState<boolean>(false);
+    const incomeRecords: incomeParams[] = [
+        {
+            from: 'Company A',
+            amount: 1500.00,
+            date: new Date('2022-01-01'),
+            senderId: 'comp-a-123'
+        },
+        {
+            from: 'Company B',
+            amount: 2500.00,
+            date: new Date('2022-02-15'),
+            senderId: 'comp-b-456'
+        },
+        {
+            from: 'Company C',
+            amount: 3500.00,
+            date: new Date('2022-03-20'),
+            senderId: 'comp-c-789'
+        },
+        {
+            from: 'Company C',
+            amount: 3500.00,
+            date: new Date('2022-03-20'),
+            senderId: 'comp-c-789'
+        },
+        {
+            from: 'Company C',
+            amount: 3500.00,
+            date: new Date('2022-03-20'),
+            senderId: 'comp-c-789'
+        },
+        {
+            from: 'Company C',
+            amount: 3500.00,
+            date: new Date('2022-03-20'),
+            senderId: 'comp-c-789'
+        },
+        {
+            from: 'Company C',
+            amount: 3500.00,
+            date: new Date('2022-03-20'),
+            senderId: 'comp-c-789'
+        },
+        {
+            from: 'Company C',
+            amount: 3500.00,
+            date: new Date('2022-03-20'),
+            senderId: 'comp-c-789'
+        },
+        
+        // ... more records as needed
+    ];
+    
+    const content: ContentMap = {
+        Income: <IncomeScreen incomeList={incomeRecords} />,
+        Expenses: <div>Expenses Content</div>,
+        Invoices: <div>Invoices Content</div>,
+        Transactions: <div>Transactions Content</div>
+    };
 
     useEffect(() => {
         setLoading(true); // Set loading to true at the start of the effect
@@ -40,29 +109,29 @@ const Wallet: React.FC<WalletProps> = () => {
     };
 
     return (
-        loading ? <ActivityIncicator /> : (
-        <div className="p-p-c">
+<div className="p-p-c">
             <div className="wallet-container">
                 <div className="balance-display">
-                    {wallet  && wallet.balance ? balanceParser(wallet.balance) : <ActivityIncicator />}
+                    {wallet && wallet.balance ? balanceParser(wallet.balance) : ''}
                 </div>
                 <div className="navigation-buttons">
-                    <button onClick={() => handleButtonClick('Income')}>Income</button>
-                    <button onClick={() => handleButtonClick('Expenses')}>Expenses</button>
-                    <button onClick={() => handleButtonClick('Invoices')}>Invoices</button>
-                    <button onClick={() => handleButtonClick('Transactions')}>Transactions</button>
+                    {Object.keys(content).map((key) => (
+                        <button
+                            key={key}
+                            className={activeContent === key ? 'active' : ''}
+                            onClick={() => handleButtonClick(key)}>
+                            {key}
+                        </button>
+                    ))}
                 </div>
                 <div className="content-area">
-                    {activeContent === 'Income' && <div>{wallet.balance}</div>}
-                    {activeContent === 'Expenses' && <div>Expenses Content</div>}
-                    {activeContent === 'Invoices' && <div>Invoices Content</div>}
-                    {activeContent === 'Transactions' && <div>Transactions Content</div>}
-                    {/* Render the content based on the activeContent state */}
+                    <div className="content-area2">
+                    {content[activeContent as keyof ContentMap]}
+                    </div>
                 </div>
             </div>
         </div>
         )
-        );
 };
 
 export default Wallet;

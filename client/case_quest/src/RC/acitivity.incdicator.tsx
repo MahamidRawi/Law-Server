@@ -8,6 +8,6 @@ interface ActivityIndicatorProps {
 export const ActivityIncicator = (props: ActivityIndicatorProps) => {
 
     return (
-        <div className="spinner" style={props.fullScreen ? {position: "fixed", height: "100%", width: "100%"} : {}} />
+        props.fullScreen ? <div className="spinner-parent"><div className="spinner" /></div> : <div className="spinner" style={props.fullScreen ? {position: "fixed", height: "100%", width: "100%"} : {}} />
     )
 }

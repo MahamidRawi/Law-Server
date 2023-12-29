@@ -36,7 +36,6 @@ const getMails = async () => {
         const res = await axios.get(config.API_BASE_URL+'/main/mail/getMails', {headers: {'x-access-token': token}});
         return {success: true, mails: res.data.notifications, ud:res.data.ud};
     } catch (err) {
-        console.log('AN ERROR HAS OCCURED ', err)
         throw {success: false, info: null}
     }
 }
