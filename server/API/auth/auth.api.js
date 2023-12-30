@@ -14,7 +14,6 @@ router.post('/signup', alreadyExists, async (req, res) => {
 });
 
 router.post('/signIn', async (req, res) => {
-    console.log(req.body.credentials)
     try {
         const signed = await signIn(req.body.credentials);
         return res.status(signed.stc).json(signed);

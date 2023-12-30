@@ -7,6 +7,42 @@
     background: green;
 }
 
+.clr {
+    padding: 3%;
+    color: white;
+    height: 100%;
+    width: 100%;
+    border: 2px solid #ced4da;
+    border-radius: 10px;
+}
+
+.form-label {
+    color: white;
+    font-weight: 300;
+}
+
+.transfer-reasons {
+    border-radius: 0.25rem;
+    border-color: #ced4da;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(90, 90, 90);
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
 .scroll-wallet {
     overflow: scroll;
     height: 100%;

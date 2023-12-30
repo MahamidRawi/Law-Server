@@ -1,4 +1,7 @@
+const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
+require('../DB/models/wallet.model');
+const wallet = mongoose.model('walletModel')
 
 const enc = async (pass) => {
     try {
@@ -11,4 +14,18 @@ const enc = async (pass) => {
     }
 }
 
-module.exports = enc
+async function generateUniqueWalletAddress() {
+    while (true) {
+      let walletAddress = '';
+      for (let i = 0; i < 9; i++) {
+        walletAddress += Math.floor(Math.random() * 10);
+      }
+  
+      const exists = await wallet.findOne({ walletAddress });
+      if (!exists) {
+        return walletAddress;
+      }
+    }
+  }
+  
+module.exports = {enc, generateUniqueWalletAddress}

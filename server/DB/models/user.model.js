@@ -44,6 +44,10 @@ const UserSchema = new Schema({
 
     wallet: {
         type: String,
+    },
+    
+    walletAddress: {
+        type: String,
         required: true
     },
     

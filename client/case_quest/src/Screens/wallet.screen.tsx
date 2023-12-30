@@ -1,11 +1,12 @@
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../Providers/auth.provider';
 import '../wallet.css';
 import { getWallet } from '../actions/main/wallet.actions';
 import { balanceParser } from '../helper/res.helper';
 import { ActivityIncicator } from '../RC/acitivity.incdicator';
 import { IncomeScreen } from './wallet/wallet.income';
+import TransferScreen from './wallet/wallet.transfer';
 
 interface WalletProps {}
 
@@ -21,10 +22,16 @@ type incomeParams = {
 }
 
 const Wallet: React.FC<WalletProps> = () => {
+    const location = useLocation();
     const navigate = useNavigate();
+    const wNumber = location.state?.walletNumber;
+    const tRoute = location.state?.targetRoute;
+    const walletNumber = wNumber ? wNumber : ''
+    console.log(tRoute)
+    const targetRoute = tRoute ? tRoute : 'Income';
     const { logout } = useContext(AuthContext);
-    const [activeContent, setActiveContent] = useState('Income');
-    const [wallet, setWallet] = useState<any>({})
+    const [activeContent, setActiveContent] = useState(targetRoute);
+    const [wallet, setWallet] = useState<any>({});
     const [loading, setLoading] = useState<boolean>(false);
     const incomeRecords: incomeParams[] = [
         {
@@ -83,7 +90,7 @@ const Wallet: React.FC<WalletProps> = () => {
         Income: <IncomeScreen incomeList={incomeRecords} />,
         Expenses: <div>Expenses Content</div>,
         Invoices: <div>Invoices Content</div>,
-        Transactions: <div>Transactions Content</div>
+        Transfer: <TransferScreen walletNumber={walletNumber} />
     };
 
     useEffect(() => {
@@ -101,7 +108,6 @@ const Wallet: React.FC<WalletProps> = () => {
                 alert('An Error has Occurred');
             }
         });
-        console.log(wallet)
     }, []);
 
     const handleButtonClick = (content: React.SetStateAction<string>) => {

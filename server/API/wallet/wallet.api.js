@@ -6,7 +6,6 @@ const router = express.Router();
 router.get('/getWallet', validate, async (req, res) => {
     try {
         const resp = await getWallet(req.userId);
-        console.log(resp.wallet);
         return res.json({ wallet: resp.wallet });
     } catch (err) {
         return res.status(err.stc).json(err);

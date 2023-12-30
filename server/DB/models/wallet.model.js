@@ -24,6 +24,12 @@ const WalletSchema = new Schema({
 
     owner: {
         type: String,
+    },
+    
+    walletAddress: {
+        type : String,
+        unique: true,
+        required: true
     }
 });
 

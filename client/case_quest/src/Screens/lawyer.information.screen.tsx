@@ -18,11 +18,11 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
 
     useEffect(() => {
         getLawyerInformation(uid).then(res => setUserInformation(res.userInfo)).catch(err => logout());
-        return setLoading(true)
+        return setLoading(false)
     }, [])
 
     return (
-        !information ? <ActivityIncicator /> : (
+        !information || loading ? <ActivityIncicator fullScreen /> : (
             <div className={`header-decoration ${window.innerWidth <= 685 ? 'mini-scr' : ''}`}>
         <div className="d-flex justify-content-center align-items-center vh-100">
             <div className={`card cardPad`}>
@@ -33,11 +33,9 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                             <Icon icon="solar:user-linear" width={100} height={100}/>
                             <button className="btn btn-primary mt-3" onClick={() => navigate('/Mail', {state: {targetMail: information.email}})}>Contact</button>
                             <button className="btn btn-primary mt-3">Case History</button>
+                            <button className="btn btn-primary mt-3" onClick={() => navigate('/Wallet', {state: {targetRoute: 'Transfer', walletNumber: information.walletAddress}})}>Transfer Money</button>
                             <div className="info-scroll-container">
-        {/* Your scrollable content goes here */}
     </div>
-                            
-                            {/* <ScrollWindow content={[]} type={'Notification'}  /> */}
                         </div>
                         <div className='casescontainer' />
 
@@ -51,7 +49,7 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                                 <div className="col-6">
                                     <p>Email: {information.email}</p>
                                     <p>Lawyer Since : {formatDate(information.date).split(' ')[0]}</p>
-                                    <p>Net Worth: Private</p>
+                                    <p>Wallet Number: {information.walletAddress}</p>
                                 </div>
                             </div>
                             

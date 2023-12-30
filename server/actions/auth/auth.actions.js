@@ -22,16 +22,25 @@ const signUp = async (creds) => {
         });
 
     try {
-        creds.password = await enc(password);
-        const newWallet = await new wallet().save();
-        creds.wallet = newWallet._id;
-        const newUser = await new user(creds).save();
-        newWallet.owner = newUser._id;
-        await newWallet.save();
-        // newWallet.owner = newUser._id;
-        return resolve({stc: 200, success: true, message: 'You have been Signed Up Successfully'})
+        creds.password = await enc.enc(password);
+            const walletAddress = await enc.generateUniqueWalletAddress();
+
+            // Create new user
+            
+            // Create new wallet and link it to the new user
+            creds.walletAddress = walletAddress;
+            const newUser = await new user(creds).save();
+            if (newUser) {
+            const newWallet = new wallet({ walletAddress });
+            await newWallet.save();
+
+            creds.wallet = newWallet._id;
+            newWallet.owner = newUser._id;
+            newWallet.save();
+            return resolve({stc: 200, success: true, message: 'You have been Signed Up Successfully'})
+            }
+            
     } catch (err) {
-        console.error("Error creating user:", err);
         return reject({stc: 500, success: false, err, message: 'An Error has Occured'});
     }
 });
