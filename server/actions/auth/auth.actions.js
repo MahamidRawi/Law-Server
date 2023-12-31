@@ -12,7 +12,6 @@ const enc = require('../../helper/auth.helper');
 
 const signUp = async (creds) => {
     return new Promise(async(resolve, reject) => {
-    const {password} = creds;
     const formvalidation = authSchema.validate(creds);
 
     if (formvalidation.error) return reject({
@@ -22,22 +21,18 @@ const signUp = async (creds) => {
         });
 
     try {
-        creds.password = await enc.enc(password);
+        creds.password = await enc.enc(creds.password);
             const walletAddress = await enc.generateUniqueWalletAddress();
-
-            // Create new user
-            
-            // Create new wallet and link it to the new user
             creds.walletAddress = walletAddress;
             const newUser = await new user(creds).save();
             if (newUser) {
-            const newWallet = new wallet({ walletAddress });
-            await newWallet.save();
+                const newWallet = new wallet({ walletAddress });
+                await newWallet.save();
 
-            creds.wallet = newWallet._id;
-            newWallet.owner = newUser._id;
-            newWallet.save();
-            return resolve({stc: 200, success: true, message: 'You have been Signed Up Successfully'})
+                creds.wallet = newWallet._id;
+                newWallet.owner = newUser._id;
+                newWallet.save();
+                return resolve({stc: 200, success: true, message: 'You have been Signed Up Successfully'})
             }
             
     } catch (err) {
