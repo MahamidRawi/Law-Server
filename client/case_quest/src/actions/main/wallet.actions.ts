@@ -17,4 +17,19 @@ const getWallet = (): Promise<{success: boolean, wallet: object, AR?: boolean}> 
     })
 }
 
-export {getWallet}
+const transfer = async (transactionInfo: object): Promise<{success: boolean, AR?: boolean}> => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token) reject({success: false, message: 'No Token', AR: true});
+  try {
+        await axios.post(config.API_BASE_URL + '/main/wallet/transfer', {transactionInfo}, {headers: {'x-access-token': token}});
+        return resolve({success: true});
+    } catch (err) {
+        const axiosErr = err as AxiosError<{message: string}>;
+        const stc = axiosErr.status;
+        return reject({success: false, message: axiosErr.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false});
+    }
+})
+}
+
+export {getWallet, transfer}

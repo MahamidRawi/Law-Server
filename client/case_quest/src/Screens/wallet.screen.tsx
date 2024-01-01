@@ -5,7 +5,7 @@ import '../wallet.css';
 import { getWallet } from '../actions/main/wallet.actions';
 import { balanceParser } from '../helper/res.helper';
 import { ActivityIncicator } from '../RC/acitivity.incdicator';
-import { IncomeScreen } from './wallet/wallet.income';
+import { RecordsScreen } from './wallet/wallet.records';
 import TransferScreen from './wallet/wallet.transfer';
 
 interface WalletProps {}
@@ -27,7 +27,6 @@ const Wallet: React.FC<WalletProps> = () => {
     const wNumber = location.state?.walletNumber;
     const tRoute = location.state?.targetRoute;
     const walletNumber = wNumber ? wNumber : ''
-    console.log(tRoute)
     const targetRoute = tRoute ? tRoute : 'Income';
     const { logout } = useContext(AuthContext);
     const [activeContent, setActiveContent] = useState(targetRoute);
@@ -82,13 +81,12 @@ const Wallet: React.FC<WalletProps> = () => {
             date: new Date('2022-03-20'),
             senderId: 'comp-c-789'
         },
-        
-        // ... more records as needed
+
     ];
     
     const content: ContentMap = {
-        Income: <IncomeScreen incomeList={incomeRecords} />,
-        Expenses: <div>Expenses Content</div>,
+        Income: <RecordsScreen type='Income' recordList={wallet.income} />,
+        Expenses: <RecordsScreen type='Expense' recordList={wallet.expenses} />,
         Invoices: <div>Invoices Content</div>,
         Transfer: <TransferScreen walletNumber={walletNumber} />
     };
@@ -98,7 +96,7 @@ const Wallet: React.FC<WalletProps> = () => {
     getWallet()
         .then(res => {
             setWallet(res.wallet);
-            setLoading(false); // Set loading to false after the wallet is set
+            return setLoading(false);
         })
         .catch(err => {
             setLoading(false); // Also set loading to false if there is an error
@@ -108,7 +106,7 @@ const Wallet: React.FC<WalletProps> = () => {
                 alert('An Error has Occurred');
             }
         });
-    }, []);
+    }, [activeContent]);
 
     const handleButtonClick = (content: React.SetStateAction<string>) => {
         setActiveContent(content); // Update the active content based on the button clicked

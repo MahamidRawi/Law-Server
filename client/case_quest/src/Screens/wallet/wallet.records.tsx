@@ -12,26 +12,31 @@ type incomeParams = {
 }
 
 interface IncomeProps {
-    incomeList: Array<incomeParams> 
+    recordList: Array<incomeParams> 
+    type: 'Income' | 'Expense'
 }
 
-const IncomeScreen: React.FC<IncomeProps> = ({incomeList}) => {
+interface ExpenseProps {
+
+}
+
+const RecordsScreen: React.FC<IncomeProps> = ({recordList, type}) => {
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         setLoading(true);
-        if (incomeList) setLoading(false);
-    }, [incomeList])
-    console.warn(incomeList)
+        if (recordList) setLoading(false);
+    }, [recordList])
+    console.warn(recordList)
 
     return (
         loading ? <ActivityIncicator fullScreen /> : (
             <div className='scroll-wallet'>
-                {incomeList.map(record => (
-                    <IncomeCard data={record} />
+                {recordList.map((record, idx) => (
+                    <IncomeCard type={type} key={idx} data={record} />
                 ))}
             </div>
         )
     )
 }
 
-export {IncomeScreen}
+export {RecordsScreen}

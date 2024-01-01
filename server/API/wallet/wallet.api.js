@@ -19,13 +19,12 @@ router.post('/transfer', validate, async (req, res) => {
     try {
         const uid = req.userId;
         console.log(req.body)
-        const {transactionInfo} = req.body
+        const {transactionInfo} = req.body;
         const { senderName, targetName, date, targetMail} = await transferMoney(uid, transactionInfo);
         const message = transactionMessageSuccess(senderName, targetName, transactionInfo.amount, transactionInfo.reason, date);
         await sendMail(uid, targetMail, 'Transaction', message);
         return res.json({success: true, message: 'Transaction Completed Successfully'});
     } catch (err) {
-        console.log(err);
         return res.status(err.stc).json(err);
     }
 })

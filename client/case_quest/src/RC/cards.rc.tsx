@@ -51,7 +51,7 @@ const Case: React.FC<CaseProps> = ({data, viewMore = false}) => {
 const User: React.FC<UserProps> = ({data, viewMore = false, resize=false}) => {
     const navigate = useNavigate();
     return (
-    <div className={`container py-3 ${resize ? 'f-content' : ''}`}>
+    <div className={`container py-3 ${resize ? 'f-content' : ''} ${data.admin && 'admin'}`}>
     <div className="row">
       {/* <div className="col-md-6 mx-auto"> */}
         {/* <div className="card"> */}
