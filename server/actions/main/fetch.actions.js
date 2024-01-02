@@ -35,6 +35,7 @@ const createCase = () => {
 }
 
 const getUser = async (id, removeproperty) => {
+    console.log(id);
     return new Promise(async (resolve, reject) => {
         try {
             const userFound = await users.findOne({_id: id}).select(`-password -${removeproperty}`);

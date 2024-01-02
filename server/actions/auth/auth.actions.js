@@ -52,7 +52,7 @@ const signIn = async (creds) => {
             if (!foundUser) return reject({success: false, message: 'No User Found', stc: 404})
             const passwordsMatch = bcrypt.compareSync(password, foundUser.password);
 
-            passwordsMatch ? resolve({success: true, stc: 200, message: 'Authenticated Successfully', token: jwt.sign({ UID: foundUser.id }, process.env.JWTPASS, { expiresIn: 86400 * 160 })}) : reject({stc: 404, message: 'Invalid Password', success: false})
+            passwordsMatch ? resolve({success: true, stc: 200, message: 'Authenticated Successfully', token: jwt.sign({ UID: foundUser._id }, process.env.JWTPASS, { expiresIn: 86400 * 160 })}) : reject({stc: 404, message: 'Invalid Password', success: false})
         } catch (err) { console.log(err); return reject({success: false, message: 'An Error has Occured', stc:500})}
         
     });

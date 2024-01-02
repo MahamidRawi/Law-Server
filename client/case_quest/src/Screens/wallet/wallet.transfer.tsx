@@ -37,8 +37,9 @@ const TransferScreen: React.FC<TransferProps> = ({walletNumber}) => {
     const handleSubmit = (event: { preventDefault: () => void; }) => {
         setLoading(true);
         setError('');
+        setSuccessMessage('');
         event.preventDefault();
-        transfer(transactionInfo).then(res => {console.log(res); setSuccessMessage('Money Transfered Successfully !')}).catch(err => err.AR ? logout() : setError(err.message));
+        transfer(transactionInfo).then(res => setSuccessMessage('Money Transfered Successfully !')).catch(err => err.AR ? logout() : setError(err.message));
         return setLoading(false)
     };
 

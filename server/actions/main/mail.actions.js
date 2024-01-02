@@ -30,7 +30,7 @@ const sendMail = (uid, targetMail, subject, body) => {
                 senderId: uid,
                 to: userFound.email,
                 from: senderUserFound.email,
-                associated: [userFound.id, senderUserFound.id],
+                associated: [userFound._id, senderUserFound._id],
                 targetId: userFound._id,
                 subject,
                 body,

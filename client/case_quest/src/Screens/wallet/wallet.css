@@ -43,6 +43,14 @@
     background: rgba(0, 0, 0, 0.2);
   }
 
+.Incomestyle {
+    color: green;
+}
+
+.Expensestyle {
+    color: darkred;
+}
+
 .scroll-wallet {
     overflow: scroll;
     height: 100%;

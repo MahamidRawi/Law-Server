@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import './wallet.css';
 import { ActivityIncicator } from '../../RC/acitivity.incdicator';
-import { IncomeCard } from './wallet.cards';
+import { RecordCard } from './wallet.cards';
 import ScrollWindow from '../../RC/scroll.window';
 
 type incomeParams = {
@@ -32,7 +32,7 @@ const RecordsScreen: React.FC<IncomeProps> = ({recordList, type}) => {
         loading ? <ActivityIncicator fullScreen /> : (
             <div className='scroll-wallet'>
                 {recordList.map((record, idx) => (
-                    <IncomeCard type={type} key={idx} data={record} />
+                    <RecordCard type={type} key={idx} data={record} />
                 ))}
             </div>
         )

@@ -65,6 +65,6 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now()
     }
-});
+}, {versionKey: false});
 
 mongoose.model('userModel', UserSchema);

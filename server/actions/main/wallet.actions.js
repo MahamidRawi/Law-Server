@@ -1,70 +1,75 @@
-require('../../DB/models/wallet.model');
-require('../../DB/models/user.model');
 const mongoose = require('mongoose');
 const wallet = mongoose.model('walletModel');
 const user = mongoose.model('userModel');
-const { getUser } = require('./fetch.actions');
 const { Err500 } = require('../../vars/vars');
 
-
 const transferMoney = (senderId, transactionInfo) => {
-    return new Promise(async (resolve, reject) => {
-        const {walletAddress, amount, reason} = transactionInfo
-        const date = Date.now();
-        const walletFound = await wallet.findOne({walletAddress});
-        const senderWallet = await wallet.findOne({owner: senderId});
-        const senderUser = await user.findOne({_id: senderId});
-        const targetUser = await user.findOne({walletAddress});
-        const adminWallet = await wallet.findOne({admin: true});
-        try {
-            if (targetUser && senderId == targetUser._id) return reject({success: false, message: 'You cannot send money to yourself !', stc: 400});
-            if (!walletFound || !senderWallet || !senderUser) return reject({success: false, message: !senderUser ? 'No Wallet Found' : 'Address doesn\'t Exist', stc: !senderWallet ? 401 : 404});
-            if (senderWallet.balance < amount*1.02 || !reason) return reject({success: false, message: !reason ? 'A Reason Must be Provided !' : 'You don\'t Have the sufficient balance to complete this transaction !', stc: 400});
-            adminWallet.income.unshift({
-                from: senderId,
-                amount: amount * 0.02,
-                reason: 'Transaction Fee',
-                date
-            });
-            adminWallet.balance += amount * 0.02;
-            await adminWallet.save();
-            senderWallet.expenses.unshift({
-                to: walletFound._id,
-                amount,
-                reason,
-                date,
-            });
-            senderWallet.balance -= amount*1.02
-            await walletFound.save();
+  return new Promise((resolve, reject) => {
+    const { walletAddress, amount, reason } = transactionInfo;
+    const date = Date.now();
 
-            
-            walletFound.income.unshift({
-                sender: senderId,
-                amount,
-                reason,
-                date
-            });
-            walletFound.balance += amount
-            await senderWallet.save();
-            return resolve({success: true, message: 'Transaction Completed Successfully', senderName: senderUser.firstName + ' ' + senderUser.lastName, targetMail: targetUser.email, targetName: targetUser.firstName + ' ' + targetUser.lastName, date});
-    } catch (err) {
-        console.log(err)
-        try {
-            walletFound.income.shift();
-            senderWallet.expenses.shift();
-            adminWallet.income.shift();
-            adminWallet.balance -= amount * 0.02
-            walletFound.balance -= amount
-            senderWallet.balance += amount * 1.02
-            await walletFound.save();
-            await senderWallet.save();
-            await adminWallet.save();
-            return reject({success: false, message: Err500, stc: 500, err});
-    } catch (err) {
-            return reject({success: false, message: Err500, stc: 500, err});
-    }
-    };
-});
-}
+    Promise.all([
+      wallet.findOne({ walletAddress }).exec(),
+      wallet.findOne({ owner: senderId }).exec(),
+      user.findOne({ _id: senderId }).exec(),
+      user.findOne({ walletAddress }).exec(),
+      wallet.findOne({ admin: true }).exec(),
+    ])
+    .then(async ([walletFound, senderWallet, fetchedSenderUser, fetchedTargetUser, fetchedAdminWallet]) => {
+      if (!walletFound || !senderWallet || !fetchedSenderUser) {
+        throw new Error('No Wallet or User Found');
+      }
+      if (senderId.toString() === (fetchedTargetUser && fetchedTargetUser._id.toString()) || !reason) {
+        throw new Error(!reason ? 'Please Provide a Reason' : 'You cannot send money to yourself!');
+      }
+      if (senderWallet.balance < amount * 1.02) {
+        throw new Error('Insufficient balance to complete this transaction');
+      }
+      console.log(walletFound.id);
 
-module.exports = {transferMoney}
+      const adminWalletUpdate = {
+        $inc: { balance: amount * 0.02 },
+        $push: { income: { sender: senderId, amount: amount * 0.02, reason: 'Transaction Fee', date } }
+      };
+      const senderWalletUpdate = {
+        $inc: { balance: -(amount * 1.02) },
+        $push: { expenses: { target: fetchedTargetUser.id, amount:-(amount * 1.02) , reason, date } }
+      };
+      const recipientWalletUpdate = {
+        $inc: { balance: amount },
+        $push: { income: { sender: senderId, amount, reason, date } }
+      };
+
+      await Promise.all([
+            wallet.updateOne({ admin: true }, adminWalletUpdate).exec(),
+            wallet.updateOne({ owner: senderId }, senderWalletUpdate).exec(),
+            wallet.updateOne({ walletAddress }, recipientWalletUpdate).exec()
+        ]);
+        return ({
+            senderUser: fetchedSenderUser,
+            targetUser: fetchedTargetUser,
+        });
+    })
+    .then(({ senderUser, targetUser }) => {
+      resolve({
+        success: true,
+        message: 'Transaction Completed Successfully',
+        senderName: senderUser.firstName + ' ' + senderUser.lastName,
+        targetMail: targetUser.email,
+        targetName: targetUser.firstName + ' ' + targetUser.lastName,
+        date,
+      });
+    })
+    .catch((err) => {
+      // A more descriptive error message can be constructed based on the error details if needed
+      reject({
+        success: false,
+        message: err.message || Err500,
+        stc: 500,
+        err,
+      });
+    });
+  });
+};
+
+module.exports = { transferMoney };

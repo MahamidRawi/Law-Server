@@ -16,7 +16,7 @@ const Lawyers: React.FC<LawyersProps> = () => {
     const [lawyers, setLawyers] = useState<UserInfo[]>([]);
     const [searchTerm, setSearchTerm] = useState('')
     useEffect(() => {
-        getLawyers().then(res => setLawyers(res.lawyers)).catch(err => logout());
+        getLawyers().then(res => {setLawyers(res.lawyers); console.log(res.lawyers)}).catch(err => logout());
         return
     }, []);
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { UserCase, NotificationsProps, UserInfo, IndCase } from '../data/types';
 import { Case, Notification, User } from './cards.rc';
-import { IncomeCard } from '../Screens/wallet/wallet.cards';
+import { RecordCard } from '../Screens/wallet/wallet.cards';
 
 // Type guard for individual UserCase elemen
 type IncomeProps = {
@@ -25,7 +25,7 @@ const ScrollWindow: React.FC<ScrollWindowProps> = ({ content, type, center, fit,
             {content?.map((element, index) => (
                 <div className='card mb-2 item-card' key={index}>
                     <div className="card-body">
-                        {type == 'Case' ? <Case data={element} viewMore/> : type == 'Notification' ? <Notification ud={ud} data={element}/> : 'User' ? <User data={element} /> : 'Record' ? <IncomeCard data={element}/> : null}
+                        {type == 'Case' ? <Case data={element} viewMore/> : type == 'Notification' ? <Notification ud={ud} data={element}/> : 'User' ? <User data={element} /> : 'Record' ? <RecordCard type='Income' data={element}/> : null}
                     </div>
                 </div>
             ))}

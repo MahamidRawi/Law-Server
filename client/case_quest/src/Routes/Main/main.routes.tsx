@@ -29,7 +29,7 @@ const MainRoutes = () => {
   useEffect(() => {
     if (user && (location.pathname.toLowerCase() == '/signin' || location.pathname == '/signup')) navigate('/');
     fetchUserInfo(user).then(res => setUserInfo(res.userInfo)).catch(err => logout());
-    getWallet().then(res => setWallet(res.wallet)).catch(err => err.AR ? logout() : alert('An Error has Occured'))  
+    getWallet().then(res => setWallet(res.wallet)).catch(err => logout())  
     getMails().then(res => {
         const filtered = res.mails.filter((mail: { senderId: any; id: any; opened: boolean; }) => {
             return mail.opened === false && mail.senderId !== res.ud;

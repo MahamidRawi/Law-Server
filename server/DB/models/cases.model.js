@@ -30,6 +30,6 @@ const CaseSchema = new Schema({
         type: Array,
         required: true,
     }
-});
+}, { versionKey: false });
 
 mongoose.model('casesModel', CaseSchema);

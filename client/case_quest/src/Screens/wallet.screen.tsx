@@ -32,68 +32,15 @@ const Wallet: React.FC<WalletProps> = () => {
     const [activeContent, setActiveContent] = useState(targetRoute);
     const [wallet, setWallet] = useState<any>({});
     const [loading, setLoading] = useState<boolean>(false);
-    const incomeRecords: incomeParams[] = [
-        {
-            from: 'Company A',
-            amount: 1500.00,
-            date: new Date('2022-01-01'),
-            senderId: 'comp-a-123'
-        },
-        {
-            from: 'Company B',
-            amount: 2500.00,
-            date: new Date('2022-02-15'),
-            senderId: 'comp-b-456'
-        },
-        {
-            from: 'Company C',
-            amount: 3500.00,
-            date: new Date('2022-03-20'),
-            senderId: 'comp-c-789'
-        },
-        {
-            from: 'Company C',
-            amount: 3500.00,
-            date: new Date('2022-03-20'),
-            senderId: 'comp-c-789'
-        },
-        {
-            from: 'Company C',
-            amount: 3500.00,
-            date: new Date('2022-03-20'),
-            senderId: 'comp-c-789'
-        },
-        {
-            from: 'Company C',
-            amount: 3500.00,
-            date: new Date('2022-03-20'),
-            senderId: 'comp-c-789'
-        },
-        {
-            from: 'Company C',
-            amount: 3500.00,
-            date: new Date('2022-03-20'),
-            senderId: 'comp-c-789'
-        },
-        {
-            from: 'Company C',
-            amount: 3500.00,
-            date: new Date('2022-03-20'),
-            senderId: 'comp-c-789'
-        },
-
-    ];
     
     const content: ContentMap = {
         Income: <RecordsScreen type='Income' recordList={wallet.income} />,
         Expenses: <RecordsScreen type='Expense' recordList={wallet.expenses} />,
-        Invoices: <div>Invoices Content</div>,
         Transfer: <TransferScreen walletNumber={walletNumber} />
     };
 
-    useEffect(() => {
-        setLoading(true); // Set loading to true at the start of the effect
-    getWallet()
+    const loadPage = () => {
+        getWallet()
         .then(res => {
             setWallet(res.wallet);
             return setLoading(false);
@@ -106,10 +53,15 @@ const Wallet: React.FC<WalletProps> = () => {
                 alert('An Error has Occurred');
             }
         });
+    }
+
+    useEffect(() => {
+        setLoading(true); // Set loading to true at the start of the effect
+        loadPage();
     }, [activeContent]);
 
     const handleButtonClick = (content: React.SetStateAction<string>) => {
-        setActiveContent(content); // Update the active content based on the button clicked
+        setActiveContent(content);
     };
 
     return (

@@ -31,7 +31,7 @@ const WalletSchema = new Schema({
         unique: true,
         required: true
     }
-});
+}, { versionKey: false });
 
 
 mongoose.model('walletModel', WalletSchema);

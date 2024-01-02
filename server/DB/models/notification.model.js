@@ -52,6 +52,6 @@ const MailSchema = new Schema({
         required: true
     }
 
-})
+}, { versionKey: false })
 
 mongoose.model('mailModel', MailSchema);
