@@ -16,16 +16,17 @@ const transferMoney = (senderId, transactionInfo) => {
       wallet.findOne({ admin: true }).exec(),
     ])
     .then(async ([walletFound, senderWallet, fetchedSenderUser, fetchedTargetUser, fetchedAdminWallet]) => {
-      if (!walletFound || !senderWallet || !fetchedSenderUser) {
+        const transactionFeeMultiplier = 1.02;
+        const requiredBalance = fetchedSenderUser.admin ? amount : amount * transactionFeeMultiplier;
+        if (!walletFound || !senderWallet || !fetchedSenderUser) {
         throw new Error('No Wallet or User Found');
       }
       if (senderId.toString() === (fetchedTargetUser && fetchedTargetUser._id.toString()) || !reason) {
         throw new Error(!reason ? 'Please Provide a Reason' : 'You cannot send money to yourself!');
       }
-      if (senderWallet.balance < amount * 1.02) {
+      if (senderWallet.balance < requiredBalance) {
         throw new Error('Insufficient balance to complete this transaction');
       }
-      console.log(walletFound.id);
 
       const adminWalletUpdate = {
         $inc: { balance: amount * 0.02 },
@@ -33,11 +34,11 @@ const transferMoney = (senderId, transactionInfo) => {
       };
       const senderWalletUpdate = {
         $inc: { balance: -(amount * 1.02) },
-        $push: { expenses: { target: fetchedTargetUser.id, amount:-(amount * 1.02) , reason, date } }
+        $unshift: { expenses: { target: fetchedTargetUser.id, amount: amount , reason, date } }
       };
       const recipientWalletUpdate = {
         $inc: { balance: amount },
-        $push: { income: { sender: senderId, amount, reason, date } }
+        $unshift: { income: { sender: senderId, amount, reason, date } }
       };
 
       await Promise.all([
@@ -61,7 +62,6 @@ const transferMoney = (senderId, transactionInfo) => {
       });
     })
     .catch((err) => {
-      // A more descriptive error message can be constructed based on the error details if needed
       reject({
         success: false,
         message: err.message || Err500,

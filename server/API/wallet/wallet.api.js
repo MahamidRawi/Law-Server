@@ -24,7 +24,6 @@ router.post('/transfer', validate, async (req, res) => {
         await sendMail(uid, targetMail, 'Transaction', message);
         return res.json({success: true, message: 'Transaction Completed Successfully'});
     } catch (err) {
-        console.log('Error : ', err)
         return res.status(err.stc).json(err);
     }
 })

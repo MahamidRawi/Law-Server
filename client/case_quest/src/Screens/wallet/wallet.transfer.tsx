@@ -6,6 +6,7 @@ import './wallet.css'
 import { balanceParser } from '../../helper/res.helper';
 import { getWallet, transfer } from '../../actions/main/wallet.actions';
 import { AuthContext } from '../../Providers/auth.provider';
+import { useNavigate } from 'react-router-dom';
 
 interface TransferProps {
     walletNumber?: string
@@ -17,6 +18,7 @@ const TransferScreen: React.FC<TransferProps> = ({walletNumber}) => {
     const [walletAddress, setWalletAddress] = useState(walletNumber || '');
     const [amount, setAmount] = useState<string>('0');
     const [reason, setReason] = useState('');
+    const navigate = useNavigate();
     const [wallet, setWallet] = useState<any>({});
     const [error, setError] = useState<string>('');
     const [successMessage, setSuccessMessage] = useState<string>('');
@@ -40,7 +42,8 @@ const TransferScreen: React.FC<TransferProps> = ({walletNumber}) => {
         setSuccessMessage('');
         event.preventDefault();
         transfer(transactionInfo).then(res => setSuccessMessage('Money Transfered Successfully !')).catch(err => err.AR ? logout() : setError(err.message));
-        return setLoading(false)
+        setLoading(false);
+        return setTimeout(() => navigate('/Wallet'), 300)
     };
 
     return (

@@ -34,7 +34,6 @@ const MainRoutes = () => {
         const filtered = res.mails.filter((mail: { senderId: any; id: any; opened: boolean; }) => {
             return mail.opened === false && mail.senderId !== res.ud;
         });
-        console.log(filtered)
         setNotifications(filtered);
     }).catch(err => logout());
 }, [user, location, navigate]);
@@ -71,7 +70,7 @@ const MainRoutes = () => {
                 <Route path='/MoreInfo' element={<LawyerInformationScreen />}/>
                 <Route path='/Mail' element={<MailScreen />} />
                 <Route path='/ViewMail' element={<ViewMail/>}/>
-                <Route path='/Wallet' element={<Wallet/>}/>
+                <Route path='/Wallet' element={<Wallet balance={wallet?.balance && balanceParser(wallet?.balance)}/>}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen content={userInfo.notifications}/>}/> : null}
             </Routes>
         </div>

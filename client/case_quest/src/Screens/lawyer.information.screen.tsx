@@ -38,7 +38,6 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
     </div>
                         </div>
                         <div className='casescontainer' />
-
                         <div className="col-12 col-md-8">
                             <div className="row text-start">
                                 <div className="col-6">
@@ -52,7 +51,6 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                                     <p>Wallet Number: {information.walletAddress}</p>
                                 </div>
                             </div>
-                            
                         </div>
                     </div>
                 </div>

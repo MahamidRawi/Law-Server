@@ -30,7 +30,7 @@ const sendMail = (uid, targetMail, subject, body) => {
                 senderId: uid,
                 to: userFound.email,
                 from: senderUserFound.email,
-                associated: [userFound._id, senderUserFound._id],
+                associated: [userFound.id, senderUserFound.id],
                 targetId: userFound._id,
                 subject,
                 body,
@@ -41,9 +41,8 @@ const sendMail = (uid, targetMail, subject, body) => {
             await createdNotification.save();
             return resolve({ success: true });
 
-        }).catch(err => console.log(err))
+        }).catch(err => reject({ success: false, message: Err500, stc: 500, err }))
         } catch (err) {
-            console.log(err);
             return reject({ success: false, message: Err500, stc: 500, err });
         }
     });

@@ -8,7 +8,9 @@ import { ActivityIncicator } from '../RC/acitivity.incdicator';
 import { RecordsScreen } from './wallet/wallet.records';
 import TransferScreen from './wallet/wallet.transfer';
 
-interface WalletProps {}
+interface WalletProps {
+    balance: string
+}
 
 interface ContentMap {
     [key: string]: ReactElement;
@@ -21,7 +23,7 @@ type incomeParams = {
     senderId: string,
 }
 
-const Wallet: React.FC<WalletProps> = () => {
+const Wallet: React.FC<WalletProps> = ({balance}) => {
     const location = useLocation();
     const navigate = useNavigate();
     const wNumber = location.state?.walletNumber;
@@ -46,7 +48,7 @@ const Wallet: React.FC<WalletProps> = () => {
             return setLoading(false);
         })
         .catch(err => {
-            setLoading(false); // Also set loading to false if there is an error
+            setLoading(false);
             if (err.AR) {
                 logout();
             } else {
@@ -56,7 +58,7 @@ const Wallet: React.FC<WalletProps> = () => {
     }
 
     useEffect(() => {
-        setLoading(true); // Set loading to true at the start of the effect
+        setLoading(true);
         loadPage();
     }, [activeContent]);
 
@@ -65,10 +67,11 @@ const Wallet: React.FC<WalletProps> = () => {
     };
 
     return (
+        loading ? <ActivityIncicator /> : (
 <div className="p-p-c">
             <div className="wallet-container">
                 <div className="balance-display">
-                    {wallet && wallet.balance ? balanceParser(wallet.balance) : ''}
+                    {balance}
                 </div>
                 <div className="navigation-buttons">
                     {Object.keys(content).map((key) => (
@@ -87,7 +90,7 @@ const Wallet: React.FC<WalletProps> = () => {
                 </div>
             </div>
         </div>
-        )
+        ))
 };
 
 export default Wallet;

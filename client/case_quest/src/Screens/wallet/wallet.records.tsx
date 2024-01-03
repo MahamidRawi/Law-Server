@@ -26,12 +26,11 @@ const RecordsScreen: React.FC<IncomeProps> = ({recordList, type}) => {
         setLoading(true);
         if (recordList) setLoading(false);
     }, [recordList])
-    console.warn(recordList)
 
     return (
         loading ? <ActivityIncicator fullScreen /> : (
             <div className='scroll-wallet'>
-                {recordList.map((record, idx) => (
+                {recordList.length === 0 ? <h2 className='ct'>No Records... Yet !</h2> : recordList.map((record, idx) => (
                     <RecordCard type={type} key={idx} data={record} />
                 ))}
             </div>

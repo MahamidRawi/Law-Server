@@ -19,24 +19,16 @@ const RecordCard: React.FC<RecordCardProp> = ({ data, type }) => {
     const isIncome = type === 'Income';
 
     useEffect(() => {
-        // Check if the necessary data is present before making a request
         const identifier = isIncome ? data.sender : data.target;
-        console.log(isIncome);
         if (identifier) {
             setLoading(true);
             getLawyerInformation(identifier)
                 .then(res => {
                     setUserInfo(res.userInfo); 
-                    console.log(res.userInfo);// Make sure the response has the expected structure
-                    setLoading(false);
+                    return setLoading(false);
                 })
-                .catch(err => {
-                    console.error(err);
-                    logout();
-                });
-        } else {
-            setLoading(false);
-        }
+                .catch(err => logout());
+        } else setLoading(false);
     }, [data, isIncome, logout]);
 
     if (loading) {
@@ -50,6 +42,7 @@ const RecordCard: React.FC<RecordCardProp> = ({ data, type }) => {
                     <div className="flex-grow-1">
                         <p className="mb-2"><b>{type === 'Income' ? 'From:' : 'To:'}</b> {userInfo.firstName} {userInfo.lastName}</p>
                         <p className="mb-2"><b>Amount:</b> <span className={type + 'style'}>{isIncome ? '+' : '-'} {balanceParser(Math.abs(data.amount))}</span></p>
+                        {!isIncome && <p className="mb-2"><b>Fee:</b> - <span className={type + 'style'}>{balanceParser(Math.abs(data.amount * 0.02))}</span></p>}
                         <p className="mb-2"><b>Reason:</b> {data.reason}</p>
                         <p className="mb-2"><b>Date:</b> {formatDate(data.date)}</p>
                     </div>

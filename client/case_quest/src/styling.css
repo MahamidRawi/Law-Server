@@ -337,6 +337,8 @@
     color: goldenrod;
 }
 
+
+
 .green-content-container {
     border: 3px solid red;
     padding: 20px;
@@ -424,7 +426,7 @@
     display: flex;
     flex-shrink: 0;
     padding: 10px;
-    min-height: 30%;
+    min-height: 50%;
     z-index: 20;
     top: 0; /* Adjust padding if necessary */
     /* Add other styles to match the layout requirements */
@@ -476,11 +478,6 @@
     /* height: calc(100% - 26.5vh); */
     z-index: 0;
 }
-
-/* .cardPad {
-    padding-top: 7vh;
-} */
-
 hr {
     left: 0;
     position: absolute;
