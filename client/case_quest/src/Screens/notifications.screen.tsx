@@ -113,9 +113,7 @@ const NotificationScreen: React.FC<NotProps> = ({content}) => {
         </div>
         <div className="p-container">
             {not?.length > 0 ? <ScrollWindow type='Notification' ud={myid} content={filteredLawyers} /> : 
-                <div className='testerror'>
                     <p className="alert alert-light text-center">No Notifications</p>
-                </div>
             } 
                 
         </div>

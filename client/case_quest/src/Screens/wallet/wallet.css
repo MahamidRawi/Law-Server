@@ -4,15 +4,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: green;
 }
 
 .clr {
     padding: 3%;
-    color: white;
+    color: black;
+    background-color: white;
     height: 100%;
     width: 100%;
-    border: 2px solid #ced4da;
     border-radius: 10px;
 }
 

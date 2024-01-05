@@ -4,20 +4,31 @@ import { AuthContext } from "../Providers/auth.provider";
 import ScrollWindow from "../RC/scroll.window";
 import { UserCase, UserInfo } from "../data/types";
 import '../styling.css';
-import { Link } from "react-router-dom";
+import '../wallet.css';
+import { Link, useNavigate } from "react-router-dom";
+import { ActivityIncicator } from "../RC/acitivity.incdicator";
 
 const Home = () => {
     const [userCases, setUserCases] = useState<UserCase>([]); // Initialize with an empty array
     const [userInfo, setUserInfo] = useState<UserInfo>();
     const { user, logout } = useContext(AuthContext);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
+        setLoading(true);
         fetchHomePage(user).then(res => {
             setUserInfo(res.info.userInfo);
-            return setUserCases(res.info.userCases);
+            setUserCases(res.info.userCases);
+            return setLoading(false);
         }).catch(err => logout());
     }, []);
 
+    
+    
+    const handleButtonClick = () => {
+        return navigate('/NewCase');
+    }
     const mockCases = [
         {
             _id: "5f50c31e1c9d44000047fb60",
@@ -51,24 +62,23 @@ const Home = () => {
         }
         // ... more cases can be added in the same format
     ];
-    
-    
+
+    const tCase = []
 
     return (
-        <div className="header-decoration">
-        <div className="p-container">
-            {/* {userCases.length > 0 ? <ScrollWindow content={userCases} /> : 
-                <div className='testerror'>
-                    <p className="alert alert-light text-center">No Cases Found</p>
-                    <p className='lnk'>Looks like You have No Ongoing Cases :( <Link className="link" to="/Cases">Find New Cases !</Link></p>
-                </div>
-            }  */}
-
-            <ScrollWindow type="Case" center="c-sw" content={mockCases} />
+        <div>
+            {tCase.length <= 0 && <div className="searchbar d-flex flex-column hp">
+            <button type="button" className="searchbutton" onClick={() => navigate('/NewCase')}>+ Find New Case</button>
+             <p className="alert alert-light text-center mt-5">No Ongoing Cases Currently... Find New Cases :)</p>
+        </div>
+}
+        <div className={`p-container ${tCase.length > 0 ? 'cp' : 'restrain'}`}>
+            {tCase?.length > 0 && <ScrollWindow center="c-sw" type='Case' content={[]} />} 
                 
         </div>
-        </div>
+        </div>           
     );
 }
 
 export default Home;
+

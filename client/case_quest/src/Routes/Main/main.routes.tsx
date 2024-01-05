@@ -15,6 +15,7 @@ import MailScreen from '../../Screens/mail.screen';
 import { ViewMail } from '../../RC/cards.rc';
 import Wallet from '../../Screens/wallet.screen';
 import { getWallet } from '../../actions/main/wallet.actions';
+import NewCase from '../../Screens/cases/newcase.form';
 
 
 const MainRoutes = () => {
@@ -63,7 +64,7 @@ const MainRoutes = () => {
             </Navbar>
             <Routes>
                 <Route index path='/' element={<Home />}/>
-                <Route path='/Cases' element={<>Cases</>}/>
+                <Route path='/Cases' element={<Home />}/>
                 <Route path='/Lawyers' element={<Lawyers />}/>
                 <Route path='/Firms' element={<>Firms</>}/>
                 <Route path='/My-Firm' element={<>My Firm</>}/>
@@ -71,6 +72,7 @@ const MainRoutes = () => {
                 <Route path='/Mail' element={<MailScreen />} />
                 <Route path='/ViewMail' element={<ViewMail/>}/>
                 <Route path='/Wallet' element={<Wallet balance={wallet?.balance && balanceParser(wallet?.balance)}/>}/>
+                <Route path='/NewCase' element={<NewCase />}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen content={userInfo.notifications}/>}/> : null}
             </Routes>
         </div>

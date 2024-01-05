@@ -30,6 +30,11 @@ const WalletSchema = new Schema({
         type : String,
         unique: true,
         required: true
+    },
+
+    admin: {
+        type: Boolean,
+        default: false
     }
 }, { versionKey: false });
 

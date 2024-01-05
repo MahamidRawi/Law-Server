@@ -6,6 +6,9 @@
     overflow: hidden;
     background: linear-gradient(135deg, #2b2d3e 0%, #242639 100%); /* Lighter and more vibrant background */
 }
+.cp {
+    margin-top: 10px;
+}
 
 .spinner-parent {
     position: fixed;
@@ -67,6 +70,7 @@
 
 .p-container {
     width: 100vw;
+    overflow: auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -117,12 +121,17 @@
     width: 80%
 }
 
+.hp {
+    position: absolute;
+    height: 80vh;
+}
+
 .scroll-window {
     position: absolute;
     overflow: auto;
     padding-top: 20px;
     padding-bottom: 20px;
-    height: 70vh;
+    height: 75vh;
     border-radius: 10px;
     justify-self: center;
     align-self: center;
@@ -178,6 +187,7 @@
 .m-form {
     position: absolute;
     max-width: 80%;
+    overflow: scroll;
     padding: 20px;
     background: white;
     border-radius: 8px;
@@ -313,8 +323,8 @@
     position: relative; /* Relative to the parent container */
     width: 100%; /* Full width of its parent */
     margin-top: 20px; /* Space from the top */
-    padding: 10px; 
-    top: 120px;
+    padding: 10px;
+    top: 10vh;
 }
 
 .sp button {

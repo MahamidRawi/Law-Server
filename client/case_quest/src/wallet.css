@@ -2,10 +2,25 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    top: 20%;
     min-height: 100vh;
     width: 75%;
-    background: linear-gradient(135deg, #2b2d3e 0%, #242639 100%);
+    /* background: linear-gradient(135deg, #2b2d3e 0%, #242639 100%); */
     padding-top: 20px; /* Adjust as needed */
+}
+.form-label {
+    font-weight: 500;
+    color: black !important;
+}
+
+.ncform {
+    height: 80%;
+    overflow: auto;
+    margin-top: 20px;
+}
+
+.transfer-reasons:hover {
+    cursor: pointer;
 }
 
 .balance-display {

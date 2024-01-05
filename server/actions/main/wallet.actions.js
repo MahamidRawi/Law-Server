@@ -16,29 +16,39 @@ const transferMoney = (senderId, transactionInfo) => {
       wallet.findOne({ admin: true }).exec(),
     ])
     .then(async ([walletFound, senderWallet, fetchedSenderUser, fetchedTargetUser, fetchedAdminWallet]) => {
-        const transactionFeeMultiplier = 1.02;
-        const requiredBalance = fetchedSenderUser.admin ? amount : amount * transactionFeeMultiplier;
-        if (!walletFound || !senderWallet || !fetchedSenderUser) {
-        throw new Error('No Wallet or User Found');
-      }
-      if (senderId.toString() === (fetchedTargetUser && fetchedTargetUser._id.toString()) || !reason) {
-        throw new Error(!reason ? 'Please Provide a Reason' : 'You cannot send money to yourself!');
-      }
-      if (senderWallet.balance < requiredBalance) {
-        throw new Error('Insufficient balance to complete this transaction');
-      }
+        if (!walletFound || !senderWallet || !fetchedSenderUser) throw new Error('No Wallet or User Found')
+      if (senderId.toString() === (fetchedTargetUser && fetchedTargetUser._id.toString()) || !reason) throw new Error(!reason ? 'Please Provide a Reason' : 'You cannot send money to yourself!');
+      
+      if (senderWallet.balance < amount * 1.02) throw new Error('Insufficient balance to complete this transaction');
 
       const adminWalletUpdate = {
         $inc: { balance: amount * 0.02 },
-        $push: { income: { sender: senderId, amount: amount * 0.02, reason: 'Transaction Fee', date } }
+        $push: {
+          income: {
+            $each: [{ sender: senderId, amount: amount * 0.02, reason: 'Transaction Fee', date }],
+            $position: 0, // Insert at the beginning of the array
+          },
+        },
       };
+      
       const senderWalletUpdate = {
         $inc: { balance: -(amount * 1.02) },
-        $unshift: { expenses: { target: fetchedTargetUser.id, amount: amount , reason, date } }
+        $push: {
+          expenses: {
+            $each: [{ target: fetchedTargetUser.id, amount: amount, reason, date }],
+            $position: 0, // Insert at the beginning of the array
+          },
+        },
       };
+      
       const recipientWalletUpdate = {
         $inc: { balance: amount },
-        $unshift: { income: { sender: senderId, amount, reason, date } }
+        $push: {
+          income: {
+            $each: [{ sender: senderId, amount, reason, date }],
+            $position: 0, // Insert at the beginning of the array
+          },
+        },
       };
 
       await Promise.all([
