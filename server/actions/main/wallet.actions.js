@@ -25,10 +25,10 @@ const addAdminFee = async (amount, reason, senderId, date) => {
       };
 
       const userWalletUpdate = {
-        $inc: { balance: -amount },
+        $inc: { balance: -requiredAmount },
         $push: {
           expenses: {
-            $each: [{ target: fetchedAdmin._id, amount: amount, reason, date }],
+            $each: [{ target: fetchedAdmin._id, amount: requiredAmount, reason, date }],
             $position: 0, // Insert at the beginning of the array
           },
         },
@@ -56,7 +56,7 @@ const sendMoney = (senderId, transactionInfo) => {
           if (senderWallet.balance < amount * 1.02) throw new Error('Insufficient balance to complete this transaction');
           addAdminFee(amount, 'Transaction Fee', senderId, date);
           const senderWalletUpdate = {
-            $inc: { balance: -(amount * 1.02) },
+            $inc: { balance: -amount },
             $push: {
               expenses: {
                 $each: [{ target: fetchedTargetUser.id, amount: amount, reason, date }],
