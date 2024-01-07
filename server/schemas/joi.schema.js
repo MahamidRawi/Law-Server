@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { fieldsOfLaw, lawSystems } = require('../vars/vars');
 
 const authSchema = Joi.object({
   firstName: Joi.string()
@@ -42,4 +43,11 @@ const mailSchema = Joi.object({
   body: Joi.string().required()
 })
 
-module.exports = {authSchema, inAuthSchema, mailSchema}
+const caseSchema = Joi.object({
+  fieldOfLaw: Joi.string().valid(...fieldsOfLaw).required(),
+  position: Joi.string().valid('defense', 'prosecution', 'random').required(),
+  difficulty: Joi.string().valid('easy', 'medium', 'hard', 'extreme').required(),
+  lawSystem: Joi.string().valid(...lawSystems).required()
+})
+
+module.exports = {authSchema, inAuthSchema, mailSchema, caseSchema}

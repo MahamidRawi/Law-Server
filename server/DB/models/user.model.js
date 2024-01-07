@@ -50,6 +50,16 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    
+    cases: {
+        type: Array,
+        default: []
+    },
+
+    caseHistory: {
+        type: Array,
+        default: []
+    },
 
     admin: {
         type: Boolean,

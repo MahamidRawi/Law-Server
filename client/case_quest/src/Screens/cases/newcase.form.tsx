@@ -68,13 +68,22 @@ const NewCase: React.FC<NewCaseProps> = () => {
               onChange={handlePositionChange}
             />
             <Form.Check
-              className="mb-3"
               label="Prosecution"
               name="position"
               type="radio"
               id={`inline-radio-prosecution`}
               value="prosecution"
               checked={selectedPosition === 'prosecution'}
+              onChange={handlePositionChange}
+            />
+            <Form.Check
+              className="mb-3"
+              label="Random"
+              name="position"
+              type="radio"
+              id={`inline-radio-prosecution`}
+              value="random"
+              checked={selectedPosition === 'random'}
               onChange={handlePositionChange}
             />
 
@@ -127,7 +136,7 @@ const NewCase: React.FC<NewCaseProps> = () => {
 
           <div className="d-grid">
             <button className="btn btn-primary btn-lg" id="submitButton" type="submit">
-              Find New Case
+              Find New Case (250 $)
             </button>
           </div>
         </form>

@@ -17,14 +17,16 @@ const RecordCard: React.FC<RecordCardProp> = ({ data, type }) => {
     const [loading, setLoading] = useState(true);
     const [userInfo, setUserInfo] = useState<{ firstName?: string, lastName?: string }>({});
     const isIncome = type === 'Income';
-
+    const [isCGF, setCGF] = useState<boolean>(true);
     useEffect(() => {
         const identifier = isIncome ? data.sender : data.target;
         if (identifier) {
             setLoading(true);
             getLawyerInformation(identifier)
                 .then(res => {
-                    setUserInfo(res.userInfo); 
+                    setUserInfo(res.userInfo);
+                    setCGF(data.reason == 'Case Generation Fee');
+                    console.log(isCGF)
                     return setLoading(false);
                 })
                 .catch(err => logout());
@@ -42,7 +44,7 @@ const RecordCard: React.FC<RecordCardProp> = ({ data, type }) => {
                     <div className="flex-grow-1">
                         <p className="mb-2"><b>{type === 'Income' ? 'From:' : 'To:'}</b> {userInfo.firstName} {userInfo.lastName}</p>
                         <p className="mb-2"><b>Amount:</b> <span className={type + 'style'}>{isIncome ? '+' : '-'} {balanceParser(Math.abs(data.amount))}</span></p>
-                        {!isIncome && <p className="mb-2"><b>Fee:</b> - <span className={type + 'style'}>{balanceParser(Math.abs(data.amount * 0.02))}</span></p>}
+                        {!isIncome || !isCGF && <p className="mb-2"><b>Fee:</b> - <span className={type + 'style'}>{balanceParser(Math.abs(data.amount * 0.02))}</span></p>}
                         <p className="mb-2"><b>Reason:</b> {data.reason}</p>
                         <p className="mb-2"><b>Date:</b> {formatDate(data.date)}</p>
                     </div>

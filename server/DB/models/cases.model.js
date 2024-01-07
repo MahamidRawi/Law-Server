@@ -26,9 +26,26 @@ const CaseSchema = new Schema({
         type: String,
         required: true,
     }, 
+    discoveries: {
+        type: Array,
+        default: []
+    },
+    lawSystem: {
+        type: String,
+        default: 'Common Law (USA)'
+    },
+    verdict: {
+        type: Object,
+        default: {}
+    },
+
     owners: {
         type: Array,
         required: true,
+    },
+    date: {
+        type: Date,
+        default: Date.now()
     }
 }, { versionKey: false });
 

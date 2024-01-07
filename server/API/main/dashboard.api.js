@@ -4,8 +4,9 @@ const MailRouter = require('../mail/mail.api');
 const WalletRouter = require('../wallet/wallet.api');
 const { validate } = require('../../middleware/auth/auth.middleware');
 const { createCase, getCases, getUser, getUsers } = require('../../actions/main/fetch.actions');
-
+const CasesRouter = require('../cases/cases.api');
 router.use('/mail', MailRouter);
+router.use('/cases', CasesRouter);
 router.use('/wallet', WalletRouter)
 
 router.get('/fetchHomePage', validate, async (req, res) => {
