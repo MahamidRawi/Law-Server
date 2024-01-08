@@ -9,13 +9,15 @@ const cases = mongoose.model('casesModel');
 const users = mongoose.model('userModel');
 
 
-const getCases = (uid) => {
+const getCases = (casesArr) => {
+    console.log(casesArr)
     return new Promise(async (resolve, reject) => {
     try {
-        const response = await cases.find({owners: {$in: [uid]}})
+        const response = await cases.find({_id: {$in: casesArr}})
+        console.log(response)
         return resolve({success: true, cases: response});
     } catch(err) {
-        console.log('ERRRRRR;m', err)
+        console.log(err);
         return reject({success: false, stc:500, message: Err500, err});
     }
 });

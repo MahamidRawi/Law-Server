@@ -16,13 +16,6 @@ interface ContentMap {
     [key: string]: ReactElement;
 }
 
-type incomeParams = {
-    from: string, 
-    amount: number,
-    date: Date, 
-    senderId: string,
-}
-
 const Wallet: React.FC<WalletProps> = ({balance}) => {
     const location = useLocation();
     const navigate = useNavigate();

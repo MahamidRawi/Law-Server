@@ -68,6 +68,10 @@
     margin-top: 60px;
 }
 
+.cf {
+    top: 0;
+}
+
 .p-container {
     width: 100vw;
     overflow: auto;

@@ -12,13 +12,10 @@ router.use('/wallet', WalletRouter)
 router.get('/fetchHomePage', validate, async (req, res) => {
     try {
         const userInfo = await getUser(req.userId);
-        const userCases = await getCases(req.userId);
+        const userCases = await getCases(userInfo.info.cases);
         const data = { userInfo, userCases };
-        console.log(data);
         return res.json(data);
     } catch (err) {
-        console.error(err);
-        // Send back a generic error message to avoid leaking any sensitive error info
         return res.status(500).json({ message: 'An error occurred' });
     }
 });

@@ -6,6 +6,7 @@ import { fieldsOfLaw, lawSystems } from '../../schemas/law.inputs';
 import { Form } from 'react-bootstrap';
 import '../../wallet.css';
 import { ActivityIncicator } from '../../RC/acitivity.incdicator';
+import { createCase } from '../../actions/main/cases.actions';
 
 interface NewCaseProps {}
 
@@ -24,19 +25,30 @@ const NewCase: React.FC<NewCaseProps> = () => {
   const [selectedPosition, setSelectedPosition] = useState<string>('defense');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('easy');
   const [loading, setLoading] = useState(false);
-
+  const [lawSystem, setLawSystem] = useState('');
+    const [additionalKeywords, setAdditionalKeywords] = useState<string>(fol);
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setSubmitError('');
-    return setTimeout(() => setLoading(false), 400)
-  };
+    const caseInfo = {
+        difficulty: selectedDifficulty,
+        position: selectedPosition,
+        fieldOfLaw: fol,
+        additionalKeywords,
+        lawSystem
+
+    }
+    createCase(caseInfo).then(res => {
+        setSubmitted(true);
+        return setLoading(false);
+    }).catch(err => {console.log(err); setLoading(false); err.AR ? logout() : setSubmitError(err.message)});
+};
 
   const handlePositionChange = (e: ChangeEvent<HTMLInputElement>) => setSelectedPosition(e.target.value);
   const handleDifficultyChange = (e: ChangeEvent<HTMLInputElement>) => setSelectedDifficulty(e.target.value);
-
+const handleKeywordsChange = (e: ChangeEvent<HTMLInputElement>) => setAdditionalKeywords(e.target.value);
   const setFieldOfLaw = (field: string) => setFOL(field);
-
   return (
     <div className="p-m-c">
       <div className="container py-4 m-form ncform">
@@ -47,7 +59,7 @@ const NewCase: React.FC<NewCaseProps> = () => {
           </center>
           <Form.Group>
             <Form.Label className="form-label">Field Of Law</Form.Label>
-            <Form.Control as="select" value={fol} onChange={(e: any) => setFieldOfLaw(e.target.value)} className="transfer-reasons mb-4">
+            <Form.Control required as="select" value={fol} onChange={(e: any) => setFieldOfLaw(e.target.value)} className="transfer-reasons mb-4">
               <option value="">Select a Field of Law</option>
               {fieldsOfLaw.map((r) => (
                 <option key={r} value={r}>
@@ -106,14 +118,14 @@ const NewCase: React.FC<NewCaseProps> = () => {
 
           <Form.Label className="form-label">Additional Keywords</Form.Label>
 
-          <Form.Control type="text" placeholder="Enter Additional Keywords" />
+          <Form.Control type="text" placeholder="Enter Additional Keywords" onChange={handleKeywordsChange}/>
           <Form.Text className="text-muted">
             Make sure to separate them with ";" (Ex: Inside Trading ; Defamation...)
           </Form.Text>
           <br />
 
           <Form.Label className="form-label mt-3">Law System</Form.Label>
-          <Form.Control as="select" value={fol} onChange={(e: any) => setFOL(e.target.value)} className="transfer-reasons mb-4">
+          <Form.Control required as="select" value={lawSystem} onChange={(e: any) => setLawSystem(e.target.value)} className="transfer-reasons mb-4">
             <option value="">Select a Law System</option>
             {lawSystems.map((r) => (
               <option key={r} value={r}>
@@ -124,7 +136,7 @@ const NewCase: React.FC<NewCaseProps> = () => {
 
           {submitted && !submitError && (
             <div className="alert alert-success" role="alert" id="submitSuccessMessage">
-              <center>Mail Sent Successfully!</center>
+              <center>Case Created Successfully</center>
             </div>
           )}
 

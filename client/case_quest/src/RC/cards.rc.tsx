@@ -3,7 +3,7 @@ import { IndCase, NotificationsProps, UserCase } from '../data/types';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
 import { Icon } from '@iconify/react';
-import { formatDate } from '../helper/res.helper';
+import { cutResume, formatDate } from '../helper/res.helper';
 import { openMail } from '../actions/main/mail.actions';
 import { AuthContext } from '../Providers/auth.provider';
 
@@ -42,7 +42,7 @@ const Case: React.FC<CaseProps> = ({data, viewMore = false}) => {
     return (
         <>
                                 <h5 className="card-title">{data.title}</h5>
-                                <p className="card-text">{data.summary}</p>
+                                <p className="card-text">{cutResume(data.summary)}</p>
                                 {viewMore && <Link to="#" className="btn btn-primary">View More</Link>}
                             </>
     )

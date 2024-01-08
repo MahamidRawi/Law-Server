@@ -28,7 +28,8 @@ const addCaseToUser = async (tId, caseId) => {
 const createCase = async (uid, caseInfo) => {
     const date = Date.now();
     return new Promise(async (resolve, reject) => {
-        const {lawSystem, difficulty, position} = caseInfo;
+        const {lawSystem, difficulty, position, fieldOfLaw} = caseInfo;
+        caseSchema.validateAsync({lawSystem, difficulty, position, fieldOfLaw}).catch(err => reject({success: false, message: err.message, stc: 400}))
         const userFound = await users.findOne({_id: uid}).catch(err => reject({stc: 500, message: 'An Error has Occured'}));
         const sufficientBalance = compareBalanceToRequiredAmount(uid, 250);
         if (!userFound || userFound.cases.length === 3 || !sufficientBalance) reject({message: !userFound ? 'User Not Found': cases.length === 3 ?'You are already handeling 3 ongoing cases' : 'Insufficient Balance', stc: !userFound ? 401 : 400});

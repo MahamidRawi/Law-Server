@@ -21,8 +21,8 @@ const fetchHomePage = (user: any): Promise<resProps> => {
         if (!token || !user) return reject({success: false, message: 'Failed'})
 
     try {
-        const {userInfo, userCases} = (await axios.get(config.API_BASE_URL+'/main/fetchHomePage', {headers: {'x-access-token': token}})).data; 
-        return resolve({success: true, info: {userInfo: userInfo.info, userCases}});
+        const res = (await axios.get(config.API_BASE_URL+'/main/fetchHomePage', {headers: {'x-access-token': token}})).data;
+        return resolve({success: true, info: {userInfo: res.userInfo.info, userCases: res.userCases.cases}});
 } catch (err) {
     return reject({success: false, message: 'Failed'});
 }
