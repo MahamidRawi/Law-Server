@@ -17,6 +17,7 @@ const createCasePrompt = (uid, caseInfo) => {
           "title": "Discovery title",
           "content": "Detailed description or dialog repliques.",
           "dialog": "true/false for dialogues",
+          "exactContent": "The Exact content of the document, not summary, exact content litteraly word by word with exact form : {if mail : {sender (name), receiver (name), content, date, parties (object of name and role)} and in the content I want exact information as if we were in the situation}"
           "date": "Discovery date",
           "repliques": "Array of {speaker, statement} if dialog is true"
         }
