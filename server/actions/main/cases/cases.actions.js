@@ -42,8 +42,22 @@ const createCase = async (uid, caseInfo) => {
         newCase.lawSystem = lawSystem;
         newCase.owners = [uid, 'AI'];
         newCase.difficulty = difficulty;
-        newCase.prosecution = position == 'prosecution' ? uid : 'AI'
-        newCase.defense = position == 'defense' ? uid : 'AI'
+        
+if (position === 'prosecution') {
+  newCase.prosecution = uid;
+  newCase.defense = 'AI';
+} else if (position === 'defense') {
+  newCase.prosecution = 'AI';
+  newCase.defense = uid;
+} else { // position is random
+  if (Math.random() < 0.5) {
+      newCase.prosecution = uid;
+      newCase.defense = 'AI';
+  } else {
+      newCase.prosecution = 'AI';
+      newCase.defense = uid;
+  }
+}
         newCase.save().then(async suc => {
         await addAdminFee(250, 'Case Generation Fee', uid, date);
         await addCaseToUser(uid, suc._id);
