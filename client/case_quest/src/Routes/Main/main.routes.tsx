@@ -16,6 +16,7 @@ import { ViewMail } from '../../RC/cards.rc';
 import Wallet from '../../Screens/wallet.screen';
 import { getWallet } from '../../actions/main/wallet.actions';
 import NewCase from '../../Screens/cases/newcase.form';
+import Logo from '../../RC/logo.screen';
 
 
 const MainRoutes = () => {
@@ -54,7 +55,7 @@ const MainRoutes = () => {
                     </Link>
             <p className='balance-header'>{wallet?.balance && balanceParser(wallet?.balance)}</p>
                     <Nav className="justify-content-center w-100">
-                        <Link to="/" className="navbar-brand ml-25">CaseQuest</Link>
+                        <Link to="/" className="navbar-brand ml-25 applogo">CQ</Link>
                         <Link className='nav-link' to="/Cases">Cases</Link>
                         <Link className='nav-link' to="/Lawyers">Lawyers</Link>
                         <Link className='nav-link' to="/Firms">Firms</Link>
@@ -63,7 +64,7 @@ const MainRoutes = () => {
                 </Container>
             </Navbar>
             <Routes>
-                <Route index path='/' element={<Home />}/>
+                <Route index path='/' element={<Logo />}/>
                 <Route path='/Cases' element={<Home />}/>
                 <Route path='/Lawyers' element={<Lawyers />}/>
                 <Route path='/Firms' element={<>Firms</>}/>

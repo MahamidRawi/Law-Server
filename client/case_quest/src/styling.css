@@ -1,3 +1,5 @@
+@import url(https://fonts.googleapis.com/css?family=Inter);
+
 .auth-container {
     display: flex;
     justify-content: center;
@@ -6,6 +8,30 @@
     overflow: hidden;
     background: linear-gradient(135deg, #2b2d3e 0%, #242639 100%); /* Lighter and more vibrant background */
 }
+
+.fc {
+    position: absolute;
+    top: 55px;
+    color: white;
+    height: calc(100% - 55px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.fc h1 {
+    color: white;
+    letter-spacing: -40px;
+    font-family: 'Inter';
+    font-size: 10vh;
+}
+
+.applogo {
+    letter-spacing: -8px;
+    font-family: "Inter";
+}
+
 .cp {
     margin-top: 10px;
 }
