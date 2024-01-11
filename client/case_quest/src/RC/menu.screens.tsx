@@ -10,6 +10,7 @@ import ActionScreen from '../Screens/cases/caseActions/actions.screen';
 import DiscoveryScreen from '../Screens/cases/caseActions/discoveries.screen';
 import CaseOverView from '../Screens/cases/caseActions/case.overview';
 import Participants from '../Screens/cases/caseActions/case.participants';
+import { ContentMap } from '../data/data';
 
 interface WalletProps {
     title?: string
@@ -17,16 +18,12 @@ interface WalletProps {
     caseId?: string
 }
 
-interface ContentMap {
-    [key: string]: ReactElement;
-}
-
 const MenuScreen: React.FC<WalletProps> = ({title, type, caseId}) => {
     const location = useLocation();
     const wNumber = location.state?.walletNumber;
     const tRoute = location.state?.targetRoute
     const walletNumber = wNumber ? wNumber : ''
-    const targetRoute = tRoute ? tRoute : location.pathname == '/Wallet' ? 'Income' : 'Overview';
+    const targetRoute = tRoute ? tRoute : 'Income';
     const { logout } = useContext(AuthContext);
     const [activeContent, setActiveContent] = useState<any>(targetRoute);
     const [wallet, setWallet] = useState<any>({});
@@ -38,12 +35,7 @@ const MenuScreen: React.FC<WalletProps> = ({title, type, caseId}) => {
         Transfer: <TransferScreen walletNumber={walletNumber} />
     };
 
-    const caseContent: ContentMap = {
-        Overview: <CaseOverView caseId={caseId} />,
-        Actions: <ActionScreen />,
-        Discoveries: <DiscoveryScreen />,
-        Participants: <Participants caseId={caseId} />
-    }
+    
 
     const loadPage = () => {
         getWallet()
@@ -62,11 +54,9 @@ const MenuScreen: React.FC<WalletProps> = ({title, type, caseId}) => {
     }
 
     useEffect(() => {
-        console.log(targetRoute, type)
-        console.log(tRoute, location)
         setLoading(true);
         loadPage();
-    }, [activeContent, location.pathname]);
+    }, [activeContent]);
 
     const handleButtonClick = (content: React.SetStateAction<string>) => {
         setActiveContent(content);
@@ -80,7 +70,7 @@ const MenuScreen: React.FC<WalletProps> = ({title, type, caseId}) => {
                     {title}
                 </div>
                 <div className="navigation-buttons">
-                    {Object.keys(type == 'Wallet' ? content : caseContent).map((key) => (
+                    {Object.keys(content).map((key) => (
                         <button
                             key={key}
                             className={activeContent === key ? 'active' : ''}
@@ -91,7 +81,7 @@ const MenuScreen: React.FC<WalletProps> = ({title, type, caseId}) => {
                 </div>
                 <div className="content-area">
                     <div className="content-area2">
-                    {type == 'Wallet' ? content[activeContent as keyof ContentMap] : caseContent[activeContent as keyof ContentMap]}
+                    {content[activeContent as keyof ContentMap]}
                     </div>
                 </div>
             </div>

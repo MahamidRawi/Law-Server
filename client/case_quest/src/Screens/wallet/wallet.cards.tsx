@@ -44,7 +44,6 @@ const RecordCard: React.FC<RecordCardProp> = ({ data, type }) => {
                     <div className="flex-grow-1">
                         <p className="mb-2"><b>{type === 'Income' ? 'From:' : 'To:'}</b> {userInfo.firstName} {userInfo.lastName}</p>
                         <p className="mb-2"><b>Amount:</b> <span className={type + 'style'}>{isIncome ? '+' : '-'} {balanceParser(Math.abs(data.amount))}</span></p>
-                        {!isIncome || !isCGF && <p className="mb-2"><b>Fee:</b> - <span className={type + 'style'}>{balanceParser(Math.abs(data.amount * 0.02))}</span></p>}
                         <p className="mb-2"><b>Reason:</b> {data.reason}</p>
                         <p className="mb-2"><b>Date:</b> {formatDate(data.date)}</p>
                     </div>

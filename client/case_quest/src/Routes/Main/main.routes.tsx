@@ -68,7 +68,7 @@ const MainRoutes: React.FC = () => {
             <Routes>
                 <Route index path='/' element={<Logo />}/>
                 <Route path='/Cases' element={<Home />}/>
-                <Route path='/ViewCase' element={<MenuScreen type='Case' />}/>
+                <Route path='/ViewCase' element={<ViewCase />}/>
                 <Route path='/Lawyers' element={<Lawyers />}/>
                 <Route path='/Firms' element={<>Firms</>}/>
                 <Route path='/My-Firm' element={<>My Firm</>}/>

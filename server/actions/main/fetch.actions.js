@@ -23,6 +23,23 @@ const getCases = (casesArr) => {
 });
 }
 
+const getCase = (caseId, uid) => {
+    return new Promise(async (resolve, reject) => {
+        console.log(caseId)
+
+        try {
+            const response = await cases.findOne({_id: caseId});
+            console.log(response, uid)
+            const isOwner = response.owners.includes(uid)
+            if (!response || !isOwner) return reject({success: false, stc: !response ? 404 : 400, message: !response ? 'Case Not Found' : 'You are not a participant in this case'})
+            return resolve({success: true, case: response});
+        } catch(err) {
+            console.log(err);
+            return reject({success: false, stc:500, message: Err500, err});
+        }
+    })
+}
+
 const createCase = () => {
     const newCase = new cases({
         defense: 'Defense Attorney',
@@ -72,4 +89,4 @@ const getUsers = async () => {
     })
 }
 
-module.exports = {getCases, createCase, getUser, getUsers, getWallet}
+module.exports = {getCases, getCase, createCase, getUser, getUsers, getWallet}
