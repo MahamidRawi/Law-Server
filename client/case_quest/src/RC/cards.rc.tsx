@@ -43,7 +43,7 @@ const Case: React.FC<CaseProps> = ({data, viewMore = false}) => {
         <>
                                 <h5 className="card-title">{data.title}</h5>
                                 <p className="card-text">{cutResume(data.summary)}</p>
-                                {viewMore && <Link to="#" className="btn btn-primary">View More</Link>}
+                                {viewMore && <Link to='/ViewCase' state={{data: {caseId: data._id}}} className="btn btn-primary">View Case</Link>}
                             </>
     )
 }

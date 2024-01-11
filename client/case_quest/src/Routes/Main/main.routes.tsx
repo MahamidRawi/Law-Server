@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { IoMailOutline, IoMailOpenOutline, IoWalletOutline, IoLogOut, IoLogOutOutline } from "react-icons/io5";
+import { IoMailOutline, IoWalletOutline, IoLogOutOutline } from "react-icons/io5";
 import { AuthContext } from '../../Providers/auth.provider';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import '../../styling.css'
@@ -17,9 +17,11 @@ import Wallet from '../../Screens/wallet.screen';
 import { getWallet } from '../../actions/main/wallet.actions';
 import NewCase from '../../Screens/cases/newcase.form';
 import Logo from '../../RC/logo.screen';
+import ViewCase from '../../Screens/cases/viewcase.screen';
+import MenuScreen from '../../RC/menu.screens';
 
 
-const MainRoutes = () => {
+const MainRoutes: React.FC = () => {
 
     const {user, logout} = useContext(AuthContext);
     const navigate = useNavigate();
@@ -55,7 +57,7 @@ const MainRoutes = () => {
                     </Link>
             <p className='balance-header'>{wallet?.balance && balanceParser(wallet?.balance)}</p>
                     <Nav className="justify-content-center w-100">
-                        <Link to="/" className="navbar-brand ml-25 applogo">CQ</Link>
+                        <Link to="/" className="navbar-brand ml-25">CaseQuest</Link>
                         <Link className='nav-link' to="/Cases">Cases</Link>
                         <Link className='nav-link' to="/Lawyers">Lawyers</Link>
                         <Link className='nav-link' to="/Firms">Firms</Link>
@@ -66,13 +68,14 @@ const MainRoutes = () => {
             <Routes>
                 <Route index path='/' element={<Logo />}/>
                 <Route path='/Cases' element={<Home />}/>
+                <Route path='/ViewCase' element={<MenuScreen type='Case' />}/>
                 <Route path='/Lawyers' element={<Lawyers />}/>
                 <Route path='/Firms' element={<>Firms</>}/>
                 <Route path='/My-Firm' element={<>My Firm</>}/>
                 <Route path='/MoreInfo' element={<LawyerInformationScreen />}/>
                 <Route path='/Mail' element={<MailScreen />} />
                 <Route path='/ViewMail' element={<ViewMail/>}/>
-                <Route path='/Wallet' element={<Wallet balance={wallet?.balance && balanceParser(wallet?.balance)}/>}/>
+                <Route path='/Wallet' element={<MenuScreen type='Wallet' title={wallet?.balance && balanceParser(wallet?.balance)}/>}/>
                 <Route path='/NewCase' element={<NewCase />}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen content={userInfo.notifications}/>}/> : null}
             </Routes>

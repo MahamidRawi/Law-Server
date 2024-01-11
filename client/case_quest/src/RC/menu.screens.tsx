@@ -1,28 +1,34 @@
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { AuthContext } from '../Providers/auth.provider';
 import '../wallet.css';
 import { getWallet } from '../actions/main/wallet.actions';
 import { ActivityIncicator } from '../RC/acitivity.incdicator';
-import { RecordsScreen } from './wallet/wallet.records';
-import TransferScreen from './wallet/wallet.transfer';
+import { RecordsScreen } from '../Screens/wallet/wallet.records';
+import TransferScreen from '../Screens/wallet/wallet.transfer';
+import ActionScreen from '../Screens/cases/caseActions/actions.screen';
+import DiscoveryScreen from '../Screens/cases/caseActions/discoveries.screen';
+import CaseOverView from '../Screens/cases/caseActions/case.overview';
+import Participants from '../Screens/cases/caseActions/case.participants';
 
 interface WalletProps {
-    balance: string
+    title?: string
+    type: 'Wallet' | 'Case'
+    caseId?: string
 }
 
 interface ContentMap {
     [key: string]: ReactElement;
 }
 
-const Wallet: React.FC<WalletProps> = ({balance}) => {
+const MenuScreen: React.FC<WalletProps> = ({title, type, caseId}) => {
     const location = useLocation();
     const wNumber = location.state?.walletNumber;
-    const tRoute = location.state?.targetRoute;
+    const tRoute = location.state?.targetRoute
     const walletNumber = wNumber ? wNumber : ''
-    const targetRoute = tRoute ? tRoute : 'Income';
+    const targetRoute = tRoute ? tRoute : location.pathname == '/Wallet' ? 'Income' : 'Overview';
     const { logout } = useContext(AuthContext);
-    const [activeContent, setActiveContent] = useState(targetRoute);
+    const [activeContent, setActiveContent] = useState<any>(targetRoute);
     const [wallet, setWallet] = useState<any>({});
     const [loading, setLoading] = useState<boolean>(false);
     
@@ -31,6 +37,13 @@ const Wallet: React.FC<WalletProps> = ({balance}) => {
         Expenses: <RecordsScreen type='Expense' recordList={wallet.expenses} />,
         Transfer: <TransferScreen walletNumber={walletNumber} />
     };
+
+    const caseContent: ContentMap = {
+        Overview: <CaseOverView caseId={caseId} />,
+        Actions: <ActionScreen />,
+        Discoveries: <DiscoveryScreen />,
+        Participants: <Participants caseId={caseId} />
+    }
 
     const loadPage = () => {
         getWallet()
@@ -49,9 +62,11 @@ const Wallet: React.FC<WalletProps> = ({balance}) => {
     }
 
     useEffect(() => {
+        console.log(targetRoute, type)
+        console.log(tRoute, location)
         setLoading(true);
-        return loadPage();
-    }, [activeContent]);
+        loadPage();
+    }, [activeContent, location.pathname]);
 
     const handleButtonClick = (content: React.SetStateAction<string>) => {
         setActiveContent(content);
@@ -62,10 +77,10 @@ const Wallet: React.FC<WalletProps> = ({balance}) => {
 <div className="p-p-c">
             <div className="wallet-container">
                 <div className="balance-display">
-                    {balance}
+                    {title}
                 </div>
                 <div className="navigation-buttons">
-                    {Object.keys(content).map((key) => (
+                    {Object.keys(type == 'Wallet' ? content : caseContent).map((key) => (
                         <button
                             key={key}
                             className={activeContent === key ? 'active' : ''}
@@ -76,7 +91,7 @@ const Wallet: React.FC<WalletProps> = ({balance}) => {
                 </div>
                 <div className="content-area">
                     <div className="content-area2">
-                    {content[activeContent as keyof ContentMap]}
+                    {type == 'Wallet' ? content[activeContent as keyof ContentMap] : caseContent[activeContent as keyof ContentMap]}
                     </div>
                 </div>
             </div>
@@ -84,4 +99,4 @@ const Wallet: React.FC<WalletProps> = ({balance}) => {
         ))
 };
 
-export default Wallet;
+export default MenuScreen;

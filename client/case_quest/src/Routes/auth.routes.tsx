@@ -8,10 +8,7 @@ const AuthRoutes = () => {
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Navigate to='/SignIn' replace/>}/>
-                    <Route
-      path="*"
-      element={<Navigate to="/" />}
-    />
+                    <Route path="*" element={<Navigate to="/" />}/>
                     <Route path='/SignUp' element={<AuthForm formType='Sign Up' />}/>
                     <Route path='/SignIn' element={<AuthForm formType='Sign In' />}/>
                 </Routes>
