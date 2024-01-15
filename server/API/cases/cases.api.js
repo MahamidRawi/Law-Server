@@ -10,8 +10,6 @@ router.post('/createCase', validate, (req, res) => {
 
 router.get('/getCase', validate, (req, res) => {
     const caseId = req.headers['caseid'];
-    console.log('CASEID : ', caseId)
-    console.log(req.userId)
     getCase(caseId, req.userId).then(resp => res.json(resp)).catch(err => res.status(err.stc).json(err));
 });
 

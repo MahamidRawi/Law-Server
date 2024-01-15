@@ -40,7 +40,8 @@ const MainRoutes: React.FC = () => {
         });
         setNotifications(filtered);
     }).catch(err => logout());
-}, [user, location, navigate]);
+    return
+}, [user, location]);
     return (
 <div className="parent-container">
             <Navbar bg="dark" className='navbarfix' variant="dark">
@@ -77,7 +78,7 @@ const MainRoutes: React.FC = () => {
                 <Route path='/ViewMail' element={<ViewMail/>}/>
                 <Route path='/Wallet' element={<MenuScreen type='Wallet' title={wallet?.balance && balanceParser(wallet?.balance)}/>}/>
                 <Route path='/NewCase' element={<NewCase />}/>
-                {userInfo ? <Route path='/Notifications' element={<NotificationScreen content={userInfo.notifications}/>}/> : null}
+                {userInfo ? <Route path='/Notifications' element={<NotificationScreen />}/> : null}
             </Routes>
         </div>
     )

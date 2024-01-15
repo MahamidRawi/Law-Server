@@ -12,13 +12,6 @@ interface NewCaseProps {}
 
 const NewCase: React.FC<NewCaseProps> = () => {
   const { logout } = useContext(AuthContext);
-  const location = useLocation();
-  const tMail = location.state?.targetMail;
-  const targetMail = tMail ? tMail : '';
-
-  const [subject, setSubject] = useState<string>('');
-  const [emailAddress, setEmailAddress] = useState<string>(targetMail);
-  const [message, setMessage] = useState<string>('');
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string>('');
   const [fol, setFOL] = useState<string>('');

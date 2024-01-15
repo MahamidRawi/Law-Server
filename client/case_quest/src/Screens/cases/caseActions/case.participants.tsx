@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import '../../../wallet.css'
 
 interface ParticipantsProps {
     caseId?: string
@@ -6,7 +7,9 @@ interface ParticipantsProps {
 
 const Participants: React.FC<ParticipantsProps> = ({caseId}) => {
     return (
-        <h1>{caseId}</h1>
+        <div className="scroll-wallet">
+            <h1>{caseId}</h1>
+        </div>
     )
 }
 

@@ -39,18 +39,21 @@ const createCasePrompt = (uid, caseInfo) => {
     return `Create a legal case model in ${fieldOfLaw} as ${position}. The case should be ${difficulty} level, detailed with ${additionalKeywords ? filter.clean(additionalKeywords) : 'No additional Keywords,'} under ${lawSystem}. The more complex the difficulty, the more nuanced the case. Be specific with Names, Dates, and Documents. Keep it realistic. Format:
 
     {
-        "title": "\${plaintiff} vs \${defendant}",
+        "title": "\${plaintiff fictional but realistic name} vs \${defendant fictional but realistic name}",
         "summary": "Concise case overview, including key allegations, defenses, and legal points in ${fieldOfLaw} under ${lawSystem}. This summary is for the viewer/reader",
         "participants": [
-            {"name": \${name}, "role": \${role}, "alive": \${boolean}}
+            {"name": \${name}, "role": \${role}, "alive": \${boolean}, "shortDescription": \${short description}}
+        // YOU CAN ADD MORE PARTICIPANTS FOLLOWING THE GIVEN SCHEMA TO MAKE IT MORE INTERESTING
         ],
         "discoveries": [
             ${Object.values(discoveryTemplates).map(template => JSON.stringify(template, null, 2)).join(',\n')}
         ]
+        "oppositionName": "Generate Fictional but realistic name for the Representing Attorney",
+
     }
     
     Ensure each element reflects the specified complexity and realism for the case's specifics and legal standards.    
-    ATTENTION: STRICTLY JSON! IMPORTANT
+    ATTENTION: !!!STRICTLY JSON!!! IMPORTANT
     `;
 }
 

@@ -91,14 +91,12 @@ const ViewMail: React.FC = () => {
     <div className="cardmail card">
   <div className="container py-3">
   <div className="row">
-    {/* <div className="col-md-6 mx-auto"> */}
-      {/* <div className="card"> */}
         <div className="card-body d-flex align-items-center">
           
-          {/* <div className="vertical-line"></div>  */}
           <div className="flex-grow-1">
             <p className="mb-2"><b>From : </b>{data.from}</p>
             <p className="mb-2"><b>To : </b>{data.to}</p>
+            <p className="mb-2"><b>Subject : </b>{data.subject}</p>
             <p className='mb-2'><b>Date : </b>{formatDate(data.date)}</p>
             <br />
             <div className="d-flex flex-column">

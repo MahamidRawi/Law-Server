@@ -33,28 +33,29 @@ const createCase = async (uid, caseInfo) => {
         const userFound = await users.findOne({_id: uid}).catch(err => reject({stc: 500, message: 'An Error has Occured'}));
         const sufficientBalance = compareBalanceToRequiredAmount(uid, 250);
         if (!userFound || userFound.cases.length === 3 || !sufficientBalance) reject({message: !userFound ? 'User Not Found': cases.length === 3 ?'You are already handeling 3 ongoing cases' : 'Insufficient Balance', stc: !userFound ? 401 : 400});
-        // caseSchema.validateAsync(fieldOfLaw, lawSystem,position, difficulty);
         const response = await openai.chat.completions.create({
             messages: [{ role: "system", content: createCasePrompt(uid, caseInfo) }],
     model: "gpt-3.5-turbo",
         });
-        const newCase = new cases(JSON.parse(response.choices[0].message.content));
+        const newRes = JSON.parse(response.choices[0].message.content);
+        console.log(newRes)
+        const newCase = new cases(newRes);
         newCase.lawSystem = lawSystem;
-        newCase.owners = [uid, 'AI'];
+        newCase.owners = [uid, newRes.oppositionName];
         newCase.difficulty = difficulty;
         
 if (position === 'prosecution') {
   newCase.prosecution = uid;
-  newCase.defense = 'AI';
+  newCase.defense = newRes.oppositionName;
 } else if (position === 'defense') {
-  newCase.prosecution = 'AI';
+  newCase.prosecution = newRes.oppositionName;
   newCase.defense = uid;
-} else { // position is random
+} else {
   if (Math.random() < 0.5) {
       newCase.prosecution = uid;
-      newCase.defense = 'AI';
+      newCase.defense = newRes.oppositionName;
   } else {
-      newCase.prosecution = 'AI';
+      newCase.prosecution = newRes.oppositionName;
       newCase.defense = uid;
   }
 }

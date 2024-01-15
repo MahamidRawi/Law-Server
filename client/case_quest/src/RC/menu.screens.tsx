@@ -55,7 +55,7 @@ const MenuScreen: React.FC<WalletProps> = ({title, type, caseId}) => {
 
     useEffect(() => {
         setLoading(true);
-        loadPage();
+        return loadPage();
     }, [activeContent]);
 
     const handleButtonClick = (content: React.SetStateAction<string>) => {

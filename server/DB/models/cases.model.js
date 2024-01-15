@@ -26,6 +26,11 @@ const CaseSchema = new Schema({
         type: String,
         required: true,
     }, 
+    oppositionName: {
+        type: String,
+        required: true
+    },
+    
     discoveries: {
         type: Array,
         default: []
