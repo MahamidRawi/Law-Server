@@ -30,7 +30,12 @@ const CaseSchema = new Schema({
         type: String,
         required: true
     },
-    
+    verdict: {
+
+    },
+    deal: {
+
+    },
     discoveries: {
         type: Array,
         default: []

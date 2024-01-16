@@ -36,7 +36,9 @@ const createCasePrompt = (uid, caseInfo) => {
         // Add more templates as needed
     };
 
-    return `Create a legal case model in ${fieldOfLaw} as ${position}. The case should be ${difficulty} level, detailed with ${additionalKeywords ? filter.clean(additionalKeywords) : 'No additional Keywords,'} under ${lawSystem}. The more complex the difficulty, the more nuanced the case. Be specific with Names, Dates, and Documents. Keep it realistic. Format:
+    return `
+    !Make sure it the whole response is JSON !!! No exceptions. 
+    Create a legal case model in ${fieldOfLaw} as ${position}. The case should be ${difficulty} level, detailed with ${additionalKeywords ? filter.clean(additionalKeywords) : 'No additional Keywords,'} under ${lawSystem}. The more complex the difficulty, the more nuanced the case. Be specific with Names, Dates, and Documents. Keep it realistic. Format:
 
     {
         "title": "\${plaintiff fictional but realistic name} vs \${defendant fictional but realistic name}",
@@ -53,7 +55,7 @@ const createCasePrompt = (uid, caseInfo) => {
     }
     
     Ensure each element reflects the specified complexity and realism for the case's specifics and legal standards.    
-    ATTENTION: !!!STRICTLY JSON!!! IMPORTANT
+    !Make sure it the whole response is JSON !!! No exceptions. 
     `;
 }
 

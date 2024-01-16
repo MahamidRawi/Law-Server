@@ -17,7 +17,7 @@ const NewCase: React.FC<NewCaseProps> = () => {
   const [fol, setFOL] = useState<string>('');
   const [selectedPosition, setSelectedPosition] = useState<string>('defense');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('easy');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [lawSystem, setLawSystem] = useState('');
     const [additionalKeywords, setAdditionalKeywords] = useState<string>(fol);
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -45,7 +45,7 @@ const handleKeywordsChange = (e: ChangeEvent<HTMLInputElement>) => setAdditional
   return (
     <div className="p-m-c">
       <div className="container py-4 m-form ncform">
-        {loading ? <ActivityIncicator fullScreen /> : (
+        {loading ? <ActivityIncicator placeholder='Please wait patiently... It can take up to a minute :)' fullScreen /> : (
         <form id="contactForm" onSubmit={handleSubmit}>
           <center>
             <h2>Find New Case</h2>

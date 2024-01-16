@@ -42,7 +42,7 @@ const CaseOverView: React.FC<CaseOverViewProps> = ({caseId, caseInfo}) => {
                 <p><b>Prosecuting Attorney : </b>{caseInfo.prosecution == uInfo._id ? `${uInfo.firstName} ${uInfo.lastName}` : caseInfo.prosecution}</p>
                 <p><b>Defense Attorney : </b>{caseInfo.defense == uInfo._id ? `${uInfo.firstName} ${uInfo.lastName}` : caseInfo.defense}</p>
                 <p><b>Summary : </b>{caseInfo.summary}</p>
-            
+                <p><b>Started on : </b>{formatDate(caseInfo.date)}</p>
             </div>
         </div>
     )

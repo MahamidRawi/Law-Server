@@ -26,7 +26,6 @@ const addCaseToUser = async (tId, caseId) => {
 }
 
 const createCase = async (uid, caseInfo) => {
-    const date = Date.now();
     return new Promise(async (resolve, reject) => {
         const {lawSystem, difficulty, position, fieldOfLaw} = caseInfo;
         caseSchema.validateAsync({lawSystem, difficulty, position, fieldOfLaw}).catch(err => reject({success: false, message: err.message, stc: 400}))
@@ -59,8 +58,10 @@ if (position === 'prosecution') {
       newCase.defense = uid;
   }
 }
+        const newdate = Date.now();
+        newCase.date = newdate
         newCase.save().then(async suc => {
-        await addAdminFee(250, 'Case Generation Fee', uid, date);
+        await addAdminFee(250, 'Case Generation Fee', uid, newdate);
         await addCaseToUser(uid, suc._id);
         return resolve({success: true, message: 'Case Generated Successfully'});
     }).catch(err => reject({success: false, message: 'An Error has Occured', stc: 500, err}));
