@@ -17,7 +17,7 @@ const NewCase: React.FC<NewCaseProps> = () => {
   const [fol, setFOL] = useState<string>('');
   const [selectedPosition, setSelectedPosition] = useState<string>('defense');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('easy');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [lawSystem, setLawSystem] = useState('');
     const [additionalKeywords, setAdditionalKeywords] = useState<string>(fol);
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

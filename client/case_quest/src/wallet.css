@@ -95,5 +95,16 @@
     padding: 10px;
     border-width: 2px;
     border-color: green;
-    /* background-color: blue; */
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.ac {
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+
+.ac > *{
+    margin: 6px; 
 }

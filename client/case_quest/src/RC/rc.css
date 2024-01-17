@@ -2,3 +2,9 @@
     position: relative !important;
     height: 500px;
 }
+
+.action-card {
+    width: 200px;
+    height: 400px;
+    background-color: green;
+}

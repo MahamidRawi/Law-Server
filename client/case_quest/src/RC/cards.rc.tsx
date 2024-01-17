@@ -6,7 +6,7 @@ import { Icon } from '@iconify/react';
 import { cutResume, formatDate } from '../helper/res.helper';
 import { openMail } from '../actions/main/mail.actions';
 import { AuthContext } from '../Providers/auth.provider';
-
+import './rc.css'
 interface NotificationProps {
     data: any,
     viewMore?: boolean,
@@ -112,5 +112,16 @@ const ViewMail: React.FC = () => {
     </div>
   )
 }
+interface ActionCardProps {
+  type: string,
+  txt: string
+}
+const ActionCard: React.FC<ActionCardProps> = ({type, txt}) => {
+  return (
+    <div className='action-card'>
+        
+    </div>
+  )
+}
 
-export {Notification, Case, User, ViewMail}
+export {Notification, Case, User, ViewMail, ActionCard}

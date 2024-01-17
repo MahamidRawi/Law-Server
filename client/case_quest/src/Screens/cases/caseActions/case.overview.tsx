@@ -25,7 +25,6 @@ const CaseOverView: React.FC<CaseOverViewProps> = ({caseId, caseInfo}) => {
         setLoading(true);
         if (caseInfo) {
             getLawyerInformation(caseInfo.owners[0]).then(res => {
-                console.log(res.userInfo);
                 setUInfo(res.userInfo);
                 setLoading(false);
             }).catch(err => logout())
@@ -43,6 +42,7 @@ const CaseOverView: React.FC<CaseOverViewProps> = ({caseId, caseInfo}) => {
                 <p><b>Defense Attorney : </b>{caseInfo.defense == uInfo._id ? `${uInfo.firstName} ${uInfo.lastName}` : caseInfo.defense}</p>
                 <p><b>Summary : </b>{caseInfo.summary}</p>
                 <p><b>Started on : </b>{formatDate(caseInfo.date)}</p>
+                <p><b>Status : </b>{caseInfo.status ? 'Over' : 'Ongoing'}</p>
             </div>
         </div>
     )

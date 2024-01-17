@@ -26,7 +26,7 @@ const Home = () => {
         loading ? <ActivityIncicator fullScreen /> : (
         <div>
             <div className={`searchbar ${userCases.length == 0 && "d-flex flex-column hp"}`}>
-            {userCases.length < 4 && (
+            {userCases.length < 3 && (
                 <>
             <button type="button" className="searchbutton" onClick={() => navigate('/NewCase')}>+ Find New Case</button>
             {userCases.length == 0 && <p className="alert alert-light text-center mt-5">No Ongoing Cases Currently... Find New Cases :)</p>}

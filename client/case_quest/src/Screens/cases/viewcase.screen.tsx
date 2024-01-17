@@ -28,7 +28,9 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
         Overview: <CaseOverView caseId={caseId} caseInfo={caseInfo} />,
         Actions: <ActionScreen />,
         Discoveries: <DiscoveryScreen />,
-        Participants: <Participants caseId={caseId} />
+        Participants: <Participants caseId={caseId} />,
+        Court: <Participants caseId={caseId} />,
+        Deal: <Participants caseId={caseId} />
     }
 
     useEffect(() => {
