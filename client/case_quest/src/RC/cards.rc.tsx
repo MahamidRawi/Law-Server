@@ -114,12 +114,16 @@ const ViewMail: React.FC = () => {
 }
 interface ActionCardProps {
   type: string,
-  txt: string
+  txt: string,
+  icon: any
 }
-const ActionCard: React.FC<ActionCardProps> = ({type, txt}) => {
+const ActionCard: React.FC<ActionCardProps> = ({type, txt, icon}) => {
   return (
     <div className='action-card'>
-        
+      <div className="icon-container">
+        {icon}
+        <div className="header-text"><h3>{type}</h3></div>
+      </div>
     </div>
   )
 }

@@ -2,8 +2,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import { ActivityIncicator } from '../../../RC/acitivity.incdicator';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
+import { GoLaw } from "react-icons/go";
 import { balanceParser, formatDate } from '../../../helper/res.helper';
 import { error } from 'console';
+import { IoDocumentTextOutline, IoFileTrayFullOutline } from "react-icons/io5";
 import { Button, Form } from 'react-bootstrap';
 import '../../../wallet.css'
 import { getLawyerInformation } from '../../../actions/main/home.actions';
@@ -27,11 +29,11 @@ const ActionScreen: React.FC<ActionScreenProps> = () => {
                 <h2 className='mb-4'>Actions</h2>
             </div>
             <div className="ac coi-container">
-                <ActionCard type='Subpoena' txt='This lets you subpoena' />
-                <ActionCard type='Subpoena' txt='This lets you subpoena' />
-                <ActionCard type='Subpoena' txt='This lets you subpoena' />
-                <ActionCard type='Subpoena' txt='This lets you subpoena' />
-                <ActionCard type='Subpoena' txt='This lets you subpoena' />
+                <ActionCard icon={<IoDocumentTextOutline transform='scale(3.5)' />} type='Subpoena' txt='This lets you subpoena' />
+                <ActionCard icon={<IoFileTrayFullOutline transform='scale(3.5)' />} type='File Motion' txt='This lets you subpoena' />
+                <ActionCard icon={<GoLaw />} type='Subpoena' txt='This lets you subpoena' />
+                <ActionCard icon={<GoLaw />} type='Subpoena' txt='This lets you subpoena' />
+                <ActionCard icon={<GoLaw />} type='Subpoena' txt='This lets you subpoena' />
             </div>
         </div>
     )

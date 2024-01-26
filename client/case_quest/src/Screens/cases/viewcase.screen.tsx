@@ -30,7 +30,6 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
         Discoveries: <DiscoveryScreen />,
         Participants: <Participants caseId={caseId} />,
         Court: <Participants caseId={caseId} />,
-        Deal: <Participants caseId={caseId} />
     }
 
     useEffect(() => {

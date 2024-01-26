@@ -4,7 +4,20 @@
 }
 
 .action-card {
-    width: 200px;
+    width: 250px;
     height: 400px;
-    background-color: green;
+    background-color: blue;
+}
+
+.ic {
+    background: blue;
+}
+
+.icon-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: green;
 }
