@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { GoLaw } from "react-icons/go";
 import { balanceParser, formatDate } from '../../../helper/res.helper';
 import { error } from 'console';
+import { MdOutlineHandshake } from "react-icons/md";
 import { IoDocumentTextOutline, IoFileTrayFullOutline } from "react-icons/io5";
 import { Button, Form } from 'react-bootstrap';
 import '../../../wallet.css'
@@ -29,11 +30,9 @@ const ActionScreen: React.FC<ActionScreenProps> = () => {
                 <h2 className='mb-4'>Actions</h2>
             </div>
             <div className="ac coi-container">
-                <ActionCard icon={<IoDocumentTextOutline transform='scale(3.5)' />} type='Subpoena' txt='This lets you subpoena' />
-                <ActionCard icon={<IoFileTrayFullOutline transform='scale(3.5)' />} type='File Motion' txt='This lets you subpoena' />
-                <ActionCard icon={<GoLaw />} type='Subpoena' txt='This lets you subpoena' />
-                <ActionCard icon={<GoLaw />} type='Subpoena' txt='This lets you subpoena' />
-                <ActionCard icon={<GoLaw />} type='Subpoena' txt='This lets you subpoena' />
+                <ActionCard icon={<IoDocumentTextOutline />} type='Subpoena' txt='Command individuals to testify or present evidence in court through a subpoena.' />
+                <ActionCard icon={<IoFileTrayFullOutline />} type='File Motion' txt='Initiate a legal request by filing a motion to prompt a court ruling on a specific matter.' />
+                <ActionCard icon={<MdOutlineHandshake />} type='Settle' txt='Negotiate a settlement to resolve a dispute outside of court.' />
             </div>
         </div>
     )

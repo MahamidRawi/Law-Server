@@ -3,21 +3,47 @@
     height: 500px;
 }
 
+.addS {
+    border: none;
+    position: relative;
+    width: 100%;
+}
+
+
+.ds {
+    position: relative;
+}
+
 .action-card {
     width: 250px;
     height: 400px;
-    background-color: blue;
-}
-
-.ic {
-    background: blue;
-}
-
-.icon-container {
-    position: relative;
+    background-color: #f0f0f0; /* Lighter background for better visibility */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
-    background: green;
+    padding: 20px;
+    margin: 10px;
+}
+
+.icon-container {
+    text-align: center; /* Center content */
+}
+
+.icon {
+    font-size: 40px; /* Adjust icon size */
+    color: #007bff; /* Icon color */
+    margin-bottom: 10px; /* Space between icon and text */
+}
+
+.content .type {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.content .text {
+    font-size: 14px;
+    color: #666;
 }

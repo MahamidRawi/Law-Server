@@ -27,9 +27,9 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
     const caseContent: ContentMap = {
         Overview: <CaseOverView caseId={caseId} caseInfo={caseInfo} />,
         Actions: <ActionScreen />,
-        Discoveries: <DiscoveryScreen />,
-        Participants: <Participants caseId={caseId} />,
-        Court: <Participants caseId={caseId} />,
+        Discoveries: <DiscoveryScreen data={caseInfo} />,
+        Participants: <Participants caseInfo={caseInfo} />,
+        Court: <Participants caseInfo={caseId} />,
     }
 
     useEffect(() => {
@@ -55,13 +55,13 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
                                 key={key}
                                 className={activeContent === key ? 'active' : ''}
                                 onClick={() => handleButtonClick(key)}>
-                                {key}
+                                {key} {key === 'Discoveries' && `(${caseInfo.discoveries.length})`}
                             </button>
                         ))}
                     </div>
                     <div className="content-area">
                         <div className="content-area2">
-                        {caseContent[activeContent as keyof ContentMap]}
+                        {caseContent[activeContent as keyof ContentMap] }
                         </div>
                     </div>
                 </div>

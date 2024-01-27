@@ -21,7 +21,8 @@ interface CaseProps {
 interface UserProps {
     data: any,
     viewMore?: boolean,
-    resize?: boolean
+    resize?: boolean,
+    participant?: boolean
 }
 
 const Notification: React.FC<NotificationProps> = ({ data, ud }) => {
@@ -48,32 +49,52 @@ const Case: React.FC<CaseProps> = ({data, viewMore = false}) => {
     )
 }
 
-const User: React.FC<UserProps> = ({data, viewMore = false, resize=false}) => {
+const User: React.FC<UserProps> = ({data, viewMore = false, resize=false, participant}) => {
     const navigate = useNavigate();
     return (
     <div className={`container py-3 ${resize ? 'f-content' : ''} ${data.admin && 'admin'}`}>
     <div className="row">
-      {/* <div className="col-md-6 mx-auto"> */}
-        {/* <div className="card"> */}
           <div className="card-body d-flex align-items-center">
             <div className="me-3">
               <Icon icon="solar:user-linear" width={100} height={100}/>
             </div>
-            {/* <div className="vertical-line"></div>  */}
             <div className="flex-grow-1">
-              <p className="mb-2">Name: {data.firstName} {data.lastName}</p>
-              <p className="mb-2">Email: {data.email}</p>
+              <p className="mb-2">Name: {participant ? data.name : `${data.firstName} ${data.lastName}`}</p>
+              <p className="mb-2">{participant ? `Role: ${data.role}` : `Email: ${data.email}`}</p>
+              {participant && <p className='mb-2'>Description : {data.shortDescription}</p>}
             </div>
             <div className="d-flex flex-column">
               <button className="btn btn-primary mb-2" onClick={() => navigate("/MoreInfo", {state: { uId: data._id }})}>More</button>
-              <button className="btn btn-outline-primary" onClick={() => navigate('/Mail', {state: {targetMail: data.email}})}>Contact</button>
+              {!participant && <button className="btn btn-outline-primary" onClick={() => navigate('/Mail', {state: {targetMail: data.email}})}>Contact</button>}
             </div>
           </div>
         </div>
       </div>
-    // </div>
-//   </div>
     
+    )
+}
+
+interface DiscoveryProps {
+  data: any
+}
+
+const Discovery: React.FC<DiscoveryProps> = ({data}) => {
+  const navigate = useNavigate();
+  return (
+    <div className='container py-3'>
+    <div className="row">
+          <div className="card-body d-flex align-items-center">
+            <div className="flex-grow-1">
+              <p className="mb-2"><b>Title:</b> {data.title}</p>
+              <p className="mb-2"><b>Type :</b> {data.type}</p>
+              <p className="mb-2"><b>Content :</b> {data.content.replace('Relevance:', '')}</p>
+            </div>
+            <div className="d-flex flex-column">
+              <button className="btn btn-primary mb-2" onClick={() => navigate("/ViewDiscovery", {state: { data }})}>Details</button>
+            </div>
+          </div>
+        </div>
+      </div>
     )
 }
 
@@ -112,20 +133,55 @@ const ViewMail: React.FC = () => {
     </div>
   )
 }
+
+const ViewDiscovery: React.FC = () => {
+  const location = useLocation();
+  const {logout} = useContext(AuthContext);
+  const data = location.state.data
+  const navigate = useNavigate();
+  return (
+    <div className="p-c-c">
+
+    <div className="cardmail card">
+  <div className="container py-3">
+  <center><h2>Discovery Details</h2></center>
+
+  <div className="row">
+        <div className="card-body d-flex align-items-center">          
+          <div className="flex-grow-1">
+            <p className="mb-2"><b>Title : </b>{data.title}</p>
+            <p className="mb-2"><b>Type : </b>{data.type}</p>
+            <p className="mb-2"><b>Summary : </b>{data.content}</p>
+
+            <div className="d-flex flex-column">
+          </div>
+            <div className='scrollable-div ds' dangerouslySetInnerHTML={{ __html: data.exactContent.replace(/\n/g, '<br />') }} />
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+  )
+}
+
 interface ActionCardProps {
   type: string,
   txt: string,
   icon: any
 }
-const ActionCard: React.FC<ActionCardProps> = ({type, txt, icon}) => {
+const ActionCard: React.FC<ActionCardProps> = ({ type, txt, icon }) => {
   return (
     <div className='action-card'>
       <div className="icon-container">
-        {icon}
-        <div className="header-text"><h3>{type}</h3></div>
+        <div className="icon">{icon}</div>
+        <div className="content">
+          <h3 className="type">{type}</h3>
+          <p className="text">{txt}</p>
+        </div>
       </div>
     </div>
   )
 }
 
-export {Notification, Case, User, ViewMail, ActionCard}
+export {ViewDiscovery, Discovery, Notification, Case, User, ViewMail, ActionCard}

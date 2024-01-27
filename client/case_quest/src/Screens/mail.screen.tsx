@@ -33,7 +33,7 @@ const ContactForm = () => {
 
   return (
     <div className="p-m-c">
-    <div className="container py-4 m-form">
+    <div className="container py-4 m-form ns">
       <form id="contactForm" onSubmit={handleSubmit}>
       <div className="mb-3">
           <label className="form-label" htmlFor="emailAddress">Email Address</label>

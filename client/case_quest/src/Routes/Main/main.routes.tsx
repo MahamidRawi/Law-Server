@@ -12,7 +12,7 @@ import NotificationScreen from '../../Screens/notifications.screen';
 import Lawyers from '../../Screens/lawyers.screen';
 import LawyerInformationScreen from '../../Screens/lawyer.information.screen';
 import MailScreen from '../../Screens/mail.screen';
-import { ViewMail } from '../../RC/cards.rc';
+import { ViewDiscovery, ViewMail } from '../../RC/cards.rc';
 import Wallet from '../../Screens/wallet.screen';
 import { getWallet } from '../../actions/main/wallet.actions';
 import NewCase from '../../Screens/cases/newcase.form';
@@ -78,6 +78,7 @@ const MainRoutes: React.FC = () => {
                 <Route path='/ViewMail' element={<ViewMail/>}/>
                 <Route path='/Wallet' element={<MenuScreen type='Wallet' title={wallet?.balance && balanceParser(wallet?.balance)}/>}/>
                 <Route path='/NewCase' element={<NewCase />}/>
+                <Route path='/ViewDiscovery' element={<ViewDiscovery />}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen />}/> : null}
             </Routes>
         </div>
