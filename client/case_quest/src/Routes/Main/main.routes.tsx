@@ -19,6 +19,7 @@ import NewCase from '../../Screens/cases/newcase.form';
 import Logo from '../../RC/logo.screen';
 import ViewCase from '../../Screens/cases/viewcase.screen';
 import MenuScreen from '../../RC/menu.screens';
+import SubpoenaScreen from '../../Screens/cases/caseActions/subpoena.screen';
 
 
 const MainRoutes: React.FC = () => {
@@ -79,6 +80,7 @@ const MainRoutes: React.FC = () => {
                 <Route path='/Wallet' element={<MenuScreen type='Wallet' title={wallet?.balance && balanceParser(wallet?.balance)}/>}/>
                 <Route path='/NewCase' element={<NewCase />}/>
                 <Route path='/ViewDiscovery' element={<ViewDiscovery />}/>
+                <Route path='/Subpoena' element={<SubpoenaScreen />}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen />}/> : null}
             </Routes>
         </div>

@@ -26,7 +26,7 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
 
     const caseContent: ContentMap = {
         Overview: <CaseOverView caseId={caseId} caseInfo={caseInfo} />,
-        Actions: <ActionScreen />,
+        Actions: <ActionScreen caseId={caseId} />,
         Discoveries: <DiscoveryScreen data={caseInfo} />,
         Participants: <Participants caseInfo={caseInfo} />,
         Court: <Participants caseInfo={caseId} />,

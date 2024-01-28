@@ -166,13 +166,15 @@ const ViewDiscovery: React.FC = () => {
 }
 
 interface ActionCardProps {
-  type: string,
+  type: 'Subpoena' | 'File Motion' | 'Settle',
   txt: string,
-  icon: any
+  icon: any,
+  caseId: string
 }
-const ActionCard: React.FC<ActionCardProps> = ({ type, txt, icon }) => {
+const ActionCard: React.FC<ActionCardProps> = ({ type, txt, icon, caseId }) => {
+  const navigate = useNavigate();
   return (
-    <div className='action-card'>
+    <div className='action-card' onClick={() => navigate(`/${type}`, {state: {caseId}})}>
       <div className="icon-container">
         <div className="icon">{icon}</div>
         <div className="content">

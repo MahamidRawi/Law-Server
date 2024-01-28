@@ -14,9 +14,10 @@ import { AuthContext } from '../../../Providers/auth.provider';
 import { ActionCard } from '../../../RC/cards.rc';
 
 interface ActionScreenProps {
+caseId: string
 }
 
-const ActionScreen: React.FC<ActionScreenProps> = () => {
+const ActionScreen: React.FC<ActionScreenProps> = ({caseId}) => {
     const {logout} = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [uInfo, setUInfo] = useState<any>();
@@ -30,9 +31,9 @@ const ActionScreen: React.FC<ActionScreenProps> = () => {
                 <h2 className='mb-4'>Actions</h2>
             </div>
             <div className="ac coi-container">
-                <ActionCard icon={<IoDocumentTextOutline />} type='Subpoena' txt='Command individuals to testify or present evidence in court through a subpoena.' />
-                <ActionCard icon={<IoFileTrayFullOutline />} type='File Motion' txt='Initiate a legal request by filing a motion to prompt a court ruling on a specific matter.' />
-                <ActionCard icon={<MdOutlineHandshake />} type='Settle' txt='Negotiate a settlement to resolve a dispute outside of court.' />
+                <ActionCard caseId={caseId} icon={<IoDocumentTextOutline />} type='Subpoena' txt='Command individuals to testify or present evidence in court through a subpoena.' />
+                <ActionCard caseId={caseId} icon={<IoFileTrayFullOutline />} type='File Motion' txt='Initiate a legal request by filing a motion to prompt a court ruling on a specific matter.' />
+                <ActionCard caseId={caseId} icon={<MdOutlineHandshake />} type='Settle' txt='Negotiate a settlement to resolve a dispute outside of court.' />
             </div>
         </div>
     )
