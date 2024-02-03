@@ -48,6 +48,12 @@ const caseSchema = Joi.object({
   position: Joi.string().valid('defense', 'prosecution', 'random').required(),
   difficulty: Joi.string().valid('easy', 'medium', 'hard', 'extreme').required(),
   lawSystem: Joi.string().valid(...lawSystems).required()
-})
+});
 
-module.exports = {authSchema, inAuthSchema, mailSchema, caseSchema}
+const subpoenaSchema = Joi.object({
+  type: Joi.string().required(),
+  justification: Joi.string().required(),
+  entity: Joi.string().required()
+});
+
+module.exports = {subpoenaSchema, authSchema, inAuthSchema, mailSchema, caseSchema}

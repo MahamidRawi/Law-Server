@@ -37,7 +37,6 @@ const createCase = async (uid, caseInfo) => {
     model: "gpt-3.5-turbo",
         });
         const newRes = JSON.parse(response.choices[0].message.content);
-        console.log(newRes)
         const newCase = new cases(newRes);
         newCase.lawSystem = lawSystem;
         newCase.owners = [uid, newRes.oppositionName];

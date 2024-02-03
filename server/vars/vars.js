@@ -56,6 +56,34 @@ const fieldsOfLaw = [
     'Zoning, Planning and Land Use'
   ];
 
+  const baseCost = 80;
+
+  const typesOfSubpoenas = [
+    { name: 'Subpoena ad testificandum', complexityFactor: 1, participant: true },
+    { name: 'Subpoena duces tecum', complexityFactor: 1.5, participant: false },
+    { name: 'Deposition Subpoena', complexityFactor: 1.2, participant: true },
+    { name: 'Subpoena to Produce Documents or Permit Inspection', complexityFactor: 1.4, participant: false },
+    { name: 'Administrative Subpoena', complexityFactor: 1.1, participant: false },
+    { name: 'Subpoena for Personal Appearance', complexityFactor: 1.3, participant: true },
+    { name: 'Subpoena for Trial', complexityFactor: 1.6, participant: true },
+    { name: 'Subpoena for Hearing', complexityFactor: 1, participant: true },
+    { name: 'Subpoena for Arbitration', complexityFactor: 1.5, participant: true },
+    { name: 'Information Subpoena', complexityFactor: 1.2, participant: false },
+    { name: 'Subpoena for Medical Records', complexityFactor: 1.7, participant: false },
+    { name: 'Subpoena for Employment Records', complexityFactor: 1.3, participant: false },
+    { name: 'Subpoena for Bank Records', complexityFactor: 1.4, participant: false },
+    { name: 'Subpoena for School Records', complexityFactor: 1.1, participant: false },
+    { name: 'Subpoena for Cellular Records', complexityFactor: 1.15, participant: false },
+    { name: 'Subpoena for Internet Records', complexityFactor: 1.25, participant: false }
+];
+
+
+  const calculatedPrices = typesOfSubpoenas.map(subpoena => ({
+    participant: subpoena.participant,
+    name: subpoena.name,
+    price: baseCost * subpoena.complexityFactor
+}));
+
   const lawSystems = [
     "Common Law (USA)",
     "Civil Law (France)",
@@ -76,4 +104,4 @@ const fieldsOfLaw = [
   ];
 
 
-module.exports = {Err500, transactionMessageSuccess, fieldsOfLaw, lawSystems}
+module.exports = {calculatedPrices, Err500, transactionMessageSuccess, fieldsOfLaw, lawSystems}

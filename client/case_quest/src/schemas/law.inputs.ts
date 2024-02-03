@@ -68,4 +68,23 @@ const fieldsOfLaw = [
     "Indigenous Legal Systems (Various Indigenous Peoples)",
   ];
 
-export {fieldsOfLaw, lawSystems}
+  const typesOfSubpoenas = [
+    'Subpoena ad testificandum', // For compelling witness testimony in court
+    'Subpoena duces tecum', // For requiring documents, materials, or other tangible evidence
+    'Deposition Subpoena', // For compelling testimony at a deposition
+    'Subpoena to Produce Documents or Permit Inspection', // For producing evidence or allowing property inspection
+    'Subpoena for Personal Appearance',
+    'Subpoena for Trial', 
+    'Subpoena for Hearing', 
+    'Subpoena for Arbitration',
+    'Information Subpoena',
+    'Subpoena for Medical Records', 
+    'Subpoena for Employment Records',
+    'Subpoena for Bank Records',
+    'Subpoena for School Records', 
+    'Subpoena for Cellular Records',
+    'Subpoena for Internet Records',
+    'Subpoena for Expert\'s Testimony' 
+];
+
+export {fieldsOfLaw, lawSystems, typesOfSubpoenas}

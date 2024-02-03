@@ -169,7 +169,7 @@ interface ActionCardProps {
   type: 'Subpoena' | 'File Motion' | 'Settle',
   txt: string,
   icon: any,
-  caseId: string
+  caseId: string,
 }
 const ActionCard: React.FC<ActionCardProps> = ({ type, txt, icon, caseId }) => {
   const navigate = useNavigate();
