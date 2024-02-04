@@ -141,49 +141,41 @@ Deny the subpoena if it is incoherent, unjustified, duplicates existing informat
 
 Remember, the AI response must accurately represent whether a subpoenaed participant is already included in the case details. If not, create a believable and relevant fictitious participant profile. The response should demonstrate careful consideration of the case's complexities and legal implications.
 Response strictly in JSON!!
-` : `
-As the court, you are tasked with evaluating the appropriateness of issuing a subpoena based on detailed case information. Your decision-making process is guided by comprehensive criteria to ensure a realistic and coherent approach to the legal scenario.
+` : `Given the legal case details and a request for a subpoena concerning specific documents, your task is to determine whether the subpoena should be granted and to generate the requested document content dynamically, based on the details provided.
 
-**Case Information Provided:** ${caseInfo}
+Case Information: ${caseInfo}
 
-**Form Fields:**
-- **Entity:** ${entity}
-- **Justification:** ${justification}
-- **Type:** ${type}
+Request Details:
+- Entity: ${entity}
+- Document Type: ${type}
+- Justification: "${justification}"
 
-**Judgment Criteria:**
-- **Relevance:** Assess the subpoena's relevance to the case's core issues. If there is incoherence between the type, entity, or justification, the subpoena should not be granted.
-- **Coherence:** Ensure the request aligns with the case's facts and existing evidence. Incoherence between details like type, entity, and justification should lead to a denial of the subpoena.
-- **Justification Quality:** The justification for the subpoena must be clear, sufficient, and well-structured.
-- **Difficulty Level:** The case's complexity affects the scrutiny level for the subpoena request. Higher difficulty requires stricter evaluation.
-- **Legality:** The subpoena must comply with current legal standards and regulations.
-- **Duplication and Manipulation:** Deny the subpoena if it seeks information already available in the discovery phase or aims to manipulate the legal process.
+Criteria for Decision:
+1. Relevance of the requested document to the case.
+2. Coherence among the case information, entity, and document type.
+3. The strength and structure of the justification.
+4. Compliance with legal standards and the avoidance of duplicates or leading requests.
 
-**Response Format:**
-Your decision and the subpoena document must be formatted in JSON to ensure application compatibility. The response structure is consistent, but the content varies based on your judgment. The response includes:
-
-\`\`\`
+Response Format:
 {
-  "granted": true or false,
-  "rationale": "Your reasoning behind the decision",
+  "granted": true/false,
+  "rationale": "Provide a detailed reasoning for granting or denying the subpoena, incorporating the case details, request specifics, and legal principles.",
   "document": {
-    "type": "${type}, ${entity}",
-    "title": "Title of the document, crafted to be realistic and relevant to the case",
-    "content": "A brief summary of the document content",
-    "exactContent": "A detailed and coherent representation of the document content, structured as a legitimate legal document, including pertinent dates and information. All blanks for dates, names, company names, and signatures should be filled with realistic, fabricated details specific to the case context.",
-    "date": "Issuance date of the document"
+    "type": "${type}",
+    "title": "Fabricate a specific title for the ${type}, relevant to ${entity}.",
+    "content": "Summarize the document's contents, ensuring relevance to the case and subpoena request.",
+    "exactContent": "Generate detailed, realistic content for the document, including all necessary specifics such as dates, names, and factual information, tailored to the case and document type. Avoid placeholders and ensure the content reflects the complexity and nuances of the case.",
+    "date": "Include the fictional issuance date of the document, aligned with the case timeline."
   }
 }
-\`\`\`
 
-**Creative Aspect:**
-If the subpoena is granted, the document generated should reflect the case's complexity and difficulty. Incorporate elements that hint at underlying issues or broader themes, such as corruption or ethical dilemmas, to enrich the narrative.
+Instructions:
+- The decision on the subpoena must logically follow from the provided case information and justification.
+- The rationale should clearly articulate the reasons for the decision, referencing specific details from the case and legal considerations.
+- The document section must include precise, fabricated details that are plausible and relevant to the case and the type of document requested. Avoid generalizations, placeholders, or any content that could not be directly linked to the case scenario.
 
-**Detail and Specificity Requirement:**
-It is crucial that the "exactContent" section of the document is complete and detailed, avoiding any blanks or placeholders. This includes specifying dates (e.g., "December 31, 2024"), full names, precise figures, and comprehensive descriptions that directly relate to the case. The document must realistically simulate a legal scenario, providing clear insights into the matter under consideration.
-
-Ensure the response is in JSON, with the structure provided. Incoherence between details or any blanks in critical information will necessitate a revision of the response to meet these stringent requirements.`
-
+Your response should reflect a comprehensive understanding of legal practices and the specific context of the request, ensuring accuracy and dynamic adaptation to the provided case and document type.
+`
     return prompt 
 } 
 

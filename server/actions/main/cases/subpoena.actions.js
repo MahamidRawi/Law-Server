@@ -27,6 +27,7 @@ const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
             messages: [{ role: "system", content: issueSubpoenaPrompt(caseInfo, validSubpoenaType, subpoenaInfo.justification, subpoenaInfo.entity) }],
             model: "gpt-3.5-turbo-1106",
         });
+        console.log("HERE IS THE RESPONSE : ", response.choices[0].message);
 
         const parsedRes = JSON.parse(response.choices[0].message.content);
         console.warn("CONTENT OF RES", parsedRes)
