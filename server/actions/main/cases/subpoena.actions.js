@@ -27,22 +27,19 @@ const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
             messages: [{ role: "system", content: issueSubpoenaPrompt(caseInfo, validSubpoenaType, subpoenaInfo.justification, subpoenaInfo.entity) }],
             model: "gpt-3.5-turbo-1106",
         });
-        console.log("HERE IS THE RESPONSE : ", response.choices[0].message);
 
         const parsedRes = JSON.parse(response.choices[0].message.content);
-        console.warn("CONTENT OF RES", parsedRes)
+
         if (parsedRes.granted === false) return {success: false, message: parsedRes.rationale, stc: 400}
 
         await addAdminFee(validSubpoenaType.price, `${validSubpoenaType.name} Fee`, uid, Date.now());
-        console.log('Here it is', parsedRes)
-        if (validSubpoenaType.participant || parsedRes.inList) {
+        if (validSubpoenaType.participant && parsedRes.participant.inList) {
             return { success: true, message: parsedRes.rationale, stc: 200 };
         } else {
             await cases.updateOne({ _id: caseFound._id }, { $push: validSubpoenaType.participant ? { participants: parsedRes.participant.details } : { discoveries: parsedRes.document } });
             return { success: true, message: parsedRes.rationale, stc: 200 };
         }
     } catch (err) {
-        console.log(err);
         return { success: false, message: err.message || 'An error occurred', stc: 500 };
     }
 };

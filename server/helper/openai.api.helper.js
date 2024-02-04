@@ -116,12 +116,12 @@ const issueSubpoenaPrompt = (caseInfo, type, justification, entity) => {
         Analyze a subpoena request for a participant within the provided case details. Your task is to judiciously decide on granting the subpoena based on its type, the justification provided, and its relevance to the case, while adhering to legal standards.
 
 Subpoena Request for Participant:
-- Type: 'Participant'
+- Type: 'Participant', ${entity}
 - Justification: '${justification}'
 - Case Details: '${caseInfo}'
 
 Determine if the subpoena request meets legal criteria. Check if the requested participant is already listed in '${caseInfo.participants}'. If they are not listed, provide details for a new fictitious participant. If they are listed, indicate their existing presence in the case.
-
+You have to option to deny the subpoena, if the justification is not good enough or it is irrelevant, or it is not well justified. And also if there is incoherence between the Type and Justification, and Entity
 Response Format:
 {
   "granted": Boolean (based on the validity of the request),
@@ -141,9 +141,9 @@ Deny the subpoena if it is incoherent, unjustified, duplicates existing informat
 
 Remember, the AI response must accurately represent whether a subpoenaed participant is already included in the case details. If not, create a believable and relevant fictitious participant profile. The response should demonstrate careful consideration of the case's complexities and legal implications.
 Response strictly in JSON!!
-` : `Given the legal case details and a request for a subpoena concerning specific documents, your task is to determine whether the subpoena should be granted and to generate the requested document content dynamically, based on the details provided.
+` : `Given the details of a legal case and a request for a subpoena concerning specific documents, your task is to evaluate the request and generate the document content dynamically, based on the provided details.
 
-Case Information: ${caseInfo}
+Case Information: ${JSON.stringify(caseInfo)}
 
 Request Details:
 - Entity: ${entity}
@@ -151,30 +151,30 @@ Request Details:
 - Justification: "${justification}"
 
 Criteria for Decision:
-1. Relevance of the requested document to the case.
-2. Coherence among the case information, entity, and document type.
-3. The strength and structure of the justification.
-4. Compliance with legal standards and the avoidance of duplicates or leading requests.
+1. Evaluate the relevance of the requested document to the case.
+2. Assess coherence among the case information, the entity involved, and the document type requested.
+3. Examine the strength and structure of the justification provided.
+4. Ensure compliance with legal standards and avoid duplicates or leading requests.
 
-Response Format:
+The response must be in JSON format, exactly as it follows:
 {
   "granted": true/false,
-  "rationale": "Provide a detailed reasoning for granting or denying the subpoena, incorporating the case details, request specifics, and legal principles.",
+  "rationale": "Provide a comprehensive rationale for granting or denying the subpoena, integrating the case details, request specifics, and applicable legal standards. Your reasoning should be detailed, reflecting a nuanced understanding of the case and the significance of the requested document.",
   "document": {
     "type": "${type}",
-    "title": "Fabricate a specific title for the ${type}, relevant to ${entity}.",
-    "content": "Summarize the document's contents, ensuring relevance to the case and subpoena request.",
-    "exactContent": "Generate detailed, realistic content for the document, including all necessary specifics such as dates, names, and factual information, tailored to the case and document type. Avoid placeholders and ensure the content reflects the complexity and nuances of the case.",
-    "date": "Include the fictional issuance date of the document, aligned with the case timeline."
+    "title": "Construct a specific and relevant title for the document related to ${entity}, ensuring it is directly relevant to the case at hand.",
+    "content": "Provide a concise summary of the document’s content, highlighting its relevance and importance to the case and the subpoena request.",
+    "exactContent": "Generate detailed, structured, and realistic content for the document, including precise dates, names, incidents, and other factual information, specifically tailored to the case and document type. Avoid placeholders and generic descriptions, creating a narrative that includes a sequence of detailed entries or points relevant to the case, demonstrating a deep understanding of the case dynamics. Everything must be structured in a string. Strictly.",
+    "date": "Specify the fictional issuance date of the document, ensuring it aligns accurately with the case timeline."
   }
 }
 
-Instructions:
-- The decision on the subpoena must logically follow from the provided case information and justification.
-- The rationale should clearly articulate the reasons for the decision, referencing specific details from the case and legal considerations.
-- The document section must include precise, fabricated details that are plausible and relevant to the case and the type of document requested. Avoid generalizations, placeholders, or any content that could not be directly linked to the case scenario.
+Instructional Guidance:
+- The decision on the subpoena must be logically derived from the provided case details and the justification argument.
+- The rationale section should articulate a clear, reasoned argument, referencing specific elements from the case information and legal criteria that influence the decision.
+- The document section must include precision and depth. The "exactContent" should be presented not in paragraphs, but in an excellently structured format, offering a granular depiction of the document’s contents as they would exist in reality. This includes creating a sequence of detailed events, specific interactions, and direct references to facts relevant to the case.
 
-Your response should reflect a comprehensive understanding of legal practices and the specific context of the request, ensuring accuracy and dynamic adaptation to the provided case and document type.
+Ensure the model’s response embodies a comprehensive grasp of legal document preparation, accurately reflecting the unique aspects of the case and document type, adhering strictly to the given JSON format.
 `
     return prompt 
 } 
