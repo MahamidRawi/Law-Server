@@ -29,6 +29,7 @@ const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
         });
 
         const parsedRes = JSON.parse(response.choices[0].message.content);
+        console.warn("CONTENT OF RES", parsedRes)
         if (parsedRes.granted === false) return {success: false, message: parsedRes.rationale, stc: 400}
 
         await addAdminFee(validSubpoenaType.price, `${validSubpoenaType.name} Fee`, uid, Date.now());

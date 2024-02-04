@@ -142,24 +142,48 @@ Deny the subpoena if it is incoherent, unjustified, duplicates existing informat
 Remember, the AI response must accurately represent whether a subpoenaed participant is already included in the case details. If not, create a believable and relevant fictitious participant profile. The response should demonstrate careful consideration of the case's complexities and legal implications.
 Response strictly in JSON!!
 ` : `
-{
-    "prompt": "Remember, strictly JSON response (if not JSON response, It is the end of the world). Based on the provided subpoena request details, generate a JSON response. If the request is for a 'Family Tree', automatically grant it and include a detailed fictional family tree in the response. For other document types specified by 'type', generate a fictional document relevant to that type with specific dates, names, and information that adhere to legal standards without duplicating case discoveries. Use real case details and ensure the response is in strict JSON format, focusing on creating plausible content for the 'exactContent' field.\n\nSubpoena Request Details:\n- Type: 'Type of the requested document'\n- Justification: 'Justification for the subpoena request'\n- Entity: 'The entity involved in the subpoena request'\n- CaseInfo: 'Detailed information about the case including parties involved and complexity level'\n\nRequired JSON response format for any document request, including 'Family Tree':\n{\n  \"granted\": true,\n  \"rationale\": \"Reasoning behind the decision based on the subpoena type\",\n  \"document\": {\n    \"type\": \"The document type requested\",\n    \"title\": \"A fictitious title relevant to the case\",\n    \"content\": \"A summary explaining the document's relevance\",\n    \"exactContent\": \"A detailed, fictional representation of the document with dates, names, and specifics\",\n    \"date\": \"The fictional creation date of the document\"\n  }\n}\n\nThe document generated must be realistic and detailed, adhering to confidentiality and legal compliance. If 'Family Tree' is not requested, generate the document according to the specified 'type', ensuring the content is structured like a legal document and the 'exactContent' is a string that vividly provides fictional information that may or not help the user advance in the case",
-    "type": ${type},
-    "justification": ${justification},
-    "entity": ${entity},
-    "caseInfo": ${caseInfo}
+As the court, you are tasked with evaluating the appropriateness of issuing a subpoena based on detailed case information. Your decision-making process is guided by comprehensive criteria to ensure a realistic and coherent approach to the legal scenario.
 
-    for example, if I ask for family tree, create something similar to this : 
-    {
-        "type": "Family Tree",
-        "title": "The Johnson Family Tree",
-        "content": "This family tree outlines the defendant's ancestral lineage and immediate family, highlighting connections relevant to the case.",
-        "exactContent": "Family Tree Report\n\nTitle: The Johnson Family Tree\n\nDate: 2024-01-28\n\nThis family tree report provides a detailed overview of the ancestral lineage and immediate family of the defendant, Michael Johnson, in relation to the case of Smith vs Johnson under Civil Law in France.\n\nAncestral Lineage:\n\n- Parents: William Johnson (b. 1955, d. 2010), Rachel Johnson (b. 1958)\n\n- Grandparents: Charles Johnson (b. 1930, d. 2005), Elizabeth Johnson (b. 1932, d. 2012); James Adams (b. 1935, d. 2015), Margaret Adams (b. 1938)\n\nImmediate Family:\n\n- Spouse: Sarah Johnson (b. 1978)\n\n- Children: David Johnson (b. 2000), Emma Johnson (b. 2005)\n\nConnections Relevant to the Case:\n\n- William Johnson: Known for financial investments and offshore accounts, including transactions with entities related to the plaintiff, John Smith.\n\n- Rachel Johnson: Inherited significant assets from her father, Charles Johnson, and has been involved in trusts and financial arrangements potentially linked to the defendant's alleged money laundering activities. \n\n- Sarah Johnson: Has been a beneficiary of offshore accounts connected to the defendant, raising questions about the source of funds and asset tracing in the case.\n",
-        "date": "2024-01-28"
-      },
+**Case Information Provided:** ${caseInfo}
+
+**Form Fields:**
+- **Entity:** ${entity}
+- **Justification:** ${justification}
+- **Type:** ${type}
+
+**Judgment Criteria:**
+- **Relevance:** Assess the subpoena's relevance to the case's core issues. If there is incoherence between the type, entity, or justification, the subpoena should not be granted.
+- **Coherence:** Ensure the request aligns with the case's facts and existing evidence. Incoherence between details like type, entity, and justification should lead to a denial of the subpoena.
+- **Justification Quality:** The justification for the subpoena must be clear, sufficient, and well-structured.
+- **Difficulty Level:** The case's complexity affects the scrutiny level for the subpoena request. Higher difficulty requires stricter evaluation.
+- **Legality:** The subpoena must comply with current legal standards and regulations.
+- **Duplication and Manipulation:** Deny the subpoena if it seeks information already available in the discovery phase or aims to manipulate the legal process.
+
+**Response Format:**
+Your decision and the subpoena document must be formatted in JSON to ensure application compatibility. The response structure is consistent, but the content varies based on your judgment. The response includes:
+
+\`\`\`
+{
+  "granted": true or false,
+  "rationale": "Your reasoning behind the decision",
+  "document": {
+    "type": "${type}, ${entity}",
+    "title": "Title of the document, crafted to be realistic and relevant to the case",
+    "content": "A brief summary of the document content",
+    "exactContent": "A detailed and coherent representation of the document content, structured as a legitimate legal document, including pertinent dates and information. All blanks for dates, names, company names, and signatures should be filled with realistic, fabricated details specific to the case context.",
+    "date": "Issuance date of the document"
   }
-  
-`
+}
+\`\`\`
+
+**Creative Aspect:**
+If the subpoena is granted, the document generated should reflect the case's complexity and difficulty. Incorporate elements that hint at underlying issues or broader themes, such as corruption or ethical dilemmas, to enrich the narrative.
+
+**Detail and Specificity Requirement:**
+It is crucial that the "exactContent" section of the document is complete and detailed, avoiding any blanks or placeholders. This includes specifying dates (e.g., "December 31, 2024"), full names, precise figures, and comprehensive descriptions that directly relate to the case. The document must realistically simulate a legal scenario, providing clear insights into the matter under consideration.
+
+Ensure the response is in JSON, with the structure provided. Incoherence between details or any blanks in critical information will necessitate a revision of the response to meet these stringent requirements.`
+
     return prompt 
 } 
 
