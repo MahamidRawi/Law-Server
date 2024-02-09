@@ -66,7 +66,6 @@ const fieldsOfLaw = [
     { name: 'Subpoena for Trial', complexityFactor: 1.6, participant: true },
     { name: 'Subpoena for Hearing', complexityFactor: 1, participant: true },
     { name: 'Subpoena for Arbitration', complexityFactor: 1.5, participant: true },
-    { name: 'Subpoena for Internet Records', complexityFactor: 1.25, participant: false }
     {
       name: 'Subpoena to Produce Documents or Permit Inspection',
       complexityFactor: 1.4,
