@@ -80,7 +80,8 @@ const MainRoutes: React.FC = () => {
                 <Route path='/Wallet' element={<MenuScreen type='Wallet' title={wallet?.balance && balanceParser(wallet?.balance)}/>}/>
                 <Route path='/NewCase' element={<NewCase />}/>
                 <Route path='/ViewDiscovery' element={<ViewDiscovery />}/>
-                <Route path='/Subpoena' element={<SubpoenaScreen />}/>
+                <Route path='/FileMotion' element={<SubpoenaScreen formtype='File Motion' />}/>
+                <Route path='/Subpoena' element={<SubpoenaScreen formtype='Subpoena' />}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen />}/> : null}
             </Routes>
         </div>

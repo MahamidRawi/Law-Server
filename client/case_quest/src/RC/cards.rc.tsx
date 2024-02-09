@@ -174,7 +174,7 @@ interface ActionCardProps {
 const ActionCard: React.FC<ActionCardProps> = ({ type, txt, icon, caseId }) => {
   const navigate = useNavigate();
   return (
-    <div className='action-card' onClick={() => navigate(`/${type}`, {state: {caseId}})}>
+    <div className='action-card' onClick={() => navigate(`/${type.replace(' ', '')}`, {state: {caseId, type: type == 'Subpoena' ? 1 : 2}})}>
       <div className="icon-container">
         <div className="icon">{icon}</div>
         <div className="content">

@@ -6,77 +6,77 @@ const discoveryTemplates = {
         "type": "Document",
         "title": "Title of the Document",
         "content": "Brief description of the document's relevance to the case.",
-        "exactContent": "Detailed and formatted content of the document, including specific data, names, and relevant information.",
+        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure. Detailed and formatted content of the document, including specific data, names, and relevant information.]",
         "date": "Date of the document"
     },
     "testimony": {
         "type": "Testimony",
         "title": "Title of the Testimony",
         "content": "Summary of the testimony and its significance.",
-        "exactContent": "Full transcript of the testimony, including questions and answers, formatted as a legal document.",
+        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure.Full transcript of the testimony, including questions and answers, formatted as a legal document. If it is a dialogue, I want Q/A, otherwise, I want exactly what was said]",
         "date": "Date of the testimony"
     },
     "investigationReport": {
         "type": "Investigation Report",
         "title": "Title of the Investigation Report",
         "content": "Overview of the investigation's findings.",
-        "exactContent": "Detailed report including methodology, findings, and conclusions.",
+        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure.Detailed report including methodology, findings, and conclusions.]",
         "date": "Date of the report"
     },
     "email": {
         "type": "Email",
         "title": "Subject of the Email",
         "content": "Summary of the email's relevance to the case.",
-        "exactContent": "Complete email conversation, including sender, receiver, date, and body of the email.",
+        "exactContent": "[Complete email conversation, including sender, receiver, date, and body of the email.]",
         "date": "Date of the email"
     },
     "financialRecords": {
         "type": "Financial Records",
-        "title": "Title of the Financial Record",
-        "content": "Overview of the financial record's relevance to the financial aspects of the case.",
-        "exactContent": "Detailed financial statements, transactions, and account summaries, with annotations explaining their significance.",
+        "title": "[Title of the Financial Record]",
+        "content": "[Overview of the financial record's relevance to the financial aspects of the case.]",
+        "exactContent": "[I want no overviews, no summaries, no paragraphs. Exact Statement of the bank records' relevance to the case, highlighting financial transactions and balances.]",
         "date": "Date of the record"
     },
     "surveillanceFootage": {
         "type": "Surveillance Footage",
         "title": "Location and Date of the Footage",
-        "content": "Description of the footage's relevance to the case events.",
-        "exactContent": "Timestamped summary of the footage, noting key moments and individuals captured, supplemented by still images or descriptions.",
+        "content": "[Description of the footage's relevance to the case events.]",
+        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure.Timestamped summary of the footage, noting key moments and individuals captured, supplemented by still images or descriptions.]",
         "date": "Date of the recording"
     },
     "medicalRecords": {
         "type": "Medical Records",
-        "title": "Patient Name and Date of the Records",
-        "content": "Significance of the medical records to the individual's condition or the case.",
-        "exactContent": "Detailed account of medical visits, diagnoses, treatments, and physician notes, with relevance to case events highlighted.",
+        "title": "[Patient Name and Date of the Records]",
+        "content": "[Significance of the medical records to the individual's condition or the case.]",
+        "exactContent": "[Detailed account of medical visits, diagnoses, treatments, and physician notes, with relevance to case events highlighted.]",
         "date": "Date of the records"
     },
     "policeReport": {
         "type": "Police Report",
-        "title": "Report Number and Incident Date",
+        "title": "[Report Number and Incident Date]",
         "content": "Summary of the incident as reported to law enforcement.",
-        "exactContent": "Complete report text, including descriptions of the incident, statements from involved parties and witnesses, and initial findings.",
-        "date": "Date of the report"
+        "exactContent": "[Complete report text, including descriptions of the incident, statements from involved parties and witnesses, and initial findings.]",
+        "date": "[Date of the report]"
     },
     "courtDocuments": {
         "type": "Court Document",
-        "title": "Title of the Court Document",
+        "title": "[Title of the Court Document]",
         "content": "Brief on how the document pertains to the legal proceedings.",
-        "exactContent": "Full document text, including legal arguments, motions, orders, or judgments, formatted according to legal document standards.",
+        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure.Full document text, including legal arguments, motions, orders, or judgments, formatted according to legal document standards.]",
         "date": "Date of the document"
     },
     "contractAgreements": {
         "type": "Contract Agreement",
-        "title": "Title of the Contract",
-        "content": "Relevance of the contract to the dispute or case.",
-        "exactContent": "Complete contract text, including terms, conditions, parties involved, and signatures, with key clauses highlighted.",
+        "title": "[Title of the Contract]",
+        "content": "[Relevance of the contract to the dispute or case.]",
+        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure.Complete contract text, including terms, conditions, parties involved, and signatures, with key clauses highlighted.]",
         "date": "Date of the agreement"
     },
     "academicRecords": {
         "type": "Academic Records",
-        "title": "Name of the Institution and Student",
-        "content": "Overview of the academic records' relevance to the case.",
-        "exactContent": "Transcripts, diplomas, and other records, detailing courses, grades, and achievements, with any discrepancies or notable achievements highlighted.",
+        "title": "[Name of the Institution and Student]",
+        "content": "[Overview of the academic records' relevance to the case.]",
+        "exactContent": "[Transcripts, diplomas, and other records, detailing courses, grades, and achievements, with any discrepancies or notable achievements highlighted.]",
         "date": "Date of the records"
     },
     // Add additional templates as required for your application
@@ -84,7 +84,6 @@ const discoveryTemplates = {
 
 const createCasePrompt = (uid, caseInfo) => {
     const { lawSystem, additionalKeywords, fieldOfLaw, difficulty, position } = caseInfo;
-
     
 
     return `
@@ -99,7 +98,7 @@ const createCasePrompt = (uid, caseInfo) => {
         // YOU CAN ADD MORE PARTICIPANTS FOLLOWING THE GIVEN SCHEMA TO MAKE IT MORE INTERESTING
         ],
         "discoveries": [
-            ${Object.values(discoveryTemplates).map(template => JSON.stringify(template, null, 2)).join(',\n')}
+            Only 4 items, extremely detailed, as it is an investigation / law / detective game / with no placeholders. 100% complete : ${Object.values(discoveryTemplates).map(template => JSON.stringify(template, null, 2)).join(',\n')}
         ]
         "oppositionName": "Generate Fictional but realistic name for the Representing Attorney",
 
@@ -111,7 +110,6 @@ const createCasePrompt = (uid, caseInfo) => {
 }
 
 const issueSubpoenaPrompt = (caseInfo, type, justification, entity) => {
-    const inf = {caseInfo, type, justification, entity}
     const prompt = type.participant ? `
         Analyze a subpoena request for a participant within the provided case details. Your task is to judiciously decide on granting the subpoena based on its type, the justification provided, and its relevance to the case, while adhering to legal standards.
 
@@ -141,41 +139,30 @@ Deny the subpoena if it is incoherent, unjustified, duplicates existing informat
 
 Remember, the AI response must accurately represent whether a subpoenaed participant is already included in the case details. If not, create a believable and relevant fictitious participant profile. The response should demonstrate careful consideration of the case's complexities and legal implications.
 Response strictly in JSON!!
-` : `Given the details of a legal case and a request for a subpoena concerning specific documents, your task is to evaluate the request and generate the document content dynamically, based on the provided details.
+` : `
+Given the case information and the subpoena request details, the court is to decide on granting the subpoena. If the decision is to deny, provide the rationale. If granted, generate a fictitious document relevant to the case, adhering to the provided template with no placeholders, reflecting the complexity and thematic elements corresponding to the case's difficulty level.
 
-Case Information: ${JSON.stringify(caseInfo)}
+Case Information: ${caseInfo} // This should include the case's difficulty level.
+Type of Subpoena: ${type.name}
+Justification: "${justification}"
+Targeted Entity: "${entity}"
 
-Request Details:
-- Entity: ${entity}
-- Document Type: ${type}
-- Justification: "${justification}"
+Evaluate the justification against the case's difficulty level. Consider the reality of legal processes, including potential corruption or other thematic elements based on the case's difficulty, to decide on granting the subpoena.
+Deny the subpoena if the user is trying to mislead / manipulate / move the case in a certain direction.
+Don't be easy on granting subpoenas. 
+if there is duplicates, deny the subpoena. 
 
-Criteria for Decision:
-1. Evaluate the relevance of the requested document to the case.
-2. Assess coherence among the case information, the entity involved, and the document type requested.
-3. Examine the strength and structure of the justification provided.
-4. Ensure compliance with legal standards and avoid duplicates or leading requests.
-
-The response must be in JSON format, exactly as it follows:
+Response structure:
 {
-  "granted": true/false,
-  "rationale": "Provide a comprehensive rationale for granting or denying the subpoena, integrating the case details, request specifics, and applicable legal standards. Your reasoning should be detailed, reflecting a nuanced understanding of the case and the significance of the requested document.",
-  "document": {
-    "type": "${type}",
-    "title": "Construct a specific and relevant title for the document related to ${entity}, ensuring it is directly relevant to the case at hand.",
-    "content": "Provide a concise summary of the document’s content, highlighting its relevance and importance to the case and the subpoena request.",
-    "exactContent": "Generate detailed, structured, and realistic content for the document, including precise dates, names, incidents, and other factual information, specifically tailored to the case and document type. Avoid placeholders and generic descriptions, creating a narrative that includes a sequence of detailed entries or points relevant to the case, demonstrating a deep understanding of the case dynamics. Everything must be structured in a string. Strictly.",
-    "date": "Specify the fictional issuance date of the document, ensuring it aligns accurately with the case timeline."
-  }
+  "granted": true or false,
+  "rationale": "Provide this only if the subpoena is denied, explaining the decision.",
+  "document": ${JSON.stringify(type.template)}
 }
 
-Instructional Guidance:
-- The decision on the subpoena must be logically derived from the provided case details and the justification argument.
-- The rationale section should articulate a clear, reasoned argument, referencing specific elements from the case information and legal criteria that influence the decision.
-- The document section must include precision and depth. The "exactContent" should be presented not in paragraphs, but in an excellently structured format, offering a granular depiction of the document’s contents as they would exist in reality. This includes creating a sequence of detailed events, specific interactions, and direct references to facts relevant to the case.
-
-Ensure the model’s response embodies a comprehensive grasp of legal document preparation, accurately reflecting the unique aspects of the case and document type, adhering strictly to the given JSON format.
-`
+The document content must be fictional, extremely detailed, as is a simulation for detective / lawyer game, compelling and complete, designed to enrich the gameplay and educational experience, especially in harder cases where the legal system's complexity and challenges are more pronounced. Also, strictly follow the guidance given by the template : ${type.template}. Remember, I don't want overview / summary, I want details.
+You must change the "document" content with very detailed information, not an overview, or a summary. IMPORANT : Because as a detective, I have to be able to see the discovery.
+You must leave no placeholders. If you can't find a certain company name in the Case Information, generate one.
+`;
     return prompt 
 } 
 

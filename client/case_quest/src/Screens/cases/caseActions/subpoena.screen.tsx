@@ -3,16 +3,20 @@ import { Form } from 'react-bootstrap';
 import { getSubpoenasPricings, issueSubpoena } from '../../../actions/main/cases.actions';
 import { AuthContext } from '../../../Providers/auth.provider';
 import { ActivityIncicator } from '../../../RC/acitivity.incdicator';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 interface SubpoenaType {
   name: string;
   price: number;
 }
 
+interface SubpoenaProps {
+  formtype: 'Subpoena' | 'File Motion'
+}
+
 type FormControlElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
-const SubpoenaScreen: React.FC = () => {
+const SubpoenaScreen: React.FC<SubpoenaProps> = ({formtype}) => {
   const location = useLocation();
   const { logout } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
@@ -24,15 +28,17 @@ const SubpoenaScreen: React.FC = () => {
   const [price, setPrice] = useState<number | undefined>(undefined);
   const [entity, setTarget] = useState<string>('');
   const [justification, setJustification] = useState<string>('');
-  const caseId = location.state.caseId
+  const {caseId} = location.state;
+  const shortened = formtype == 'File Motion' ? 'Motion' : 'Subpoena'
 
-  
+  // ftype = 1 : subpoena
+  // ftype = 2 : file motion
 
   useEffect(() => {
     setLoading(true);
     const fetchPricings = async () => {
       try {
-        const res = await getSubpoenasPricings();
+        const res = await getSubpoenasPricings(formtype);
         setSubpoenas(res.pricings);
         return setLoading(false);
       } catch (err) {
@@ -53,21 +59,34 @@ const SubpoenaScreen: React.FC = () => {
     }
 };
 
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setLoading(true);
+  setSubmitError(false);
+  setSubmitted(false);
+  if (formtype == 'Subpoena') {
+    issueSubpoena(caseId, {entity, justification, type}).then(res => {
+    setSubmitted(true); 
+    return setLoading(false)
+  }).catch(err => {setLoading(false); err.AR ? logout() : setSubmitError(err.message)})
+  } else {
 
+  }
+}
 
   return (
+        loading ? <ActivityIncicator fullScreen /> : (
     <div className="p-m-c">
       <div className="container py-4 m-form ncform">
-        {loading ? <ActivityIncicator fullScreen /> : (
-        <form id="contactForm" onSubmit={(e) => {e.preventDefault(); setSubmitError(false); setSubmitted(false); issueSubpoena(caseId, {entity, justification, type}).then(res => {setSubmitted(true);}).catch(err => err.AR ? logout() : setSubmitError(err.message))}}>
+        <form id="contactForm" onSubmit={(e) => handleSubmit(e)}>
           <center>
-            <h2>Subpoena</h2>
+            <h2>{formtype}</h2>
           </center>
           <br />
           <Form.Group>
-            <Form.Label className="form-label">Subpoena Type</Form.Label>
+            <Form.Label className="form-label">{shortened} Type</Form.Label>
             <Form.Control as="select" value={type} onChange={handleChange} className="transfer-reasons mb-4" required>
-              <option value="">Select a Subpoena Type</option>
+              <option value="">Select a {shortened} Type</option>
               {subpoenas.map((r, index) => (
                 <option key={index} value={r.name}>
                   {r.name} - {r.price} $
@@ -76,17 +95,17 @@ const SubpoenaScreen: React.FC = () => {
             </Form.Control>
           </Form.Group>
 
-          <Form.Label className="form-label">Who ? / What ?</Form.Label>
-          <Form.Control type='text' required placeholder="Enter The Name of the Entity You Are Subpoenaing..." onChange={(e) => setTarget(e.target.value)}/>
+          <Form.Label className="form-label">{formtype == 'Subpoena' ? 'Entity / Who ? / What ?' : 'Title' }</Form.Label>
+          <Form.Control type='text' required placeholder={formtype == 'Subpoena' ? "Enter The Name of the Entity You Are Subpoenaing..." : 'Enter the Title for your Motion'} onChange={(e) => setTarget(e.target.value)}/>
           <Form.Text className="text-muted">
-            Please Precise Specific details of the Subject of your Subpoena.
+            {formtype == 'Subpoena' ? 'Please Precise Specific details of the Subject of your Subpoena.' : 'Please Precise a Specific title for the Motion'}
           </Form.Text>
           <br />
           <br />
           <Form.Label className="form-label">Ground</Form.Label>
-          <textarea className="form-control" id="message" placeholder="Justify the basis for the subpoena." style={{ height: '10rem' }} required onChange={(e) => setJustification(e.target.value)} />
+          <textarea className="form-control" id="message" placeholder={`Justify the basis for the ${shortened}.`} style={{ height: '10rem' }} required onChange={(e) => setJustification(e.target.value)} />
           <Form.Text className="text-muted">
-            Delineate the particular details pertaining to the subject matter of your subpoena request.
+            Delineate the particular details pertaining to the subject matter of your {shortened} request.
           </Form.Text>
           <br />
           <br />
@@ -103,19 +122,21 @@ const SubpoenaScreen: React.FC = () => {
           <br />
           <div className="d-grid">
             <Form.Text className="text-muted">
-              * Subpoenas are automatically endorsed by the issuer upon court approval.
+              * {shortened}s are automatically endorsed by the issuer upon court approval.
               <br />
-              * A price tag is accompagnied with each subpoena.
+              * A price tag is accompagnied with each {shortened}.
+              <br />
+              * You will be charged even if your request is denied.
             </Form.Text>
             <br />
             <button className="btn btn-primary btn-lg" id="submitButton" type="submit">
-              Issue Subpoena {price && `(${price} $)`}
+              Issue {shortened} {price && `(${price} $)`}
             </button>
           </div>
         </form>
-        )}
       </div>
     </div>
+        )
   );
 };
 

@@ -16,13 +16,13 @@ const createCase = async (caseInfo: object): Promise<{success: boolean, AR?: boo
 })
 }
 
-const getSubpoenasPricings = async (): Promise<{success: boolean, AR?: boolean, pricings: any}> => {
+const getSubpoenasPricings = async (formtype: 'Subpoena' | 'File Motion'): Promise<{success: boolean, AR?: boolean, pricings: any}> => {
     return new Promise(async (resolve, reject) =>  {
     const token = localStorage.getItem('user_token');
         if (!token) reject({success: false, message: 'No Token', AR: true}) 
         
         try {
-            const res = await axios.get(config.API_BASE_URL + '/main/cases/getSubpoenasPricings', {headers: {'x-access-token': token}});
+            const res = await axios.get(config.API_BASE_URL + '/main/cases/getSubpoenasPricings', {headers: {'x-access-token': token, 'target': formtype}});
             console.log(res.data);
             return resolve({success: true, pricings: res.data.calculatedPrices});
         } catch (err) {
@@ -61,4 +61,19 @@ const issueSubpoena = (caseId: string, subpoenaInfo: any): Promise<{message?: st
     })
 }
 
-export {issueSubpoena, createCase, getCase, getSubpoenasPricings}
+const fileMotion = (caseId: string, subpoenaInfo: any): Promise<{message?: string, success: boolean, AR?: boolean}> => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token) return reject({success: false, message: 'No Token', AR: true});
+        try {
+            const res = await axios.post(config.API_BASE_URL + '/main/cases/fileMotion', {subpoenaInfo, caseId}, {headers: {'x-access-token': token}});
+            return resolve({success: true, message: res.data.message});
+        } catch (err) {
+            const axiosErr = err as AxiosError<{message: string}>;
+            const stc = axiosErr.status;
+            return stc != 200 ? reject({success: false, message: axiosErr.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : axiosErr.response?.data.message});
+        }
+    })
+}
+
+export {fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}

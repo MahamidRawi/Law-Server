@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { Err500 } = require('../../vars/vars');
+const { Err500, typesOfSubpoenas } = require('../../vars/vars');
 require('../../DB/models/cases.model');
 require('../../DB/models/user.model');
 require('../../DB/models/wallet.model');
@@ -10,7 +10,6 @@ const users = mongoose.model('userModel');
 
 
 const getCases = (casesArr) => {
-    console.log(casesArr)
     return new Promise(async (resolve, reject) => {
     try {
         const response = await cases.find({_id: {$in: casesArr}})
@@ -25,7 +24,6 @@ const getCases = (casesArr) => {
 
 const getCase = (caseId, uid) => {
     return new Promise(async (resolve, reject) => {
-        console.log(caseId)
 
         try {
             const response = await cases.findOne({_id: caseId});
@@ -54,7 +52,6 @@ const createCase = () => {
 }
 
 const getUser = async (id, removeproperty) => {
-    console.log(id);
     return new Promise(async (resolve, reject) => {
         try {
             const userFound = await users.findOne({_id: id}).select(`-password -${removeproperty}`);
