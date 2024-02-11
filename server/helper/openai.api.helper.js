@@ -3,84 +3,87 @@ const filter = new Filter({ placeHolder: '*' });
 
 const discoveryTemplates = {
     "document": {
-        "type": "Document",
-        "title": "Title of the Document",
-        "content": "Brief description of the document's relevance to the case.",
-        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure. Detailed and formatted content of the document, including specific data, names, and relevant information.]",
-        "date": "Date of the document"
+      "type": "Document",
+      "title": "Explicit Title Reflecting Document Subject",
+      "content": "Concise summary highlighting the document's relevance to the case.",
+      "exactContent": "Title: '{{Document Title}}'\nDate: '{{YYYY-MM-DD}}'\n\nOverview:\n{{Brief overview of document relevance and content.}}\n\nDetailed Analysis:\n{{Point-by-point detailed analysis, including data points, names, dates, and locations.}}\n\nImplications:\n{{Discussion on how this document affects the case.}}\n\nAttachments:\n{{List of attached images, charts, or relevant documents with brief descriptions.}}",
+      "date": "YYYY-MM-DD format"
     },
     "testimony": {
-        "type": "Testimony",
-        "title": "Title of the Testimony",
-        "content": "Summary of the testimony and its significance.",
-        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure.Full transcript of the testimony, including questions and answers, formatted as a legal document. If it is a dialogue, I want Q/A, otherwise, I want exactly what was said]",
-        "date": "Date of the testimony"
+      "type": "Testimony",
+      "title": "Witness Name or Identifier",
+      "content": "Essential summary of the testimony, emphasizing its impact on the case.",
+      "exactContent": "Witness: '{{Name}}'\nDate: '{{YYYY-MM-DD}}'\n\nTranscript:\nQ1: '{{Question 1}}'\nA1: '{{Answer 1}}'\nQ2: '{{Question 2}}'\nA2: '{{Answer 2}}'\n{{Additional Q&A as necessary}}\n\nConclusion:\n{{Key takeaways from the testimony.}}\n\nNotes:\n{{Examiner's observations or relevant comments.}}",
+      "date": "YYYY-MM-DD format"
     },
     "investigationReport": {
-        "type": "Investigation Report",
-        "title": "Title of the Investigation Report",
-        "content": "Overview of the investigation's findings.",
-        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure.Detailed report including methodology, findings, and conclusions.]",
-        "date": "Date of the report"
+      "type": "Investigation Report",
+      "title": "Investigation Focus and Report Number",
+      "content": "Overview summarizing key findings and their implications.",
+      "exactContent": "Report Title: '{{Report Title}}'\nDate: '{{YYYY-MM-DD}}'\n\nMethodology:\n{{Description of investigation techniques and tools used.}}\n\nFindings:\n{{Detailed account of evidence found, including photographs, diagrams, and key observations.}}\n\nConclusions:\n{{Summary of implications for the case.}}\n\nRecommendations:\n{{Suggested next steps based on findings.}}",
+      "date": "YYYY-MM-DD format"
     },
+    // Following the same pattern for other document types
     "email": {
-        "type": "Email",
-        "title": "Subject of the Email",
-        "content": "Summary of the email's relevance to the case.",
-        "exactContent": "[Complete email conversation, including sender, receiver, date, and body of the email.]",
-        "date": "Date of the email"
+      "type": "Email",
+      "title": "Email Subject Line",
+      "content": "Summary of the email's relevance to the case.",
+      "exactContent": "Date: '{{YYYY-MM-DD}}'\nFrom: '{{Sender}}'\nTo: '{{Receiver}}'\nSubject: '{{Subject Line}}'\n\nBody:\n{{Full email body text}}\n\nFollow-up:\n{{Response emails if any, with full headers and body.}}\n\nSummary:\n{{Key points and relevance to the case.}}",
+      "date": "YYYY-MM-DD format"
     },
     "financialRecords": {
-        "type": "Financial Records",
-        "title": "[Title of the Financial Record]",
-        "content": "[Overview of the financial record's relevance to the financial aspects of the case.]",
-        "exactContent": "[I want no overviews, no summaries, no paragraphs. Exact Statement of the bank records' relevance to the case, highlighting financial transactions and balances.]",
-        "date": "Date of the record"
-    },
-    "surveillanceFootage": {
+      "type": "Financial Records",
+      "title": "Record Type and Account Number",
+      "content": "Analysis of the record's significance, focusing on financial implications.",
+      "exactContent": "Account Number: '{{Account Number}}'\nStatement Period: '{{Start Date}} to {{End Date}}'\n\nTransactions:\n- Date: '{{Transaction Date}}', Description: '{{Transaction Description}}', Amount: '{{Amount}}', Balance: '{{Running Balance}}'\n{{Repeat for each transaction}}\n\nSummary:\n{{Analysis of financial activity's impact on the case.}}",
+      "date": "YYYY-MM-DD format"
+    },"surveillanceFootage": {
         "type": "Surveillance Footage",
-        "title": "Location and Date of the Footage",
-        "content": "[Description of the footage's relevance to the case events.]",
-        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure.Timestamped summary of the footage, noting key moments and individuals captured, supplemented by still images or descriptions.]",
-        "date": "Date of the recording"
-    },
-    "medicalRecords": {
+        "title": "Location and Timestamp of Footage",
+        "content": "Contextual overview of the footage's role in the investigation.",
+        "exactContent": "Location: '{{Location}}'\nDate and Time: '{{YYYY-MM-DD HH:MM}}'\n\nEvents:\n{{Timestamped summary of key moments and individuals identified, with detailed descriptions of actions.}}\n\nAnalysis:\n{{Significance of footage to case investigation, including any discrepancies or notable behaviors observed.}}",
+        "date": "YYYY-MM-DD format"
+      },
+      "medicalRecords": {
         "type": "Medical Records",
-        "title": "[Patient Name and Date of the Records]",
-        "content": "[Significance of the medical records to the individual's condition or the case.]",
-        "exactContent": "[Detailed account of medical visits, diagnoses, treatments, and physician notes, with relevance to case events highlighted.]",
-        "date": "Date of the records"
-    },
-    "policeReport": {
+        "title": "Patient Name and Record Number",
+        "content": "Summary of medical history's relevance to case events.",
+        "exactContent": "Patient: '{{Patient Name}}'\nRecord Date: '{{YYYY-MM-DD}}'\n\nVisits:\n{{Date and summary of each visit, including diagnosis, treatment provided, and physician notes.}}\n\nSummary:\n{{Medical history overview with relevance to the case highlighted, including any discrepancies or notable conditions.}}",
+        "date": "YYYY-MM-DD format"
+      },
+      "policeReport": {
         "type": "Police Report",
-        "title": "[Report Number and Incident Date]",
-        "content": "Summary of the incident as reported to law enforcement.",
-        "exactContent": "[Complete report text, including descriptions of the incident, statements from involved parties and witnesses, and initial findings.]",
-        "date": "[Date of the report]"
-    },
-    "courtDocuments": {
+        "title": "Incident Report Number",
+        "content": "Brief overview of the incident and initial findings.",
+        "exactContent": "Report Number: '{{Report Number}}'\nIncident Date: '{{YYYY-MM-DD}}'\n\nIncident Description:\n{{Detailed narrative of the event, including involved parties, witness statements, and initial findings.}}\n\nFindings:\n{{Initial observations, evidence collected, and any immediate conclusions drawn.}}\n\nPhotos/Diagrams:\n{{Descriptions of included visual aids, if any, with relevance to the findings.}}",
+        "date": "YYYY-MM-DD format"
+      },
+      "courtDocuments": {
         "type": "Court Document",
-        "title": "[Title of the Court Document]",
-        "content": "Brief on how the document pertains to the legal proceedings.",
-        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure.Full document text, including legal arguments, motions, orders, or judgments, formatted according to legal document standards.]",
-        "date": "Date of the document"
-    },
-    "contractAgreements": {
+        "title": "Document Name and Case Number",
+        "content": "Outline of the document's legal significance.",
+        "exactContent": "Document Title: '{{Title}}'\nCase Number: '{{Case Number}}'\n\nLegal Text:\n{{Full document content, with critical sections highlighted and annotated for clarity.}}\n\nAnalysis:\n{{Commentary on document implications for the case, including any legal precedents or arguments presented.}}\n\nAttachments:\n{{Any relevant legal briefs, exhibits, or supporting documents listed with brief descriptions.}}",
+        "date": "YYYY-MM-DD format"
+      },
+      "contractAgreements": {
         "type": "Contract Agreement",
-        "title": "[Title of the Contract]",
-        "content": "[Relevance of the contract to the dispute or case.]",
-        "exactContent": "[I don't want summaries, nor paragprah, nor overviews. I want hight details level, very good structure.Complete contract text, including terms, conditions, parties involved, and signatures, with key clauses highlighted.]",
-        "date": "Date of the agreement"
-    },
-    "academicRecords": {
+        "title": "Contract Title and Parties Involved",
+        "content": "Summary of the contract's purpose and its relevance to the dispute.",
+        "exactContent": "Contract Title: '{{Title}}'\nParties Involved: '{{Names of Parties}}'\nDate: '{{YYYY-MM-DD}}'\n\nTerms:\n{{Detailed enumeration of contract terms, conditions, and obligations, with key clauses highlighted and their implications discussed.}}\n\nSignatures:\n{{Signatures of all parties involved, with dates.}}\n\nAnalysis:\n{{Examination of the contract's relevance to the dispute, including any points of contention.}}",
+        "date": "YYYY-MM-DD format"
+      },
+      "academicRecords": {
         "type": "Academic Records",
-        "title": "[Name of the Institution and Student]",
-        "content": "[Overview of the academic records' relevance to the case.]",
-        "exactContent": "[Transcripts, diplomas, and other records, detailing courses, grades, and achievements, with any discrepancies or notable achievements highlighted.]",
-        "date": "Date of the records"
-    },
-    // Add additional templates as required for your application
-};
+        "title": "Institution Name and Student Identifier",
+        "content": "Insight into the records' pertinence to the investigation.",
+        "exactContent": "Student: '{{Student Name}}'\nInstitution: '{{Institution Name}}'\nDate: '{{YYYY-MM-DD}}'\n\nRecords:\n{{Detailed list of courses, grades, and academic achievements, with any discrepancies or notable achievements highlighted.}}\n\nSummary:\n{{Overview of academic performance with emphasis on relevance to the case, including any patterns or irregularities observed.}}",
+        "date": "YYYY-MM-DD format"
+      }
+      // Any additional document types would follow the same detailed and dynamic structure.
+    // Add additional templates for other document types as required, following the dynamic structure outlined above.
+  };
+  
+  
 
 const createCasePrompt = (uid, caseInfo) => {
     const { lawSystem, additionalKeywords, fieldOfLaw, difficulty, position } = caseInfo;
@@ -193,7 +196,7 @@ Response must follow the following structure:
     "type": "Motion",
     "title": "${entity} - [Generated Title based on the motion's content]",
     "content": "A very short summary outlining the motion",
-    "exactContent": "Introduction: [Introduction to the motion, including the legal basis for the request.]\\n\\nBackground: [Details on the case and how it relates to the motion.]\\n\\nArgument: [A detailed argument for the motion, including references to applicable laws, precedents, and evidence from the case.]\\n\\nConclusion: [The court's decision on the motion, including any conditions or instructions.]\\n\\nDated: ${new Date().toISOString().split('T')[0]}",
+    "exactContent": "[Introduction] [Introduction to the motion, including the legal basis for the request.]\\n\\n[Background] [Details on the case and how it relates to the motion.]\\n\\n[Argument:] [A detailed argument for the motion, including references to applicable laws, precedents, and evidence from the case.]\\n\\n[Conclusion] [The court's decision on the motion, including any conditions or instructions.]\\n\\nDated: ${new Date().toISOString().split('T')[0]}",
     "date": "${new Date().toISOString().split('T')[0]}"
   }
 }
