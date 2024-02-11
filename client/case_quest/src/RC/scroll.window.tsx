@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { UserCase, NotificationsProps, UserInfo, IndCase } from '../data/types';
 import { Case, Discovery, Notification, User } from './cards.rc';
 import { RecordCard } from '../Screens/wallet/wallet.cards';
+import { ActivityIncicator } from './acitivity.incdicator';
 
 // Type guard for individual UserCase elemen
 type IncomeProps = {

@@ -98,7 +98,7 @@ const createCasePrompt = (uid, caseInfo) => {
         // YOU CAN ADD MORE PARTICIPANTS FOLLOWING THE GIVEN SCHEMA TO MAKE IT MORE INTERESTING
         ],
         "discoveries": [
-            Only 4 items, extremely detailed, as it is an investigation / law / detective game / with no placeholders. 100% complete : ${Object.values(discoveryTemplates).map(template => JSON.stringify(template, null, 2)).join(',\n')}
+            Only 4 items, extremely detailed and excellently structured (not summary / overview / paragraph), with no placeholders, as it is an investigation / law / detective game / with no placeholders. 100% complete : ${Object.values(discoveryTemplates).map(template => JSON.stringify(template, null, 2)).join(',\n')}
         ]
         "oppositionName": "Generate Fictional but realistic name for the Representing Attorney",
 
@@ -166,4 +166,45 @@ You must leave no placeholders. If you can't find a certain company name in the 
     return prompt 
 } 
 
-module.exports = {createCasePrompt, issueSubpoenaPrompt}
+const fileMotionPrompt = (caseInfo, type, justification, entity) => {
+    const openAiPrompt = `
+As the court reviewing a motion request, critically assess the provided information to make an informed decision. The motion request includes:
+
+- Type of Motion: ${type}
+- Title: ${entity}
+- Justification: ${justification}
+- Case Information: ${JSON.stringify(caseInfo)}
+
+In your evaluation, consider:
+- The coherence and completeness of the form information.
+- Whether the type of evidence mentioned is present within the caseInfo.discoveries array.
+- How the case's difficulty level, as described in caseInfo.discoveries, impacts the motion's likelihood of success.
+- The reasoning's strength and its foundation on solid evidence and legal principles.
+- Remaining impartial and not swayed by external factors, including any implied threats or unsubstantiated claims.
+- The validity of the argument, ensuring all claims are supported by evidence. If a claim made by the user isn't backed by information in the caseInfo.discoveries array or contradicts known facts, the motion should not be approved.
+
+Your response should mirror the seriousness and structure of a legal document, providing a clear, evidence-based decision.
+
+Response must follow the following structure:
+{
+  "granted": [true/false based on the above criteria],
+  "rationale": "Provide with a clear explanation of the court's decision",
+  "document": {
+    "type": "Motion",
+    "title": "${entity} - [Generated Title based on the motion's content]",
+    "content": "A very short summary outlining the motion",
+    "exactContent": "Introduction: [Introduction to the motion, including the legal basis for the request.]\\n\\nBackground: [Details on the case and how it relates to the motion.]\\n\\nArgument: [A detailed argument for the motion, including references to applicable laws, precedents, and evidence from the case.]\\n\\nConclusion: [The court's decision on the motion, including any conditions or instructions.]\\n\\nDated: ${new Date().toISOString().split('T')[0]}",
+    "date": "${new Date().toISOString().split('T')[0]}"
+  }
+}
+Ensure all parts of the document are fully detailed, reflecting a realistic and structured approach as seen in actual legal documents, without using placeholders.
+
+Ensure your decision is justified with a meticulous review of the provided case information and the motion's alignment with legal standards and evidential support.
+`;
+
+
+return openAiPrompt;
+
+}
+
+module.exports = {createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}

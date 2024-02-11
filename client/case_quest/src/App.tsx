@@ -3,12 +3,15 @@ import './App.css';
 import { AuthProvider } from './Providers/auth.provider';
 import { Routes } from './Routes/routes';
 import { SignIn } from './Screens/auth.screens';
+import { BrowserRouter } from 'react-router-dom';
 
 function App() {
   return (
-   <AuthProvider>
+    <BrowserRouter>
+    <AuthProvider>
     <Routes />
    </AuthProvider>
+   </BrowserRouter>
   );
 }
 

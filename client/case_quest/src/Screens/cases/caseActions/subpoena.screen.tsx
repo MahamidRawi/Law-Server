@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Form } from 'react-bootstrap';
-import { getSubpoenasPricings, issueSubpoena } from '../../../actions/main/cases.actions';
+import { fileMotion, getSubpoenasPricings, issueSubpoena } from '../../../actions/main/cases.actions';
 import { AuthContext } from '../../../Providers/auth.provider';
 import { ActivityIncicator } from '../../../RC/acitivity.incdicator';
 import { useLocation } from 'react-router-dom';
@@ -24,15 +24,12 @@ const SubpoenaScreen: React.FC<SubpoenaProps> = ({formtype}) => {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | undefined | false>(false);
   const [subpoenas, setSubpoenas] = useState<SubpoenaType[]>([]);
-  const [name, setName] = useState<string | undefined>(undefined);
+  const [msg, setSMsg] = useState<string | undefined>(undefined);
   const [price, setPrice] = useState<number | undefined>(undefined);
   const [entity, setTarget] = useState<string>('');
   const [justification, setJustification] = useState<string>('');
   const {caseId} = location.state;
   const shortened = formtype == 'File Motion' ? 'Motion' : 'Subpoena'
-
-  // ftype = 1 : subpoena
-  // ftype = 2 : file motion
 
   useEffect(() => {
     setLoading(true);
@@ -54,7 +51,6 @@ const SubpoenaScreen: React.FC<SubpoenaProps> = ({formtype}) => {
     const selectedSubpoena = subpoenas.find(subpoena => subpoena.name === value);
     if (selectedSubpoena) {
       setSubpoenaType(selectedSubpoena.name);
-      setName(selectedSubpoena.name);
       setPrice(selectedSubpoena.price);
     }
 };
@@ -70,7 +66,11 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     return setLoading(false)
   }).catch(err => {setLoading(false); err.AR ? logout() : setSubmitError(err.message)})
   } else {
-
+    fileMotion(caseId, {entity, justification, type}).then(res => {
+      setSubmitted(true); 
+      res.granted ? setSMsg(res.message) : setSubmitError(res.message);
+      return setLoading(false)
+    }).catch(err => logout())
   }
 }
 
@@ -111,7 +111,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
           <br />
           {submitted && !submitError && (
             <div className="alert alert-success" role="alert" id="submitSuccessMessage">
-              <center>Subpoena Issued Successfully</center>
+              <center>{formtype == 'Subpoena' ? 'Subpoena Issued Successfully ! Please View Your Case\'s Discoveries / Participant Section.' : msg}</center>
             </div>
           )}
           {submitError && (

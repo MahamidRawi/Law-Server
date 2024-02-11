@@ -134,7 +134,7 @@ const fieldsOfLaw = [
         type: "Financial Records",
         title: "Bank Records of [Individual/Entity Name]",
         content: "Overview of the bank records' relevance to the case, highlighting financial transactions and balances.",
-        exactContent: "Comprehensive listing of all transactions, deposits, withdrawals, and balances within the specified period, including any irregular activities or transactions that directly pertain to the case events. Each entry is annotated with explanations for its relevance to the ongoing investigation.",
+        exactContent: "[Comprehensive listing of all transactions, deposits, withdrawals, and balances within the specified period, including any irregular activities or transactions that directly pertain to the case events. Each entry is annotated with explanations for its relevance to the ongoing investigation. I want you generate information, not generalized, for the person's bank records (transactions, etc...). I don't want paragraphs, nor summaries]",
         date: "Date of the bank records compilation"
       }
     },

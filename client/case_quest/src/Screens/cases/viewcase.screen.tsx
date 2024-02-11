@@ -20,7 +20,8 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
     const [loading, setLoading] = useState(true);
     const {logout} = useContext(AuthContext);
     const location = useLocation();
-    const [activeContent, setActiveContent] = useState('Overview');
+    const lastLocation = localStorage.getItem('LCC')
+    const [activeContent, setActiveContent] = useState(lastLocation || 'Overview');
     const [caseInfo, setCaseInfo] = useState<any>();
     const caseId = location.state.data.caseId
 
@@ -28,22 +29,35 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
         Overview: <CaseOverView caseId={caseId} caseInfo={caseInfo} />,
         Actions: <ActionScreen caseId={caseId} />,
         Discoveries: <DiscoveryScreen data={caseInfo} />,
-        Participants: <Participants caseInfo={caseInfo} />,
-        Court: <Participants caseInfo={caseId} />,
+        Participants: <Participants data={caseInfo} />,
+        Court: <Participants />,
     }
 
     useEffect(() => {
-        setLoading(true);
+        if (!caseId) {
+            alert('Case ID is missing');
+            setLoading(false);
+            return;
+        }
+        console.log('Here');
         getCase(caseId).then(res => {
-            setCaseInfo(res.case); 
-            return setLoading(false)
-        }).catch(err => err.AR ? logout() : alert('An Error Has Occured'))
-    }, [activeContent]);
+            console.log('reached here too')
+            setCaseInfo(res.case)
+            return setLoading(false);
+        }).catch(err => {
+            setLoading(false);
+            err.AR ? logout() : alert('An Error Has Occured');
+        });
+    }, [caseId, activeContent]);
 
-    const handleButtonClick = (content: React.SetStateAction<string>) => setActiveContent(content);
+    const handleButtonClick = (content: string) => {
+        localStorage.setItem('LCC', content);
+        return setActiveContent(content);
+    };
+
+    if (loading) return <ActivityIncicator fullScreen />
 
         return (
-            loading ? <ActivityIncicator fullScreen /> : (
     <div className="p-p-c">
                 <div className="wallet-container">
                     <div className="balance-display">
@@ -55,18 +69,18 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
                                 key={key}
                                 className={activeContent === key ? 'active' : ''}
                                 onClick={() => handleButtonClick(key)}>
-                                {key} {key === 'Discoveries' && `(${caseInfo.discoveries.length})`}
+                                {key} {key === 'Discoveries' ? `(${caseInfo.discoveries.length})` : key == 'Participants' ? `(${caseInfo.participants.length})` : ''}
                             </button>
                         ))}
                     </div>
                     <div className="content-area">
                         <div className="content-area2">
-                        {caseContent[activeContent as keyof ContentMap] }
+                        {caseContent[activeContent as keyof ContentMap]}
                         </div>
                     </div>
                 </div>
             </div>
-            ))
+            )
 }
 
 export default ViewCase

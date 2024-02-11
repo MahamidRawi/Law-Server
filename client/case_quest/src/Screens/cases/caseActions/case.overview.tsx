@@ -22,6 +22,7 @@ const CaseOverView: React.FC<CaseOverViewProps> = ({caseId, caseInfo}) => {
     const navigate = useNavigate();
     
     useEffect(() => {
+        localStorage.setItem('LCC', 'Overview');
         setLoading(true);
         if (caseInfo) {
             getLawyerInformation(caseInfo.owners[0]).then(res => {

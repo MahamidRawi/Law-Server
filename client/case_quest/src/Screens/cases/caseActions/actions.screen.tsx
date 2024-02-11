@@ -24,6 +24,10 @@ const ActionScreen: React.FC<ActionScreenProps> = ({caseId}) => {
     
     const navigate = useNavigate();
 
+    useEffect(() => {
+        return localStorage.setItem('LCC', 'Actions')
+    }, [])
+
     return (
         loading ? <ActivityIncicator fullScreen /> : (
             <div className="container cov-parent clr d-flex  justify-content-center overflow-auto">

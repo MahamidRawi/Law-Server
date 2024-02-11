@@ -3,13 +3,14 @@ import '../../../wallet.css'
 import ScrollWindow from '../../../RC/scroll.window';
 
 interface ParticipantsProps {
-    caseInfo?: any
+    data?: any
 }
 
-const Participants: React.FC<ParticipantsProps> = ({caseInfo}) => {
+const Participants: React.FC<ParticipantsProps> = ({data}) => {
+
     return (
         <div className="scroll-wallet ns">
-            <ScrollWindow pt type='User' content={caseInfo.participants} addS />
+            <ScrollWindow pt type='User' content={data.participants} addS />
         </div>
     )
 }

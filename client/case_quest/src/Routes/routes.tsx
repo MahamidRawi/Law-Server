@@ -23,6 +23,6 @@ export const Routes = () => {
     if (loading) return <center><div className='spinner' /></center>
 
     return (
-        user ? <BrowserRouter><MainRoutes /></BrowserRouter> : <AuthRoutes />
+        user ? <MainRoutes /> : <AuthRoutes />
     )
 }

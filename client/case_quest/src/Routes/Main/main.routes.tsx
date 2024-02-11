@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { IoMailOutline, IoWalletOutline, IoLogOutOutline } from "react-icons/io5";
 import { AuthContext } from '../../Providers/auth.provider';
 import { Container, Nav, Navbar } from 'react-bootstrap';
@@ -32,7 +32,7 @@ const MainRoutes: React.FC = () => {
     const [wallet, setWallet] = useState<any>({})
 
   useEffect(() => {
-    if (user && (location.pathname.toLowerCase() == '/signin' || location.pathname == '/signup')) navigate('/');
+    if (user && (location.pathname.toLowerCase() == '/signin' || location.pathname == '/signup')) return navigate('/');
     fetchUserInfo(user).then(res => setUserInfo(res.userInfo)).catch(err => logout());
     getWallet().then(res => setWallet(res.wallet)).catch(err => logout())  
     getMails().then(res => {

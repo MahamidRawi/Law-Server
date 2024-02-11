@@ -31,7 +31,7 @@ const getSubpoenasPricings = async (formtype: 'Subpoena' | 'File Motion'): Promi
     })
 }
 
-const getCase = (caseId: string): Promise<{success: boolean, case: object, AR?: boolean}> => {
+const getCase = (caseId: string): Promise<{success: boolean, case: any, AR?: boolean}> => {
     return new Promise(async (resolve, reject) => {
         const token = localStorage.getItem('user_token');
         if (!token) return reject({success: false, message: 'No Token', AR: true});
@@ -61,17 +61,16 @@ const issueSubpoena = (caseId: string, subpoenaInfo: any): Promise<{message?: st
     })
 }
 
-const fileMotion = (caseId: string, subpoenaInfo: any): Promise<{message?: string, success: boolean, AR?: boolean}> => {
+const fileMotion = (caseId: string, subpoenaInfo: any): Promise<{message?: string, success: boolean, granted?: boolean, AR?: boolean}> => {
     return new Promise(async (resolve, reject) => {
         const token = localStorage.getItem('user_token');
         if (!token) return reject({success: false, message: 'No Token', AR: true});
         try {
             const res = await axios.post(config.API_BASE_URL + '/main/cases/fileMotion', {subpoenaInfo, caseId}, {headers: {'x-access-token': token}});
-            return resolve({success: true, message: res.data.message});
-        } catch (err) {
-            const axiosErr = err as AxiosError<{message: string}>;
-            const stc = axiosErr.status;
-            return stc != 200 ? reject({success: false, message: axiosErr.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : axiosErr.response?.data.message});
+            return resolve({success: true, message: res.data.message, granted: res.data.granted});
+        } catch (err: any) {
+            const {stc} = err
+            return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
         }
     })
 }
