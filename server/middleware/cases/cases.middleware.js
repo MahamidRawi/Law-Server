@@ -9,7 +9,6 @@ const caseExists = async (req, res, next) => {
         req.caseInfo = caseFound
         return next();
     } catch (err) {
-        console.log(err);
         return res.status(500).json({success: false, message: 'An Error has Occured'});
     }
 }

@@ -1,89 +1,6 @@
 const Filter = require('bad-words');
+const { discoveryTemplates } = require('../vars/vars');
 const filter = new Filter({ placeHolder: '*' });
-
-const discoveryTemplates = {
-    "document": {
-      "type": "Document",
-      "title": "Explicit Title Reflecting Document Subject",
-      "content": "Concise summary highlighting the document's relevance to the case.",
-      "exactContent": "Title: '{{Document Title}}'\nDate: '{{YYYY-MM-DD}}'\n\nOverview:\n{{Brief overview of document relevance and content.}}\n\nDetailed Analysis:\n{{Point-by-point detailed analysis, including data points, names, dates, and locations.}}\n\nImplications:\n{{Discussion on how this document affects the case.}}\n\nAttachments:\n{{List of attached images, charts, or relevant documents with brief descriptions.}}",
-      "date": "YYYY-MM-DD format"
-    },
-    "testimony": {
-      "type": "Testimony",
-      "title": "Witness Name or Identifier",
-      "content": "Essential summary of the testimony, emphasizing its impact on the case.",
-      "exactContent": "Witness: '{{Name}}'\nDate: '{{YYYY-MM-DD}}'\n\nTranscript:\nQ1: '{{Question 1}}'\nA1: '{{Answer 1}}'\nQ2: '{{Question 2}}'\nA2: '{{Answer 2}}'\n{{Additional Q&A as necessary}}\n\nConclusion:\n{{Key takeaways from the testimony.}}\n\nNotes:\n{{Examiner's observations or relevant comments.}}",
-      "date": "YYYY-MM-DD format"
-    },
-    "investigationReport": {
-      "type": "Investigation Report",
-      "title": "Investigation Focus and Report Number",
-      "content": "Overview summarizing key findings and their implications.",
-      "exactContent": "Report Title: '{{Report Title}}'\nDate: '{{YYYY-MM-DD}}'\n\nMethodology:\n{{Description of investigation techniques and tools used.}}\n\nFindings:\n{{Detailed account of evidence found, including photographs, diagrams, and key observations.}}\n\nConclusions:\n{{Summary of implications for the case.}}\n\nRecommendations:\n{{Suggested next steps based on findings.}}",
-      "date": "YYYY-MM-DD format"
-    },
-    // Following the same pattern for other document types
-    "email": {
-      "type": "Email",
-      "title": "Email Subject Line",
-      "content": "Summary of the email's relevance to the case.",
-      "exactContent": "Date: '{{YYYY-MM-DD}}'\nFrom: '{{Sender}}'\nTo: '{{Receiver}}'\nSubject: '{{Subject Line}}'\n\nBody:\n{{Full email body text}}\n\nFollow-up:\n{{Response emails if any, with full headers and body.}}\n\nSummary:\n{{Key points and relevance to the case.}}",
-      "date": "YYYY-MM-DD format"
-    },
-    "financialRecords": {
-      "type": "Financial Records",
-      "title": "Record Type and Account Number",
-      "content": "Analysis of the record's significance, focusing on financial implications.",
-      "exactContent": "Account Number: '{{Account Number}}'\nStatement Period: '{{Start Date}} to {{End Date}}'\n\nTransactions:\n- Date: '{{Transaction Date}}', Description: '{{Transaction Description}}', Amount: '{{Amount}}', Balance: '{{Running Balance}}'\n{{Repeat for each transaction}}\n\nSummary:\n{{Analysis of financial activity's impact on the case.}}",
-      "date": "YYYY-MM-DD format"
-    },"surveillanceFootage": {
-        "type": "Surveillance Footage",
-        "title": "Location and Timestamp of Footage",
-        "content": "Contextual overview of the footage's role in the investigation.",
-        "exactContent": "Location: '{{Location}}'\nDate and Time: '{{YYYY-MM-DD HH:MM}}'\n\nEvents:\n{{Timestamped summary of key moments and individuals identified, with detailed descriptions of actions.}}\n\nAnalysis:\n{{Significance of footage to case investigation, including any discrepancies or notable behaviors observed.}}",
-        "date": "YYYY-MM-DD format"
-      },
-      "medicalRecords": {
-        "type": "Medical Records",
-        "title": "Patient Name and Record Number",
-        "content": "Summary of medical history's relevance to case events.",
-        "exactContent": "Patient: '{{Patient Name}}'\nRecord Date: '{{YYYY-MM-DD}}'\n\nVisits:\n{{Date and summary of each visit, including diagnosis, treatment provided, and physician notes.}}\n\nSummary:\n{{Medical history overview with relevance to the case highlighted, including any discrepancies or notable conditions.}}",
-        "date": "YYYY-MM-DD format"
-      },
-      "policeReport": {
-        "type": "Police Report",
-        "title": "Incident Report Number",
-        "content": "Brief overview of the incident and initial findings.",
-        "exactContent": "Report Number: '{{Report Number}}'\nIncident Date: '{{YYYY-MM-DD}}'\n\nIncident Description:\n{{Detailed narrative of the event, including involved parties, witness statements, and initial findings.}}\n\nFindings:\n{{Initial observations, evidence collected, and any immediate conclusions drawn.}}\n\nPhotos/Diagrams:\n{{Descriptions of included visual aids, if any, with relevance to the findings.}}",
-        "date": "YYYY-MM-DD format"
-      },
-      "courtDocuments": {
-        "type": "Court Document",
-        "title": "Document Name and Case Number",
-        "content": "Outline of the document's legal significance.",
-        "exactContent": "Document Title: '{{Title}}'\nCase Number: '{{Case Number}}'\n\nLegal Text:\n{{Full document content, with critical sections highlighted and annotated for clarity.}}\n\nAnalysis:\n{{Commentary on document implications for the case, including any legal precedents or arguments presented.}}\n\nAttachments:\n{{Any relevant legal briefs, exhibits, or supporting documents listed with brief descriptions.}}",
-        "date": "YYYY-MM-DD format"
-      },
-      "contractAgreements": {
-        "type": "Contract Agreement",
-        "title": "Contract Title and Parties Involved",
-        "content": "Summary of the contract's purpose and its relevance to the dispute.",
-        "exactContent": "Contract Title: '{{Title}}'\nParties Involved: '{{Names of Parties}}'\nDate: '{{YYYY-MM-DD}}'\n\nTerms:\n{{Detailed enumeration of contract terms, conditions, and obligations, with key clauses highlighted and their implications discussed.}}\n\nSignatures:\n{{Signatures of all parties involved, with dates.}}\n\nAnalysis:\n{{Examination of the contract's relevance to the dispute, including any points of contention.}}",
-        "date": "YYYY-MM-DD format"
-      },
-      "academicRecords": {
-        "type": "Academic Records",
-        "title": "Institution Name and Student Identifier",
-        "content": "Insight into the records' pertinence to the investigation.",
-        "exactContent": "Student: '{{Student Name}}'\nInstitution: '{{Institution Name}}'\nDate: '{{YYYY-MM-DD}}'\n\nRecords:\n{{Detailed list of courses, grades, and academic achievements, with any discrepancies or notable achievements highlighted.}}\n\nSummary:\n{{Overview of academic performance with emphasis on relevance to the case, including any patterns or irregularities observed.}}",
-        "date": "YYYY-MM-DD format"
-      }
-      // Any additional document types would follow the same detailed and dynamic structure.
-    // Add additional templates for other document types as required, following the dynamic structure outlined above.
-  };
-  
-  
 
 const createCasePrompt = (uid, caseInfo) => {
     const { lawSystem, additionalKeywords, fieldOfLaw, difficulty, position } = caseInfo;
@@ -139,7 +56,8 @@ Response Format:
 }
 
 Deny the subpoena if it is incoherent, unjustified, duplicates existing information, or if granting it does not further the investigation. Your decision must reflect a comprehensive understanding of the legal and factual elements of the case. Ensure that the response is legally coherent and realistically aligns with the case scenario.
-
+Deny the subpoena if the suboenaed person is not relevant to the case (if the user invents witnesses, anything, fictional characters, etc...)
+You are the one in charge of granting or not the subpoena of experts in the case. 
 Remember, the AI response must accurately represent whether a subpoenaed participant is already included in the case details. If not, create a believable and relevant fictitious participant profile. The response should demonstrate careful consideration of the case's complexities and legal implications.
 Response strictly in JSON!!
 ` : `
@@ -168,8 +86,44 @@ You must leave no placeholders. If you can't find a certain company name in the 
 `;
     return prompt 
 } 
+  
 
 const fileMotionPrompt = (caseInfo, type, justification, entity) => {
+    const mtnprmpt = {
+        "type": "Motion",
+        "title": "${entity} - [Generated Title based on the motion's content]",
+        "content": "A very short summary outlining the motion",
+        "exactContent": `
+      Title: ${{entity}} - [Generated Title based on the motion's content]
+      
+      Introduction:
+      - Purpose: [Introduction to the motion, including the legal basis for the request.]
+      - Date: ${new Date().toISOString().split('T')[0]}
+      
+      Background:
+      - Case Details: [Details on the case and how it relates to the motion.]
+      - Relevant Facts: [Key facts from the case that support the motion.]
+      
+      Argument:
+      - Legal Framework: [Reference to applicable laws, statutes, and legal precedents.]
+      - Evidence: [Summary of evidence from the case supporting the motion.]
+      - Analysis: [Detailed analysis connecting the evidence and legal framework to the argument.]
+      
+      Conclusion:
+      - Request: [Specific request or relief being sought through the motion.]
+      - Court's Decision: [The court's decision on the motion, including any conditions or instructions.]
+      
+      Dated: "${new Date().toISOString().split('T')[0]}"
+      
+      Signatory:
+      - Attorney Name: [{Attorney's Name}]
+      - On Behalf of: [{Client Name or Entity}]
+      - Date: ${new Date().toISOString().split('T')[0]}
+      
+      Notes:
+      - [Optional] Additional comments or procedural notes related to the motion or its filing.`,
+        "date": "${new Date().toISOString().split('T')[0]}"
+      }
     const openAiPrompt = `
 As the court reviewing a motion request, critically assess the provided information to make an informed decision. The motion request includes:
 
@@ -188,17 +142,11 @@ In your evaluation, consider:
 
 Your response should mirror the seriousness and structure of a legal document, providing a clear, evidence-based decision.
 
-Response must follow the following structure:
+Response must follow the following structure, with no placeholders whatsoever. 
 {
   "granted": [true/false based on the above criteria],
   "rationale": "Provide with a clear explanation of the court's decision",
-  "document": {
-    "type": "Motion",
-    "title": "${entity} - [Generated Title based on the motion's content]",
-    "content": "A very short summary outlining the motion",
-    "exactContent": "[Introduction] [Introduction to the motion, including the legal basis for the request.]\\n\\n[Background] [Details on the case and how it relates to the motion.]\\n\\n[Argument:] [A detailed argument for the motion, including references to applicable laws, precedents, and evidence from the case.]\\n\\n[Conclusion] [The court's decision on the motion, including any conditions or instructions.]\\n\\nDated: ${new Date().toISOString().split('T')[0]}",
-    "date": "${new Date().toISOString().split('T')[0]}"
-  }
+  "document": ${JSON.stringify(mtnprmpt)}
 }
 Ensure all parts of the document are fully detailed, reflecting a realistic and structured approach as seen in actual legal documents, without using placeholders.
 
