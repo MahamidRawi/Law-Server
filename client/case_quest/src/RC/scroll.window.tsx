@@ -18,7 +18,7 @@ interface ScrollWindowProps {
     ud?: string,
     fit?: boolean,
     addS?: boolean,
-    pt?: boolean
+    pt?: boolean,
 }
 
 const ScrollWindow: React.FC<ScrollWindowProps> = ({ content, type, center, addS, fit, ud, pt }) => {

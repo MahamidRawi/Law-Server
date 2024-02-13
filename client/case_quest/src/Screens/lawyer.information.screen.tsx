@@ -13,12 +13,14 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
     const {logout} = useContext(AuthContext);
     const location = useLocation();
     const navigate = useNavigate();
-    const uid = location.state.uId
+    const uid = location.state.uId;
+    const participant = location.state.data;
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getLawyerInformation(uid).then(res => setUserInformation(res.userInfo)).catch(err => logout());
-        return setLoading(false)
+        console.log(participant, uid)
+        if (!participant) { 
+            getLawyerInformation(uid).then(res => {setUserInformation(res.userInfo); setLoading(false)}).catch(err => logout()); }else { setUserInformation(true); setLoading(false)}
     }, [])
 
     return (
@@ -31,9 +33,13 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                     <div className="row g-3">
                         <div className="col-12 col-md-4 d-flex flex-column align-items-center">
                             <Icon icon="solar:user-linear" width={100} height={100}/>
+                            {!participant ? (
+                                <>
                             <button className="btn btn-primary mt-3" onClick={() => navigate('/Mail', {state: {targetMail: information.email}})}>Contact</button>
                             <button className="btn btn-primary mt-3">Case History</button>
-                            <button className="btn btn-primary mt-3" onClick={() => navigate('/Wallet', {state: {targetRoute: 'Transfer', walletNumber: information.walletAddress}})}>Transfer Money</button>
+                            <button className="btn btn-primary mt-3" onClick={() => navigate('/Wallet', {state: {targetRoute: 'Transfer', walletNumber: information.walletAddress}})}>Transfer Funds</button>
+                            </>
+                            ) : (<><p className='mt-1'>{participant.name}</p><button className="btn btn-primary mt-1" onClick={() => navigate('/Wallet', {state: {targetRoute: 'Transfer', walletNumber: information.walletAddress}})}>Deposit</button></>)}
                             <div className="info-scroll-container">
     </div>
                         </div>
@@ -41,15 +47,15 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                         <div className="col-12 col-md-8">
                             <div className="row text-start">
                                 <div className="col-6">
-                                    <p>First Name: {information.firstName}</p>
-                                    <p>Last Name: {information.lastName}</p>
-                                    <p>Username: {information.username}</p>
+                                    <p><b>First Name:</b> {participant ? participant.name.split(' ')[0] : information.firstName}</p>
+                                    <p><b>Last Name:</b> {participant ? participant.name.split(' ')[1] : information.lastName}</p>
+                                    {!participant ? <p><b>Username:</b> {information.username}</p> : (<><p><b>Role:</b> {participant.role}</p> <p><b>Description:</b> {participant.shortDescription}</p></>)}
                                 </div>
-                                <div className="col-6">
-                                    <p>Email: {information.email}</p>
-                                    <p>Lawyer Since : {formatDate(information.date).split(' ')[0]}</p>
-                                    <p>Wallet Number: {information.walletAddress}</p>
-                                </div>
+                                {!participant && (<div className="col-6">
+                                    <>
+                                    <p><b>Email:</b> {information.email}</p><p><b>Lawyer Since:</b> {formatDate(information.date).split(' ')[0]}</p><p><b>Wallet Number:</b> {information.walletAddress}</p>
+                                    </>
+                                </div>)}
                             </div>
                         </div>
                     </div>

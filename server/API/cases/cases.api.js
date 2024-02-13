@@ -27,7 +27,6 @@ router.post('/fileMotion', validate, caseExists, async (req, res) => {
         const resp = await fileMotion(req.userId, req.caseInfo, req.body.subpoenaInfo);
         return res.status(resp.stc).json(resp);
     } catch (err) {
-        console.log(err)
         return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});
     }
 });
