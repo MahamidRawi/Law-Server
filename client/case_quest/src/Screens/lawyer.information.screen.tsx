@@ -15,6 +15,7 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
     const navigate = useNavigate();
     const uid = location.state.uId;
     const participant = location.state.data;
+    const subpoenaAvailability = participant.subpoena || participant.ctc;
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -39,16 +40,16 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                             <button className="btn btn-primary mt-3">Case History</button>
                             <button className="btn btn-primary mt-3" onClick={() => navigate('/Wallet', {state: {targetRoute: 'Transfer', walletNumber: information.walletAddress}})}>Transfer Funds</button>
                             </>
-                            ) : (<><p className='mt-1'>{participant.name}</p><button className="btn btn-primary mt-1" onClick={() => navigate('/Wallet', {state: {targetRoute: 'Transfer', walletNumber: information.walletAddress}})}>Deposit</button></>)}
+                            ) : (<><p className='mt-1'>{participant.name}</p><button disabled={!subpoenaAvailability} className="btn btn-primary mt-1" onClick={() => navigate('/Wallet', {state: {targetRoute: 'Transfer', walletNumber: information.walletAddress}})}>Deposit</button></>)}
                             <div className="info-scroll-container">
-    </div>
+                        </div>
                         </div>
                         <div className='casescontainer' />
                         <div className="col-12 col-md-8">
                             <div className="row text-start">
                                 <div className="col-6">
-                                    <p><b>First Name:</b> {participant ? participant.name.split(' ')[0] : information.firstName}</p>
-                                    <p><b>Last Name:</b> {participant ? participant.name.split(' ')[1] : information.lastName}</p>
+                                    <p><b>First Name:</b> {participant ? participant.name.replace('Dr. ', '').split(' ')[0] : information.firstName}</p>
+                                    <p><b>Last Name:</b> {participant ? participant.name.replace('Dr. ', '').split(' ')[1] : information.lastName}</p>
                                     {!participant ? <p><b>Username:</b> {information.username}</p> : (<><p><b>Role:</b> {participant.role}</p> <p><b>Description:</b> {participant.shortDescription}</p></>)}
                                 </div>
                                 {!participant && (<div className="col-6">

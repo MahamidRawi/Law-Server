@@ -1,5 +1,5 @@
 const Filter = require('bad-words');
-const { discoveryTemplates } = require('../vars/vars');
+const { discoveryTemplates, lMPrices } = require('../vars/vars');
 const filter = new Filter({ placeHolder: '*' });
 
 const createCasePrompt = (uid, caseInfo) => {
@@ -14,20 +14,55 @@ const createCasePrompt = (uid, caseInfo) => {
         "title": "\${plaintiff fictional but realistic name} vs \${defendant fictional but realistic name}",
         "summary": "Concise case overview, including key allegations, defenses, and legal points in ${fieldOfLaw} under ${lawSystem}. This summary is for the viewer/reader",
         "participants": [
-            {"name": \${name}, "role": \${role}, "alive": \${boolean}, "shortDescription": \${short description}}
-        // YOU CAN ADD MORE PARTICIPANTS FOLLOWING THE GIVEN SCHEMA TO MAKE IT MORE INTERESTING
-        ],
+            {"name": \${name}, "role": \${role}, "ctc": \${true if participant is ${position} client or is the opposing attorney. Otherwise, false.}, "alive": \${boolean}, "subpoena": false, "shortDescription": \${short description}}
+            
+    ],
         "discoveries": [
-            Only 4 items, extremely detailed and excellently structured (not summary / overview / paragraph), with no placeholders, as it is an investigation / law / detective game / with no placeholders. 100% complete : ${Object.values(discoveryTemplates).map(template => JSON.stringify(template, null, 2)).join(',\n')}
+            Only 4 items, extremely detailed and excellently structured (not summary / overview / paragraph), with no placeholders! Provide dates, everything., as it is an investigation / law / detective game / with no placeholders. 100% complete : ${Object.values(discoveryTemplates).map(template => JSON.stringify(template, null, 2)).join(',\n')}
         ]
         "oppositionName": "Generate Fictional but realistic name for the Representing Attorney",
 
     }
-    
+    // YOU CAN ADD MORE PARTICIPANTS FOLLOWING THE GIVEN SCHEMA TO MAKE IT MORE INTERESTING
+            // ONLY HUMAN BEINGS. I DONT WANT COMPANIES OR THINGS THAT ARE NOT HUMAN IN MY PARTICIPANTS array.
     Ensure each element reflects the specified complexity and realism for the case's specifics and legal standards.    
     !Make sure it the whole response is JSON !!! No exceptions. Every little detail should be provided without blanks. Every information (cc numbers, everything)
+    Add the opposing attorney in participants array.
     `;
 }
+
+const tmplt = `"type": "Motion",
+"title": "[Generated Title based on the motion's content]",
+"content": "A very short summary outlining the motion",
+"exactContent": "Title: [Generated Title based on the motion's content]
+
+Introduction:
+- Purpose: [Introduction to the motion, including the legal basis for the request.]
+- Date: ${new Date().toISOString().split('T')[0]}
+
+Background:
+- Case Details: [Details on the case and how it relates to the motion.]
+- Relevant Facts: [Key facts from the case that support the motion.]
+
+Argument:
+- Legal Framework: [Reference to applicable laws, statutes, and legal precedents.]
+- Evidence: [Summary of evidence from the case supporting the motion.]
+- Analysis: [Detailed analysis connecting the evidence and legal framework to the argument.]
+
+Conclusion:
+- Request: [Specific request or relief being sought through the motion.]
+- Court's Decision: [The court's decision on the motion, including any conditions or instructions.]
+
+Dated: "${new Date().toISOString().split('T')[0]}"
+
+Signatory:
+- Attorney Name: [{Attorney's Name}]
+- On Behalf of: [{Client Name or Entity}]
+- Date: ${new Date().toISOString().split('T')[0]}
+
+Notes:
+- [Optional] Additional comments or procedural notes related to the motion or its filing.`
+"date: new Date().toISOString().split('T')[0]";
 
 const issueSubpoenaPrompt = (caseInfo, type, justification, entity) => {
     const prompt = type.participant ? `
@@ -46,8 +81,9 @@ Response Format:
   "rationale": "A detailed explanation for the decision to grant or deny the subpoena, considering the case's legal and factual context.",
   "participant": {
     "inList": Boolean (true if the participant is already in ${caseInfo.participants}, false otherwise),
+    "dtls": "[if subpoenaed in array of participants I want this ARRAY but with corresponding information: ['exact name', 'role']]"
     "details": inList ? null : {
-      "name": "Fictitious Name",
+      "name": "\${firstName} \${lastName}",
       "role": "Role in the Case",
       "shortDescription": "Relevance of the participant to the case",
       "alive": Boolean
@@ -71,13 +107,14 @@ Targeted Entity: "${entity}"
 Evaluate the justification against the case's difficulty level. Consider the reality of legal processes, including potential corruption or other thematic elements based on the case's difficulty, to decide on granting the subpoena.
 Deny the subpoena if the user is trying to mislead / manipulate / move the case in a certain direction.
 Don't be easy on granting subpoenas. 
-if there is duplicates, deny the subpoena. 
+if there is duplicates, deny the subpoena.
 
 Response structure:
 {
   "granted": true or false,
   "rationale": "Provide this only if the subpoena is denied, explaining the decision.",
-  "document": ${JSON.stringify(type.template)}
+  "document": ${JSON.stringify(type.template)},
+  "ai_move": [Here you must provide a response to the subpoena, a document like "document" field, but offering a discovery element from your side following the templates. You can choose from the following array : ${JSON.stringify(discoveryTemplates)} or even a motion : ${JSON.stringify(lMPrices)}. In case the response move of the ai, the template must be like the following : ${tmplt}. it can also be testimony. It must be also very well structured.],
 }
 
 The document content must be fictional, extremely detailed, as is a simulation for detective / lawyer game, compelling and complete, designed to enrich the gameplay and educational experience, especially in harder cases where the legal system's complexity and challenges are more pronounced. Also, strictly follow the guidance given by the template : ${type.template}. Remember, I don't want overview / summary, I want details.
