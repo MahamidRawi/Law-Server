@@ -40,7 +40,7 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                             <button className="btn btn-primary mt-3">Case History</button>
                             <button className="btn btn-primary mt-3" onClick={() => navigate('/Wallet', {state: {targetRoute: 'Transfer', walletNumber: information.walletAddress}})}>Transfer Funds</button>
                             </>
-                            ) : (<><p className='mt-1'>{participant.name}</p><button disabled={!subpoenaAvailability} className="btn btn-primary mt-1" onClick={() => navigate('/Wallet', {state: {targetRoute: 'Transfer', walletNumber: information.walletAddress}})}>Deposit</button></>)}
+                            ) : (<><p className='mt-1'>{participant.name}</p><button disabled={!subpoenaAvailability} className="btn btn-primary mt-1" onClick={() => navigate('/Deposition', {state: {caseId: 'Transfer', uinf: participant}})}>Deposit</button></>)}
                             <div className="info-scroll-container">
                         </div>
                         </div>

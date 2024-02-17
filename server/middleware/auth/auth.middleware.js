@@ -21,12 +21,13 @@ const validate = (req, res, next) => {
     
     if (!token) return res.status(401).json({ validated: false, errors: [{text:"No token was provided"}] });
 
-    jwt.verify(token, process.env.JWTPASS, (err, decoded) => {
+    jwt.verify(token, process.env.JWTPASS, async (err, decoded) => {
         
         if (err) return res.status(401).json({success: false, message: "Failed To Authenticate"});
-
+        const uFound = await user.findOne({_id: decoded.UID}).select('-password');
+        if (!uFound) res.status(401).json({success: false, message: "Failed To Authenticate"});
         req.userId = decoded.UID
-
+        req.uInfo = uFound
         return next();
     });
 }

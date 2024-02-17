@@ -15,9 +15,33 @@
     border-radius: 10px;
 }
 
+.messages-list {
+    height: 400px;
+    border-radius: 0.25rem;
+    border-color: #ced4da;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .custom-card {
+    background-color: transparent; /* Example: a blue background */
+    color: black; /* White text */
+  }
+  
+
 .form-label {
     color: white;
     font-weight: 300;
+}
+
+.c-room {
+    overflow: auto;
+    height: calc(100% - 50px);
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    position: absolute;
+    color: white;
 }
 
 .transfer-reasons {

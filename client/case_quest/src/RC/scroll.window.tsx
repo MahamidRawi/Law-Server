@@ -19,15 +19,16 @@ interface ScrollWindowProps {
     fit?: boolean,
     addS?: boolean,
     pt?: boolean,
+    cId?: string
 }
 
-const ScrollWindow: React.FC<ScrollWindowProps> = ({ content, type, center, addS, fit, ud, pt }) => {
+const ScrollWindow: React.FC<ScrollWindowProps> = ({ cId, content, type, center, addS, fit, ud, pt }) => {
     return (
          <div className={`${center} overflow-auto scroll-window ${fit && 'fit-container'} ${addS && 'addS'}`}>
             {content?.map((element, index) => (
                 <div className='card mb-2 item-card' key={index}>
                     <div className="card-body">
-                        {type == 'Case' ? <Case data={element} viewMore/> : type == 'Notification' ? <Notification ud={ud} data={element}/> : type == 'User' ? <User data={element} participant={pt} /> : type == 'Record' ? <RecordCard type='Income' data={element}/> : type == 'Discovery' ? <Discovery data={element} /> : null}
+                        {type == 'Case' ? <Case data={element} viewMore/> : type == 'Notification' ? <Notification ud={ud} data={element}/> : type == 'User' ? <User data={element} participant={pt} cId={cId} /> : type == 'Record' ? <RecordCard type='Income' data={element}/> : type == 'Discovery' ? <Discovery data={element} /> : null}
                     </div>
                 </div>
             ))}

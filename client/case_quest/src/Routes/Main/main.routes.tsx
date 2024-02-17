@@ -20,6 +20,7 @@ import Logo from '../../RC/logo.screen';
 import ViewCase from '../../Screens/cases/viewcase.screen';
 import MenuScreen from '../../RC/menu.screens';
 import SubpoenaScreen from '../../Screens/cases/caseActions/subpoena.screen';
+import DepositionScreen from '../../Screens/cases/deposition.screen';
 
 
 const MainRoutes: React.FC = () => {
@@ -82,6 +83,7 @@ const MainRoutes: React.FC = () => {
                 <Route path='/ViewDiscovery' element={<ViewDiscovery />}/>
                 <Route path='/FileMotion' element={<SubpoenaScreen formtype='File Motion' />}/>
                 <Route path='/Subpoena' element={<SubpoenaScreen formtype='Subpoena' />}/>
+                <Route path='/Deposition' element={<DepositionScreen />}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen />}/> : null}
             </Routes>
         </div>

@@ -16,12 +16,12 @@ interface SignUpResponse {
     success: boolean
 }
 
-interface ValidationResponse { success: boolean, message: string }
+interface ValidationResponse { success: boolean, message: string, info: any }
 
 interface SignInResponse {
     message:string,
     token: string, 
-    success: boolean
+    success: boolean,
 }
 
 
@@ -61,7 +61,7 @@ const userValidate = async (token: string | null): Promise<ValidationResponse> =
     return new Promise(async (resolve, reject) => {
         try {
             const res = await axios.post(config.API_BASE_URL+'/auth/validate', {}, {headers: {'x-access-token': token}}) as AxiosResponse
-            return resolve({success: true, message: res.data.message});
+            return resolve({success: true, message: res.data.message, info: res.data.info});
     } catch (err) {
         const axiosError = err as AxiosError<ErrorResponse>;
         console.log(axiosError.response?.data);

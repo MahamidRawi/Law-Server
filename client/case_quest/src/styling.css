@@ -486,7 +486,7 @@
 }
 
 .logout-icon {
-    color: darkred;
+    color: rgb(255, 0, 0);
     transform: scale(1.75);
 }
 

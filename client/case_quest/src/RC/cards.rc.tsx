@@ -22,7 +22,8 @@ interface UserProps {
     data: any,
     viewMore?: boolean,
     resize?: boolean,
-    participant?: boolean
+    participant?: boolean,
+    cId?: string
 }
 
 const Notification: React.FC<NotificationProps> = ({ data, ud }) => {
@@ -49,7 +50,7 @@ const Case: React.FC<CaseProps> = ({data, viewMore = false}) => {
     )
 }
 
-const User: React.FC<UserProps> = ({data, resize=false, participant = false}) => {
+const User: React.FC<UserProps> = ({cId, data, resize=false, participant = false}) => {
     const navigate = useNavigate();
     return (
     <div className={`container py-3 ${resize ? 'f-content' : ''} ${data.admin && 'admin'}`}>
@@ -64,7 +65,7 @@ const User: React.FC<UserProps> = ({data, resize=false, participant = false}) =>
               {participant && <p className='mb-2'>Description : {data.shortDescription}</p>}
             </div>
             <div className="d-flex flex-column">
-              <button className="btn btn-primary mb-2" onClick={() => navigate("/MoreInfo", {state: !participant ? {uId: data._id} : {data} })}>More</button>
+              <button className="btn btn-primary mb-2" onClick={() => navigate("/MoreInfo", {state: !participant ? {uId: data._id} : {data, caseId: cId} })}>More</button>
               {!participant && <button className="btn btn-outline-primary" onClick={() => navigate('/Mail', {state: {targetMail: data.email}})}>Contact</button>}
             </div>
           </div>
