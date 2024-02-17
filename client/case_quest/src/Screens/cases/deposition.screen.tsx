@@ -18,7 +18,6 @@ interface LocationState {
     text: string;
     sender: string;
     role: string;
-    date: any
   }
   
 function DepositionScreen() {
@@ -40,9 +39,8 @@ function DepositionScreen() {
       const newMessage: Message = {
         id: messages.length + 1,
         text: currentMessage,
-        sender: myInfo.firstName + ' ' + myInfo.lastName,
+        sender: `${myInfo.firstName} ${myInfo.lastName}`,
         role: role,
-        date: Date.now()
       };
   
       setMessages([...messages, newMessage]);

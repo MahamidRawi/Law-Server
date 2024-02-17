@@ -195,4 +195,18 @@ return openAiPrompt;
 
 }
 
-module.exports = {createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}
+const SubpoenaMessagePrompt = (subpoenee, caseInfo, message, messageHistory) => {
+    const prompt = `You are playing the role of ${subpoenee.role} with the following information : ${subpoenee}. You are asked the following question : ${message.message}. 
+    Given the following Case Informatiom : ${caseInfo}.
+    Conversation history : ${messageHistory}
+    If you are an expert witness, with no conflict of interest, you answer the ${message} in a human way with honesty. 
+    If you are the plaintiff / defendant You don't have to say the truth, but stay coherent with the case Information and the Conversation History. The harder the case Difficulty is, the more corrupt and difficult the conversations are. 
+    The answer must follow this structure strictly JSON : {
+        "text":"response of the subpoenee"
+    }
+    `
+
+    return prompt;
+}
+
+module.exports = {SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}
