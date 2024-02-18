@@ -5,68 +5,100 @@ import { AuthContext } from '../Providers/auth.provider';
 import { Icon } from '@iconify/react';
 import { ActivityIncicator } from '../RC/acitivity.incdicator';
 import { formatDate } from '../helper/res.helper';
-
 interface LawyerInformationProps {}
 
 const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
-    const [information, setUserInformation] = useState<any>();
-    const {logout} = useContext(AuthContext);
+    const [information, setUserInformation] = useState<any>(null);
+    const { logout } = useContext(AuthContext);
     const location = useLocation();
     const navigate = useNavigate();
-    const uid = location.state.uId;
-    const participant = location.state.data;
-    const subpoenaAvailability = participant.subpoena || participant.ctc;
+
+    // Safely accessing state properties using optional chaining
+    const uid = location.state?.uId;
+    const participant = location.state?.data;
+
+    // Using optional chaining to prevent runtime errors if participant is undefined
+    const subpoenaAvailability = participant?.subpoena || participant?.ctc;
+
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log(participant, uid)
-        if (!participant) { 
-            getLawyerInformation(uid).then(res => {setUserInformation(res.userInfo); setLoading(false)}).catch(err => logout()); }else { setUserInformation(true); setLoading(false)}
-    }, [])
+        // Added check for uid to prevent running the effect unnecessarily
+        if (!participant && uid) {
+            getLawyerInformation(uid)
+                .then(res => {
+                    setUserInformation(res.userInfo);
+                    setLoading(false);
+                })
+                .catch(err => {
+                    console.error(err);
+                    logout();
+                });
+        } else {
+            setUserInformation(participant); // Assuming you want to set participant as information if it exists
+            setLoading(false);
+        }
+    }, [participant, uid, logout]); // Ensure logout is a stable function or omitted if causing unnecessary re-renders
+
+    if (loading || !information) {
+        return <ActivityIncicator fullScreen />;
+    }
 
     return (
-        !information || loading ? <ActivityIncicator fullScreen /> : (
-            <div className={`header-decoration ${window.innerWidth <= 685 ? 'mini-scr' : ''}`}>
-        <div className="d-flex justify-content-center align-items-center vh-100">
-            <div className={`card cardPad`}>
-                <div className="outer-container">
-                <div className="card-body">
-                    <div className="row g-3">
-                        <div className="col-12 col-md-4 d-flex flex-column align-items-center">
-                            <Icon icon="solar:user-linear" width={100} height={100}/>
-                            {!participant ? (
-                                <>
-                            <button className="btn btn-primary mt-3" onClick={() => navigate('/Mail', {state: {targetMail: information.email}})}>Contact</button>
-                            <button className="btn btn-primary mt-3">Case History</button>
-                            <button className="btn btn-primary mt-3" onClick={() => navigate('/Wallet', {state: {targetRoute: 'Transfer', walletNumber: information.walletAddress}})}>Transfer Funds</button>
-                            </>
-                            ) : (<><p className='mt-1'>{participant.name}</p><button disabled={!subpoenaAvailability} className="btn btn-primary mt-1" onClick={() => navigate('/Deposition', {state: {caseId: 'Transfer', uinf: participant}})}>Deposit</button></>)}
-                            <div className="info-scroll-container">
-                        </div>
-                        </div>
-                        <div className='casescontainer' />
-                        <div className="col-12 col-md-8">
-                            <div className="row text-start">
-                                <div className="col-6">
-                                    <p><b>First Name:</b> {participant ? participant.name.replace('Dr. ', '').split(' ')[0] : information.firstName}</p>
-                                    <p><b>Last Name:</b> {participant ? participant.name.replace('Dr. ', '').split(' ')[1] : information.lastName}</p>
-                                    {!participant ? <p><b>Username:</b> {information.username}</p> : (<><p><b>Role:</b> {participant.role}</p> <p><b>Description:</b> {participant.shortDescription}</p></>)}
+        <div className={`header-decoration ${window.innerWidth <= 685 ? 'mini-scr' : ''}`}>
+            <div className="d-flex justify-content-center align-items-center vh-100">
+                <div className="card cardPad">
+                    <div className="outer-container">
+                        <div className="card-body">
+                            <div className="row g-3">
+                                <div className="col-12 col-md-4 d-flex flex-column align-items-center">
+                                    <Icon icon="solar:user-linear" width={100} height={100} />
+                                    {!participant ? (
+                                        <>
+                                            <button className="btn btn-primary mt-3" onClick={() => navigate('/Mail', { state: { targetMail: information.email } })}>Contact</button>
+                                            <button className="btn btn-primary mt-3">Case History</button>
+                                            <button className="btn btn-primary mt-3" onClick={() => navigate('/Wallet', { state: { targetRoute: 'Transfer', walletNumber: information.walletAddress } })}>Transfer Funds</button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className='mt-1'>{participant.name}</p>
+                                            <button disabled={!subpoenaAvailability} className="btn btn-primary mt-1" onClick={() => navigate('/Deposition', { state: { caseId: 'Transfer', uinf: participant } })}>Deposit</button>
+                                        </>
+                                    )}
+                                    <div className="info-scroll-container"></div>
                                 </div>
-                                {!participant && (<div className="col-6">
-                                    <>
-                                    <p><b>Email:</b> {information.email}</p><p><b>Lawyer Since:</b> {formatDate(information.date).split(' ')[0]}</p><p><b>Wallet Number:</b> {information.walletAddress}</p>
-                                    </>
-                                </div>)}
+                                <div className='casescontainer' />
+                                <div className="col-12 col-md-8">
+                                    <div className="row text-start">
+                                        <div className="col-6">
+                                            <p><b>First Name:</b> {participant ? participant.name.replace('Dr. ', '').split(' ')[0] : information.firstName}</p>
+                                            <p><b>Last Name:</b> {participant ? participant.name.replace('Dr. ', '').split(' ')[1] : information.lastName}</p>
+                                            {!participant ? <p><b>Username:</b> {information.username}</p> : null}
+                                            {participant && (
+                                                <>
+                                                    <p><b>Role:</b> {participant.role}</p>
+                                                    <p><b>Description:</b> {participant.shortDescription}</p>
+                                                </>
+                                            )}
+                                        </div>
+                                        {!participant && (
+                                            <div className="col-6">
+                                                <>
+                                                    <p><b>Email:</b> {information.email}</p>
+                                                    <p><b>Lawyer Since:</b> {formatDate(information.date).split(' ')[0]}</p>
+                                                    <p><b>Wallet Number:</b> {information.walletAddress}</p>
+                                                </>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                </div>
             </div>
         </div>
-        </div>
-        )
-    )
+    );
 }
 
 export default LawyerInformationScreen

@@ -7,27 +7,35 @@ const createCasePrompt = (uid, caseInfo) => {
     
 
     return `
-    !Make sure it the whole response is JSON !!! No exceptions. 
-    Create a legal case model in ${fieldOfLaw} as ${position}. The case should be ${difficulty} level, detailed with ${additionalKeywords ? filter.clean(additionalKeywords) : 'No additional Keywords,'} under ${lawSystem}. The more complex the difficulty, the more nuanced the case. Be specific with Names, Dates, and Documents. Keep it realistic. Format:
+    Create a comprehensive legal case model within the field of "${fieldOfLaw}" from the perspective of "${position}". The case complexity is defined as "${difficulty}". Incorporate the following details: ${additionalKeywords ? filter.clean(additionalKeywords) : 'No additional Keywords'} under the "${lawSystem}" legal system. As the case complexity increases, so should the detail and nuance of the scenario. Provide specific names, dates, and documents to maintain realism. The case format should be as follows:
 
-    {
-        "title": "\${plaintiff fictional but realistic name} vs \${defendant fictional but realistic name}",
-        "summary": "Concise case overview, including key allegations, defenses, and legal points in ${fieldOfLaw} under ${lawSystem}. This summary is for the viewer/reader",
-        "participants": [
-            {"name": \${name}, "role": \${role}, "ctc": \${true if participant is ${position} client or is the opposing attorney. Otherwise, false.}, "alive": \${boolean}, "subpoena": false, "shortDescription": \${short description}}
-            
+{
+    "title": "{plaintiff Name} vs {defendant Name}",
+    "summary": "Provide a concise overview of the case, highlighting key allegations, defenses, and legal points relevant to ${fieldOfLaw} within the ${lawSystem} context. This summary is intended for the reader's initial understanding.",
+    "participants": [
+        {
+            "name": "{participant Name}",
+            "role": "{participant Role}",
+            "ctc": {true if participant is ${position} client or is the opposing attorney. Otherwise, false.},
+            "alive": {is Alive},
+            "subpoena": false,
+            "shortDescription": "{participant short Description}"
+        }
     ],
-        "discoveries": [
-            Only 4 items, extremely detailed and excellently structured (not summary / overview / paragraph), with no placeholders! Provide dates, everything., as it is an investigation / law / detective game / with no placeholders. 100% complete : ${Object.values(discoveryTemplates).map(template => JSON.stringify(template, null, 2)).join(',\n')}
-        ]
-        "oppositionName": "Generate Fictional but realistic name for the Representing Attorney",
+    "discoveries": [
+      ${Object.values(discoveryTemplates).map(template => JSON.stringify(template, null, 2)).join(',\n')}
+    ],
+    "oppositionName": "{Realistic opposition Attorney Name}"
+}
 
-    }
-    // YOU CAN ADD MORE PARTICIPANTS FOLLOWING THE GIVEN SCHEMA TO MAKE IT MORE INTERESTING
-            // ONLY HUMAN BEINGS. I DONT WANT COMPANIES OR THINGS THAT ARE NOT HUMAN IN MY PARTICIPANTS array.
-    Ensure each element reflects the specified complexity and realism for the case's specifics and legal standards.    
-    !Make sure it the whole response is JSON !!! No exceptions. Every little detail should be provided without blanks. Every information (cc numbers, everything)
-    Add the opposing attorney in participants array.
+Guidelines:
+- The case model must be entirely in JSON format without exceptions.
+- Focus on generating a fictional yet realistic scenario, including participant names and legal documents.
+- Limit "discoveries" to four items, providing extensive detail and structure without using placeholders. Include specific dates and relevant information to mimic an investigative or legal strategy game. I don't want overiew or summary of content, but ultra realistic 100% complete content with no placeholders whatsoever.
+- Include only human participants in the model. Specifically, add the opposing attorney to the "participants" array, ensuring no companies or non-human entities are represented. The ${position} attorney must not be included in the participants array. But add additional participants initially to make the case interesting.
+- Ensure the case reflects the designated complexity, realism, and legal standards accurately.
+
+Note: While the primary focus is on the opposition attorney within the participants array, you may add more human participants following the schema provided to enhance the narrative. Ensure all details are comprehensive, leaving no information unspecified, including credit card numbers and sensitive data as required for the case's depth.
     `;
 }
 
