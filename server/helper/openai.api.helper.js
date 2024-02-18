@@ -74,36 +74,31 @@ Notes:
 
 const issueSubpoenaPrompt = (caseInfo, type, justification, entity) => {
     const prompt = type.participant ? `
-        Analyze a subpoena request for a participant within the provided case details. Your task is to judiciously decide on granting the subpoena based on its type, the justification provided, and its relevance to the case, while adhering to legal standards.
+    Conduct a thorough analysis of a subpoena request directed at a specific participant in the context of the given case details. Your primary objective is to critically assess the request based on the subpoena's type, the provided justification, its relevance and coherence with the case, and compliance with legal norms and standards.
 
-Subpoena Request for Participant:
-- Type: 'Participant', ${entity}
-- Justification: '${justification}'
-- Case Details: '${caseInfo}'
-
-Determine if the subpoena request meets legal criteria. Check if the requested participant is already listed in '${caseInfo.participants}'. If they are not listed, provide details for a new fictitious participant. If they are listed, indicate their existing presence in the case.
-You have to option to deny the subpoena, if the justification is not good enough or it is irrelevant, or it is not well justified. And also if there is incoherence between the Type and Justification, and Entity
-Response Format:
-{
-  "granted": Boolean (based on the validity of the request),
-  "rationale": "A detailed explanation for the decision to grant or deny the subpoena, considering the case's legal and factual context.",
-  "participant": {
-    "inList": Boolean (true if the participant is already in ${caseInfo.participants}, false otherwise),
-    "dtls": "[if subpoenaed in array of participants I want this ARRAY but with corresponding information: ['exact name', 'role']]"
-    "details": inList ? null : {
-      "name": "\${firstName} \${lastName}",
-      "role": "Role in the Case",
-      "shortDescription": "Relevance of the participant to the case",
-      "alive": Boolean
+    Subpoena Request Analysis:
+    - Request Type: 'Participant', specified as ${entity}.
+    - Justification for Subpoena: Provided as '${justification}'.
+    - Pertinent Case Details: Outlined in '${caseInfo}'.
+    
+    Your analysis must determine whether the subpoena request fulfills the legal criteria for issuance. This involves verifying the presence of the requested participant within the case details provided in '${caseInfo.participants}'. Should the participant be unlisted, you are tasked with creating a detailed profile for a new, plausible fictitious participant. Conversely, if the participant is already included, acknowledge their existing role within the case.
+    
+    The decision to grant or deny the subpoena should hinge on:
+    - The coherence between the subpoena type and the justification provided.
+    - The subpoena's relevance and justification in relation to the case.
+    - Avoidance of redundancy by not duplicating information already available in the case details.
+    - Legal and factual incoherence, or lack of substantial justification.
+    
+    Your response should adhere to the following JSON format for clarity and precision:
+    
+    {
+      "granted": "Boolean indicating the decision to grant or deny the subpoena",
+      "rationale": "A comprehensive explanation supporting the decision, grounded in legal and factual analysis of the case.",
+      "participant": {
+        "inList": "Boolean indicating if the participant is already mentioned in the case details (${caseInfo.participants})",
+        "details": "If the participant is not in the list, provide a fabricated yet plausible profile including: name, role in the case, a brief description of their relevance, and their living status. If in the list, this field must contain the following object : {'exactName':'exact name as stated', 'role': 'role of the participant as stated'} "
+      }
     }
-  }
-}
-
-Deny the subpoena if it is incoherent, unjustified, duplicates existing information, or if granting it does not further the investigation. Your decision must reflect a comprehensive understanding of the legal and factual elements of the case. Ensure that the response is legally coherent and realistically aligns with the case scenario.
-Deny the subpoena if the suboenaed person is not relevant to the case (if the user invents witnesses, anything, fictional characters, etc...)
-You are the one in charge of granting or not the subpoena of experts in the case. 
-Remember, the AI response must accurately represent whether a subpoenaed participant is already included in the case details. If not, create a believable and relevant fictitious participant profile. The response should demonstrate careful consideration of the case's complexities and legal implications.
-Response strictly in JSON!!
 ` : `
 Given the case information and the subpoena request details, the court is to decide on granting the subpoena. If the decision is to deny, provide the rationale. If granted, generate a fictitious document relevant to the case, adhering to the provided template with no placeholders, reflecting the complexity and thematic elements corresponding to the case's difficulty level.
 
@@ -204,13 +199,19 @@ return openAiPrompt;
 }
 
 const SubpoenaMessagePrompt = (subpoenee, caseInfo, message, messageHistory) => {
-    const prompt = `You are playing the role of ${subpoenee.role} with the following information : ${subpoenee}. You are asked the following question : ${message.message}. 
-    Given the following Case Informatiom : ${caseInfo}.
-    Conversation history : ${messageHistory}
-    If you are an expert witness, with no conflict of interest, you answer the ${message} in a human way with honesty. 
-    If you are the plaintiff / defendant You don't have to say the truth, but stay coherent with the case Information and the Conversation History. The harder the case Difficulty is, the more corrupt and difficult the conversations are. 
-    The answer must follow this structure strictly JSON : {
-        "text":"response of the subpoenee"
+    const prompt = `In this simulation, you embody the character of a participant involved in a legal case, assigned the role of "${subpoenee.role}". Your actions and responses are dictated by this role, informed by detailed background information: ${subpoenee}. You are presented with a specific inquiry: ${message.message}.
+
+    Contextual Background Information:
+    - Case Details: ${caseInfo}.
+    - Conversation History: ${messageHistory}.
+    
+    Role-Specific Guidelines for Response:
+    - As an "Expert Witness" without any conflicts of interest, your response to the inquiry (${message}) should be marked by honesty and professional integrity, reflecting your expert opinion or factual knowledge pertinent to the case.
+    - As either the "Plaintiff" or "Defendant", while you are not obligated to disclose the truth, your answers must maintain consistency with the provided Case Information and prior Conversation History. It's imperative to craft your responses with a strategic approach to your case role, ensuring they are coherent and plausible within the legal scenario. Note that as the case difficulty escalates, the dialogues and interactions may become increasingly complex and morally ambiguous, challenging you to navigate the conversations with careful consideration of your character's objectives and alignments.
+    
+    Your response must be meticulously formatted in JSON as follows:
+    {
+      "text": "Your detailed response based on the role's perspective and the context provided."
     }
     `
 

@@ -75,4 +75,18 @@ const fileMotion = (caseId: string, subpoenaInfo: any): Promise<{message?: strin
     })
 }
 
-export {fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}
+const sendMessage = (message: string, subpoenee: object, caseId: string): Promise<{message?: string, success: boolean, granted?: boolean, AR?: boolean}> => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token) return reject({success: false, message: 'No Token', AR: true});
+        try {
+            const res = await axios.post(config.API_BASE_URL + '/main/cases/deposition/sendMessage', {subpoenee, caseId, message}, {headers: {'x-access-token': token}});
+            return resolve({success: true, message: res.data.message});
+        } catch (err: any) {
+            const {stc} = err
+            return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
+        }
+    })
+}
+
+export {sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}
