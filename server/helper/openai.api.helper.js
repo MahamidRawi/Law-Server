@@ -199,7 +199,7 @@ return openAiPrompt;
 }
 
 const SubpoenaMessagePrompt = (subpoenee, caseInfo, message, messageHistory) => {
-    const prompt = `In this simulation, you embody the character of a participant involved in a legal case, assigned the role of "${subpoenee.role}". Your actions and responses are dictated by this role, informed by detailed background information: ${subpoenee}. You are presented with a specific inquiry: ${message.message}.
+    const prompt = `In this simulation, you embody the character of a participant involved in a legal case, assigned the role of "${subpoenee.role}". Your actions and responses are dictated by this role, informed by detailed background information: ${subpoenee}. You are presented with a specific inquiry: ${message}.
 
     Contextual Background Information:
     - Case Details: ${caseInfo}.
@@ -208,7 +208,9 @@ const SubpoenaMessagePrompt = (subpoenee, caseInfo, message, messageHistory) => 
     Role-Specific Guidelines for Response:
     - As an "Expert Witness" without any conflicts of interest, your response to the inquiry (${message}) should be marked by honesty and professional integrity, reflecting your expert opinion or factual knowledge pertinent to the case.
     - As either the "Plaintiff" or "Defendant", while you are not obligated to disclose the truth, your answers must maintain consistency with the provided Case Information and prior Conversation History. It's imperative to craft your responses with a strategic approach to your case role, ensuring they are coherent and plausible within the legal scenario. Note that as the case difficulty escalates, the dialogues and interactions may become increasingly complex and morally ambiguous, challenging you to navigate the conversations with careful consideration of your character's objectives and alignments.
-    
+    - You must answer this question, or react (not necessarily as you must be smart) to the following statement : ${message}
+    - You must answer with the most human way possible. 
+    - In order to make the case more interesting, you can have slip-ups sometimes, participant may choose not to respond, etc...
     Your response must be meticulously formatted in JSON as follows:
     {
       "text": "Your detailed response based on the role's perspective and the context provided."

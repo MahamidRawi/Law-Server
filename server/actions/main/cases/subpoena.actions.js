@@ -9,10 +9,11 @@ const { config } = require('../../../config');
 const { calculatedPrices, lMPrices } = require('../../../vars/vars');
 const updateArray = require('../../../helper/obj.helper');
 const { uuid } = require('uuidv4');
+const generateSession = require('../../../helper/obj.helper');
 
 const openai = new OpenAI({ apiKey: config.APIPASS });
 
-const onGoingDepositions = [
+const ongoingDepositions = [
     
 ]
 
@@ -121,35 +122,36 @@ const startDeposition = async (caseId, subpoenee) => {
         const caseFound = await cases.findOne({_id: caseId});
         if (!caseFound) throw new Error('Case Not Found');
         const targetParticipant = caseFound.participants.find(user => user.name == subpoenee.name && user.role == subpoenee.role);
-        if (!targetParticipant || !targetParticipant.subpoena) throw new Error('An Error has Occured');
-        
-        await cases.updateOne({ _id: caseInfo._id, participants: { $elemMatch: { name: subpoenee.name, role: subpoenee.role } }}, { $set: { "participants.$.subpoena": false } });
-
+        if (!targetParticipant || !targetParticipant.subpoena) throw new Error(!targetParticipant ? 'Participant Not Found' : 'You Don\'t Have a Subpoena for this Participant');
+        const session = generateSession(subpoenee, caseId);
+        ongoingDepositions.push(session);
+        // await cases.updateOne({ _id: caseFound._id, participants: { $elemMatch: { name: subpoenee.name, role: subpoenee.role } }}, { $set: { "participants.$.subpoena": false } });
+        return {depositionId: session.depositionId};
     } catch (err) {
-throw new Error('An Error has Occured : ', err)
+        throw new Error(err)
 }
 }
 
-const sendMessage = async (message, caseId, subpoenee, messageHistory) => {
+const sendMessage = async (message, depositionId, messageHistory) => {
+    console.log(ongoingDepositions);
     try {
 
-        const caseFound = await cases.findOne({ _id: caseId });
-        if (!caseFound) throw new Error('Case Not Found');
-        const targetParticipant = caseFound.participants.find(user => user.name == subpoenee.name && user.role == subpoenee.role);
-
-        if (!targetParticipant || !targetParticipant.subpoena) throw new Error('')
-
+        const foundDeposition = ongoingDepositions.find(dep => dep.depositionId == depositionId);
+        if (!depositionId || !foundDeposition) throw new Error('Session Doesn\'t Exist :(');
+        const caseFound = await cases.findOne({_id: foundDeposition.caseId});
+        if (!caseFound) throw new Error('Case Not Found :(');
         const makeRequestAndParseResponse = async (attempt = 0) => {
             const maxRetries = 3;
             try {
                 const response = await openai.chat.completions.create({
-                    messages: [{ role: "system", content: SubpoenaMessagePrompt(subpoenee, caseFound, message, messageHistory) }],
+                    messages: [{ role: "system", content: SubpoenaMessagePrompt(foundDeposition.subpoenee, caseFound, message, messageHistory) }],
                     model: "gpt-3.5-turbo-1106",
                 });
                 const parsedRes = JSON.parse(response.choices[0].message.content);
                 console.log(parsedRes);
                 return parsedRes;
             } catch (error) {
+                console.log(error);
                 if (error instanceof SyntaxError && attempt < maxRetries) {
                     return makeRequestAndParseResponse(attempt + 1);
                 } else {
@@ -163,9 +165,10 @@ const sendMessage = async (message, caseId, subpoenee, messageHistory) => {
         return { success: true, message: parsedRes.text, stc: 200 };
     
     } catch (err) {
+        console.log(err);
         return { success: false, message: err.message || 'An error occurred', stc: 500 };
     }
 }
 
 
-module.exports = { sendMessage, fileMotion, issueSubpoena };
+module.exports = { startDeposition, sendMessage, fileMotion, issueSubpoena };

@@ -42,7 +42,7 @@ function DepositionScreen() {
         sender: `${myInfo.firstName} ${myInfo.lastName}`,
         role: role,
       };     
-  
+   
       setMessages([...messages, newMessage]);
       setCurrentMessage('');
     };

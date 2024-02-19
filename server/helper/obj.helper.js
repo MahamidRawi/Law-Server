@@ -1,3 +1,5 @@
+const { v4: uuid_v4 } = require('uuid');
+
 const filterObjectByKeys = (obj, keysToKeep) => {
     const filteredObject = {};
   keysToKeep.forEach(key => {
@@ -17,4 +19,13 @@ const filterObjectByKeys = (obj, keysToKeep) => {
     return array;
   }
 
+  const generateSession = (subpoenee, caseId) => {
+      return {
+        depositionId: uuid_v4(),
+        subpoenee,
+        caseId 
+      }
+  }
+
 module.exports = updateArray
+module.exports = generateSession
