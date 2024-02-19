@@ -8,8 +8,13 @@ const { OpenAI } = require('openai');
 const { config } = require('../../../config');
 const { calculatedPrices, lMPrices } = require('../../../vars/vars');
 const updateArray = require('../../../helper/obj.helper');
+const { uuid } = require('uuidv4');
 
 const openai = new OpenAI({ apiKey: config.APIPASS });
+
+const onGoingDepositions = [
+    
+]
 
 const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
     try {
@@ -111,11 +116,28 @@ const fileMotion = async (uid, caseInfo, motionInfo) => {
     }
 }
 
+const startDeposition = async (caseId, subpoenee) => {
+    try {
+        const caseFound = await cases.findOne({_id: caseId});
+        if (!caseFound) throw new Error('Case Not Found');
+        const targetParticipant = caseFound.participants.find(user => user.name == subpoenee.name && user.role == subpoenee.role);
+        if (!targetParticipant || !targetParticipant.subpoena) throw new Error('An Error has Occured');
+        
+        await cases.updateOne({ _id: caseInfo._id, participants: { $elemMatch: { name: subpoenee.name, role: subpoenee.role } }}, { $set: { "participants.$.subpoena": false } });
+
+    } catch (err) {
+throw new Error('An Error has Occured : ', err)
+}
+}
+
 const sendMessage = async (message, caseId, subpoenee, messageHistory) => {
     try {
 
         const caseFound = await cases.findOne({ _id: caseId });
         if (!caseFound) throw new Error('Case Not Found');
+        const targetParticipant = caseFound.participants.find(user => user.name == subpoenee.name && user.role == subpoenee.role);
+
+        if (!targetParticipant || !targetParticipant.subpoena) throw new Error('')
 
         const makeRequestAndParseResponse = async (attempt = 0) => {
             const maxRetries = 3;
@@ -138,7 +160,7 @@ const sendMessage = async (message, caseId, subpoenee, messageHistory) => {
 
         const parsedRes = await makeRequestAndParseResponse();
 
-        return { success: true, message: parsedRes.rationale, granted: parsedRes.granted, stc: 200 };
+        return { success: true, message: parsedRes.text, stc: 200 };
     
     } catch (err) {
         return { success: false, message: err.message || 'An error occurred', stc: 500 };
@@ -146,4 +168,4 @@ const sendMessage = async (message, caseId, subpoenee, messageHistory) => {
 }
 
 
-module.exports = { fileMotion, issueSubpoena };
+module.exports = { sendMessage, fileMotion, issueSubpoena };
