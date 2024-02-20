@@ -10,6 +10,8 @@ const { calculatedPrices, lMPrices } = require('../../../vars/vars');
 const updateArray = require('../../../helper/obj.helper');
 const { uuid } = require('uuidv4');
 const generateSession = require('../../../helper/obj.helper');
+require('../../../DB/models/depositions.model');
+const Deposition = mongoose.model('Deposition');
 
 const openai = new OpenAI({ apiKey: config.APIPASS });
 
@@ -114,71 +116,84 @@ const fileMotion = async (uid, caseInfo, motionInfo) => {
         return { success: false, message: err.message || 'An error occurred', stc: 500 };
     }
 }
-
 const startDeposition = async (caseId, subpoenee) => {
-    // console.log(caseId, )
     try {
-        const caseFound = await cases.findOne({_id: caseId});
-        if (!caseFound) throw new Error('Case Not Found');
-        const targetParticipant = caseFound.participants.find(user => user.name == subpoenee.name && user.role == subpoenee.role);
-        if (!targetParticipant || !targetParticipant.subpoena) throw new Error(!targetParticipant ? 'Participant Not Found' : 'You Don\'t Have a Subpoena for this Participant');
-        const depositionFound = ongoingDepositions.filter(dep => dep.caseId == caseId && dep.subpoenee == subpoenee);
-        console.log('Here are ongoing : ',ongoingDepositions, 'THERE ', depositionFound)
-        if (depositionFound) return {depositionId: depositionFound.depositionId}
-        const session = generateSession(subpoenee, caseId);
-        ongoingDepositions.push(session);
-        // await cases.updateOne({ _id: caseFound._id, participants: { $elemMatch: { name: subpoenee.name, role: subpoenee.role } }}, { $set: { "participants.$.subpoena": false } });
-        return {depositionId: session.depositionId};
+      // Find the case by ID
+      const caseFound = await cases.findOne({ _id: caseId });
+      if (!caseFound) throw new Error('Case Not Found');
+  
+      // Find an existing deposition or create a new one if it doesn't exist
+      let deposition = await Deposition.findOne({
+        caseId: caseId,
+        'subpoenee.name': subpoenee.name,
+        'subpoenee.role': subpoenee.role
+      });
+  
+      if (!deposition) {
+        // If the deposition doesn't exist, create a new one
+        deposition = new Deposition({
+          caseId: caseId,
+          subpoenee: subpoenee,
+          messageHistory: []
+        });
+        await deposition.save();
+      }
+  
+      return { depositionId: deposition._id };
     } catch (err) {
-        throw new Error(err)
-}
-}
-
-const endDeposition = async (depositionId) => {
-    const foundDeposition = ongoingDepositions.find(dep => dep.depositionId == depositionId);
-    arrayOfObjects.filter(object => object.depositionId !== depositionId);
-    
-    return {success: true}
-}
-
-const sendMessage = async (message, depositionId, messageHistory) => {
-    try {
-
-        const foundDeposition = ongoingDepositions.find(dep => dep.depositionId == depositionId);
-        if (!depositionId || !foundDeposition) throw new Error('Session Doesn\'t Exist :(');
-        const caseFound = await cases.findOne({_id: foundDeposition.caseId});
-        if (!caseFound) throw new Error('Case Not Found :(');
-        const makeRequestAndParseResponse = async (attempt = 0) => {
-            const maxRetries = 3;
-            try {
-                const response = await openai.chat.completions.create({
-                    messages: [{ role: "system", content: SubpoenaMessagePrompt(foundDeposition.subpoenee, caseFound, message.message, messageHistory) }],
-                    model: "gpt-3.5-turbo-1106",
-                });
-                const parsedRes = JSON.parse(response.choices[0].message.content);
-                const messageObj = {
-                    sender: foundDeposition.subpoenee.name,
-                    message: parsedRes.message.message
-                }
-                foundDeposition.messageHistory.push(messageObj);
-                return {success: true, message: messageObj, stc: 200};
-            } catch (error) {
-                if (error instanceof SyntaxError && attempt < maxRetries) {
-                    return makeRequestAndParseResponse(attempt + 1);
-                } else {
-                    throw 'An Error has Occured. Please Try Again.';
-                }
-            }
-        };
-
-        const parsedRes = await makeRequestAndParseResponse();
-
-        return parsedRes
-    
-    } catch (err) {
-        return { success: false, message: err.message || 'An error occurred', stc: 500 };
+      throw new Error(err.message || 'An error occurred during startDeposition');
     }
-}
+  };
+
+  const endDeposition = async (depositionId) => {
+    try {
+      // Remove the deposition from the database
+      const result = await Deposition.deleteOne({ depositionId: depositionId });
+      if (result.deletedCount === 0) throw new Error('Deposition not found');
+  
+      return { success: true };
+    } catch (err) {
+      throw new Error(err.message || 'An error occurred during endDeposition');
+    }
+  };
+
+  const sendMessage = async (message, depositionId, messageHistory) => {
+    try {
+
+      const deposition = await Deposition.findOne({ depositionId: depositionId });
+      if (!deposition) throw new Error('Deposition not found');
+  
+      
+      const response = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: messageHistory.concat([{ role: "user", content: message }]),
+      });
+  
+      const aiMessage = response.data.choices[0].message.content;
+      const messageObj = {
+        sender: message.sender,
+        message: aiMessage
+      };
+  
+      deposition.messageHistory.push(messageObj);
+      await deposition.save();
+  
+      return {
+        success: true,
+        message: messageObj,
+        stc: 200
+      };
+    } catch (error) {
+      console.error('Error in sendMessage:', error);
+      return {
+        success: false,
+        message: error.message || 'An error occurred while sending the message',
+        stc: 500
+      };
+    }
+  };
+  
+  module.exports = sendMessage;
 
 
 module.exports = { endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena };
