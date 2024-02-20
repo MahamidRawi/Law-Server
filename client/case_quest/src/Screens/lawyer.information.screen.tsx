@@ -15,6 +15,7 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
 
     // Safely accessing state properties using optional chaining
     const uid = location.state?.uId;
+    const caseId = location.state?.caseId;
     const participant = location.state?.data;
 
     // Using optional chaining to prevent runtime errors if participant is undefined
@@ -62,7 +63,7 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                                     ) : (
                                         <>
                                             <p className='mt-1'>{participant.name}</p>
-                                            <button disabled={!subpoenaAvailability} className="btn btn-primary mt-1" onClick={() => navigate('/Deposition', { state: { caseId: 'Transfer', uinf: participant } })}>Deposit</button>
+                                            <button disabled={!subpoenaAvailability} className="btn btn-primary mt-1" onClick={() => navigate('/Deposition', { state: { caseId, uinf: participant } })}>Deposit</button>
                                         </>
                                     )}
                                     <div className="info-scroll-container"></div>

@@ -13,9 +13,7 @@ const generateSession = require('../../../helper/obj.helper');
 
 const openai = new OpenAI({ apiKey: config.APIPASS });
 
-const ongoingDepositions = [
-    
-]
+const ongoingDepositions = []
 
 const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
     try {
@@ -118,11 +116,15 @@ const fileMotion = async (uid, caseInfo, motionInfo) => {
 }
 
 const startDeposition = async (caseId, subpoenee) => {
+    // console.log(caseId, )
     try {
         const caseFound = await cases.findOne({_id: caseId});
         if (!caseFound) throw new Error('Case Not Found');
         const targetParticipant = caseFound.participants.find(user => user.name == subpoenee.name && user.role == subpoenee.role);
         if (!targetParticipant || !targetParticipant.subpoena) throw new Error(!targetParticipant ? 'Participant Not Found' : 'You Don\'t Have a Subpoena for this Participant');
+        const depositionFound = ongoingDepositions.filter(dep => dep.caseId == caseId && dep.subpoenee == subpoenee);
+        console.log('Here are ongoing : ',ongoingDepositions, 'THERE ', depositionFound)
+        if (depositionFound) return {depositionId: depositionFound.depositionId}
         const session = generateSession(subpoenee, caseId);
         ongoingDepositions.push(session);
         // await cases.updateOne({ _id: caseFound._id, participants: { $elemMatch: { name: subpoenee.name, role: subpoenee.role } }}, { $set: { "participants.$.subpoena": false } });
@@ -132,8 +134,14 @@ const startDeposition = async (caseId, subpoenee) => {
 }
 }
 
+const endDeposition = async (depositionId) => {
+    const foundDeposition = ongoingDepositions.find(dep => dep.depositionId == depositionId);
+    arrayOfObjects.filter(object => object.depositionId !== depositionId);
+    
+    return {success: true}
+}
+
 const sendMessage = async (message, depositionId, messageHistory) => {
-    console.log(ongoingDepositions);
     try {
 
         const foundDeposition = ongoingDepositions.find(dep => dep.depositionId == depositionId);
@@ -144,14 +152,17 @@ const sendMessage = async (message, depositionId, messageHistory) => {
             const maxRetries = 3;
             try {
                 const response = await openai.chat.completions.create({
-                    messages: [{ role: "system", content: SubpoenaMessagePrompt(foundDeposition.subpoenee, caseFound, message, messageHistory) }],
+                    messages: [{ role: "system", content: SubpoenaMessagePrompt(foundDeposition.subpoenee, caseFound, message.message, messageHistory) }],
                     model: "gpt-3.5-turbo-1106",
                 });
                 const parsedRes = JSON.parse(response.choices[0].message.content);
-                console.log(parsedRes);
-                return parsedRes;
+                const messageObj = {
+                    sender: foundDeposition.subpoenee.name,
+                    message: parsedRes.message.message
+                }
+                foundDeposition.messageHistory.push(messageObj);
+                return {success: true, message: messageObj, stc: 200};
             } catch (error) {
-                console.log(error);
                 if (error instanceof SyntaxError && attempt < maxRetries) {
                     return makeRequestAndParseResponse(attempt + 1);
                 } else {
@@ -162,13 +173,12 @@ const sendMessage = async (message, depositionId, messageHistory) => {
 
         const parsedRes = await makeRequestAndParseResponse();
 
-        return { success: true, message: parsedRes.text, stc: 200 };
+        return parsedRes
     
     } catch (err) {
-        console.log(err);
         return { success: false, message: err.message || 'An error occurred', stc: 500 };
     }
 }
 
 
-module.exports = { startDeposition, sendMessage, fileMotion, issueSubpoena };
+module.exports = { endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena };

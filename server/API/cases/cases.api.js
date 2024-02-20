@@ -44,7 +44,7 @@ router.post('/deposition/startDeposition', async (req, res) => {
 router.post('/deposition/sendMessage', validate, async (req, res) => {
     const {depositionId, message, messageHistory} = req.body;
     try {
-        const resp = await sendMessage(message, depositionId);
+        const resp = await sendMessage(message, depositionId, messageHistory);
         return res.status(resp.stc).json(resp);
     } catch (err) {
         return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});

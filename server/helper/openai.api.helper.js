@@ -213,7 +213,7 @@ const SubpoenaMessagePrompt = (subpoenee, caseInfo, message, messageHistory) => 
     - In order to make the case more interesting, you can have slip-ups sometimes, participant may choose not to respond, etc...
     Your response must be meticulously formatted in JSON as follows:
     {
-      "text": "Your detailed response based on the role's perspective and the context provided."
+      "message": "Your detailed response based on the role's perspective and the context provided. Very human way, and make it interesting, helpful or not for the case"
     }
     `
 

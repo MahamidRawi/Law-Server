@@ -75,12 +75,12 @@ const fileMotion = (caseId: string, subpoenaInfo: any): Promise<{message?: strin
     })
 }
 
-const sendMessage = (message: string, subpoenee: object, caseId: string): Promise<{message?: string, success: boolean, granted?: boolean, AR?: boolean}> => {
+const sendMessage = (message: string, depositionId: string): Promise<{message?: string, success: boolean, granted?: boolean, AR?: boolean}> => {
     return new Promise(async (resolve, reject) => {
         const token = localStorage.getItem('user_token');
         if (!token) return reject({success: false, message: 'No Token', AR: true});
         try {
-            const res = await axios.post(config.API_BASE_URL + '/main/cases/deposition/sendMessage', {subpoenee, caseId, message}, {headers: {'x-access-token': token}});
+            const res = await axios.post(config.API_BASE_URL + '/main/cases/deposition/sendMessage', {depositionId, message}, {headers: {'x-access-token': token}});
             return resolve({success: true, message: res.data.message});
         } catch (err: any) {
             const {stc} = err
@@ -89,4 +89,18 @@ const sendMessage = (message: string, subpoenee: object, caseId: string): Promis
     })
 }
 
-export {sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}
+const startDeposition = (subpoenee: object, caseId: string) => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token) return reject({success: false, message: 'No Token', AR: true});
+        try {
+            const res = await axios.post(config.API_BASE_URL + '/main/cases/deposition/startDeposition', {subpoenee, caseId}, {headers: {'x-access-token': token}});
+            return resolve({success: true, depositionId: res.data.depositionId});
+        } catch (err: any) {
+            const {stc} = err
+            return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
+        }
+    })
+}
+
+export {startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}
