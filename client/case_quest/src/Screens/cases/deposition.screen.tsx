@@ -6,7 +6,7 @@ import { formatDate } from '../../helper/res.helper';
 import { getLawyerInformation } from '../../actions/main/home.actions';
 import { userValidate } from '../../actions/auth.actions';
 import { AuthContext } from '../../Providers/auth.provider';
-import { startDeposition } from '../../actions/main/cases.actions';
+import { sendMessage as sMessage, startDeposition } from '../../actions/main/cases.actions';
 
 interface LocationState {
     name: string;
@@ -15,10 +15,8 @@ interface LocationState {
   }
   
   interface Message {
-    id: number;
     message: string;
     sender: string;
-    subpoenee: object;
   }
   
 const DepositionScreen: React.FC = () => {
@@ -37,12 +35,10 @@ const DepositionScreen: React.FC = () => {
         console.log('Starting deposition');
         userValidate(localStorage.getItem('user_token'))
           .then(res => {
-            // Assuming setMyInfo updates component state
-            setMyInfo(res.info); // Make sure setMyInfo is defined and updates a state variable
+            setMyInfo(res.info);
             return startDeposition(subpoenee, caseId).then((res: any) => {
-              console.log(res);
               setDepositionId(res.depositionId);
-              return setDepositionStarted(true); // Prevent further execution
+              return setDepositionStarted(true);
             }).catch(err => {
               if (err.AR) logout();
               else alert(JSON.stringify(err) || 'An Error has Occurred');
@@ -54,28 +50,27 @@ const DepositionScreen: React.FC = () => {
       }
     }, [depositionStarted, caseId]);
   
-    const sendMessage = (e: FormEvent<HTMLFormElement>) => {
+    const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!currentMessage.trim()) return;
   
       const newMessage: Message = {
-        id: messages.length + 1,
         message: currentMessage,
-        sender: `${myInfo.firstName} ${myInfo.lastName}`,
-        subpoenee: {
-          name, role, shortDescription
-        }
+        sender: `${myInfo.firstName} ${myInfo.lastName}`
       };     
-      setMessages([...messages, newMessage]);   
-      setCurrentMessage('');
-    };
-
-    useEffect(() => {
+      setMessages(prevMessages => [...prevMessages, newMessage]);
+      console.log(messages)
       try {
-      } catch (err) {
-          
+        const sentMessage:any = await sMessage(newMessage, depositionId);   
+        console.log(sentMessage);
+        setMessages(prevMessages => [...prevMessages, sentMessage.message]);
+        console.log(messages)
+        return setCurrentMessage('');
+      } catch (err: any) {
+        if (err.AR) return logout();
+        return alert(JSON.stringify(err) || 'An Error has Occured');
       }
-    });
+    };
   
     return (
         <Container fluid className="py-4 c-room">
@@ -91,8 +86,8 @@ const DepositionScreen: React.FC = () => {
           </Card>
           </center>
           <ListGroup className="messages-list mb-3">
-            {messages.map((message) => (
-              <ListGroup.Item key={message.id} className="text-wrap">
+            {messages.map((message, index) => (
+              <ListGroup.Item key={index} className="text-wrap">
                 <strong>{message.sender} :</strong> {message.message}
               </ListGroup.Item>
             ))}

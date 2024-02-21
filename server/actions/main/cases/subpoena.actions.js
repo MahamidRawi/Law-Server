@@ -7,15 +7,10 @@ const { compareBalanceToRequiredAmount, addAdminFee } = require('../wallet.actio
 const { OpenAI } = require('openai');
 const { config } = require('../../../config');
 const { calculatedPrices, lMPrices } = require('../../../vars/vars');
-const updateArray = require('../../../helper/obj.helper');
-const { uuid } = require('uuidv4');
-const generateSession = require('../../../helper/obj.helper');
 require('../../../DB/models/depositions.model');
 const Deposition = mongoose.model('Deposition');
 
 const openai = new OpenAI({ apiKey: config.APIPASS });
-
-const ongoingDepositions = []
 
 const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
     try {
@@ -118,11 +113,11 @@ const fileMotion = async (uid, caseInfo, motionInfo) => {
 }
 const startDeposition = async (caseId, subpoenee) => {
     try {
-      // Find the case by ID
+
       const caseFound = await cases.findOne({ _id: caseId });
       if (!caseFound) throw new Error('Case Not Found');
   
-      // Find an existing deposition or create a new one if it doesn't exist
+
       let deposition = await Deposition.findOne({
         caseId: caseId,
         'subpoenee.name': subpoenee.name,
@@ -130,7 +125,6 @@ const startDeposition = async (caseId, subpoenee) => {
       });
   
       if (!deposition) {
-        // If the deposition doesn't exist, create a new one
         deposition = new Deposition({
           caseId: caseId,
           subpoenee: subpoenee,
@@ -147,7 +141,6 @@ const startDeposition = async (caseId, subpoenee) => {
 
   const endDeposition = async (depositionId) => {
     try {
-      // Remove the deposition from the database
       const result = await Deposition.deleteOne({ depositionId: depositionId });
       if (result.deletedCount === 0) throw new Error('Deposition not found');
   
@@ -157,25 +150,35 @@ const startDeposition = async (caseId, subpoenee) => {
     }
   };
 
-  const sendMessage = async (message, depositionId, messageHistory) => {
+  const sendMessage = async (message, depositionId) => {
     try {
 
-      const deposition = await Deposition.findOne({ depositionId: depositionId });
+      const deposition = await Deposition.findOne({ _id: depositionId });
+      console.log(deposition, depositionId);
       if (!deposition) throw new Error('Deposition not found');
+      const caseFound = await cases.findOne({_id: deposition.caseId});
+      if (!caseFound) throw new Error('Deposition Not Found')
   
       
-      const response = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: messageHistory.concat([{ role: "user", content: message }]),
-      });
-  
-      const aiMessage = response.data.choices[0].message.content;
+    //   const response = await openai.createChatCompletion({
+    //     model: "gpt-3.5-turbo",
+    //     prompt: SubpoenaMessagePrompt(deposition.subpoenee, caseFound, message.message, deposition.messageHistory)
+    //   });
+      
+      const response = await openai.chat.completions.create({
+        messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.subpoenee, caseFound, message.message, deposition.messageHistory)}],
+        model: "gpt-3.5-turbo-1106",
+    });
+    console.log(response.choices[0].message.content)
+      const aiMessage = JSON.parse(response.choices[0].message.content);
       const messageObj = {
-        sender: message.sender,
-        message: aiMessage
+        sender: aiMessage.sender,
+        message: aiMessage.message,
       };
   
+      deposition.messageHistory.push(message);
       deposition.messageHistory.push(messageObj);
+      console.log(aiMessage);
       await deposition.save();
   
       return {

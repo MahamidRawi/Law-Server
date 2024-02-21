@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const DepositionSchema = new mongoose.Schema({
   caseId: {
     type: mongoose.Schema.Types.ObjectId,

@@ -75,7 +75,7 @@ const fileMotion = (caseId: string, subpoenaInfo: any): Promise<{message?: strin
     })
 }
 
-const sendMessage = (message: string, depositionId: string): Promise<{message?: string, success: boolean, granted?: boolean, AR?: boolean}> => {
+const sendMessage = (message: object, depositionId: string): Promise<{message?: string, success: boolean, granted?: boolean, AR?: boolean}> => {
     return new Promise(async (resolve, reject) => {
         const token = localStorage.getItem('user_token');
         if (!token) return reject({success: false, message: 'No Token', AR: true});
