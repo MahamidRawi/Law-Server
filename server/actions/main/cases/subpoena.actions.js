@@ -113,26 +113,24 @@ const fileMotion = async (uid, caseInfo, motionInfo) => {
 }
 const startDeposition = async (caseId, subpoenee) => {
     try {
-
       const caseFound = await cases.findOne({ _id: caseId });
       if (!caseFound) throw new Error('Case Not Found');
-  
-
-      let deposition = await Deposition.findOne({
-        caseId: caseId,
-        'subpoenee.name': subpoenee.name,
-        'subpoenee.role': subpoenee.role
-      });
-  
-      if (!deposition) {
-        deposition = new Deposition({
+    
+      let deposition = await Deposition.findOneAndUpdate(
+        {
           caseId: caseId,
-          subpoenee: subpoenee,
-          messageHistory: []
-        });
-        await deposition.save();
-      }
-  
+          'subpoenee.name': subpoenee.name,
+          'subpoenee.role': subpoenee.role
+        },
+        {
+          $setOnInsert: { messageHistory: [] }
+        },
+        {
+          new: true,
+          upsert: true // Create the document if it doesn't exist
+        }
+      );
+    
       return { depositionId: deposition._id };
     } catch (err) {
       throw new Error(err.message || 'An error occurred during startDeposition');
@@ -172,7 +170,7 @@ const startDeposition = async (caseId, subpoenee) => {
     console.log(response.choices[0].message.content)
       const aiMessage = JSON.parse(response.choices[0].message.content);
       const messageObj = {
-        sender: aiMessage.sender,
+        sender: deposition.subpoenee.name,
         message: aiMessage.message,
       };
   

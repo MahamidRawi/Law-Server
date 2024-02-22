@@ -2,12 +2,12 @@ const Filter = require('bad-words');
 const { discoveryTemplates, lMPrices } = require('../vars/vars');
 const filter = new Filter({ placeHolder: '*' });
 
-const createCasePrompt = (uid, caseInfo) => {
-    const { lawSystem, additionalKeywords, fieldOfLaw, difficulty, position } = caseInfo;
+const createCasePrompt = (uid, caseInfo, pos) => {
+    const { lawSystem, additionalKeywords, fieldOfLaw, difficulty } = caseInfo;
     
 
     return `
-    Create a comprehensive legal case model within the field of "${fieldOfLaw}" from the perspective of "${position}". The case complexity is defined as "${difficulty}". Incorporate the following details: ${additionalKeywords ? filter.clean(additionalKeywords) : 'No additional Keywords'} under the "${lawSystem}" legal system. As the case complexity increases, so should the detail and nuance of the scenario. Provide specific names, dates, and documents to maintain realism. The case format should be as follows:
+    Create a comprehensive legal case model within the field of "${fieldOfLaw}" from the perspective of "${pos}". The case complexity is defined as "${difficulty}". Incorporate the following details: ${additionalKeywords ? filter.clean(additionalKeywords) : 'No additional Keywords'} under the "${lawSystem}" legal system. As the case complexity increases, so should the detail and nuance of the scenario. Provide specific names, dates, and documents to maintain realism. The case format should be as follows:
 
 {
     "title": "{plaintiff Name} vs {defendant Name}",
@@ -16,8 +16,8 @@ const createCasePrompt = (uid, caseInfo) => {
         {
             "name": "{participant Name}",
             "role": "{participant Role}",
-            "ctc": {true if participant is ${position} client or is the opposing attorney. Otherwise, false.},
-            "alive": {is Alive},
+            "ctc": {true if participant is ${pos} client or is the oppositionName attorney. Otherwise, false.},
+            "alive": {is Alive ?},
             "subpoena": false,
             "shortDescription": "{participant short Description}"
         }
@@ -32,7 +32,7 @@ Guidelines:
 - The case model must be entirely in JSON format without exceptions.
 - Focus on generating a fictional yet realistic scenario, including participant names and legal documents.
 - Limit "discoveries" to four items, providing extensive detail and structure without using placeholders. Include specific dates and relevant information to mimic an investigative or legal strategy game. I don't want overiew or summary of content, but ultra realistic 100% complete content with no placeholders whatsoever.
-- Include only human participants in the model. Specifically, add the opposing attorney to the "participants" array, ensuring no companies or non-human entities are represented. The ${position} attorney must not be included in the participants array. But add additional participants initially to make the case interesting.
+- Include only human participants in the model. Specifically, add the oppositionName's attorney to the "participants" array, ensuring no companies or non-human entities are represented. The ${pos} attorney must not be included in the participants array. But add additional participants initially to make the case interesting. Don't add to the participants array the ${pos} attorney.
 - Ensure the case reflects the designated complexity, realism, and legal standards accurately.
 
 Note: While the primary focus is on the opposition attorney within the participants array, you may add more human participants following the schema provided to enhance the narrative. Ensure all details are comprehensive, leaving no information unspecified, including credit card numbers and sensitive data as required for the case's depth.
@@ -199,24 +199,25 @@ return openAiPrompt;
 }
 
 const SubpoenaMessagePrompt = (subpoenee, caseInfo, message, messageHistory) => {
-    const prompt = `In this simulation, you embody the character of a participant involved in a legal case, assigned the role of "${subpoenee.role}". Your actions and responses are dictated by this role, informed by detailed background information: ${subpoenee}. You are presented with a specific inquiry: ${message}.
-
-    Contextual Background Information:
-    - Case Details: ${caseInfo}.
-    - Conversation History: ${messageHistory}.
-    
-    Role-Specific Guidelines for Response:
-    - As an "Expert Witness" without any conflicts of interest, your response to the inquiry (${message}) should be marked by honesty and professional integrity, reflecting your expert opinion or factual knowledge pertinent to the case.
-    - As either the "Plaintiff" or "Defendant", while you are not obligated to disclose the truth, your answers must maintain consistency with the provided Case Information and prior Conversation History. It's imperative to craft your responses with a strategic approach to your case role, ensuring they are coherent and plausible within the legal scenario. Note that as the case difficulty escalates, the dialogues and interactions may become increasingly complex and morally ambiguous, challenging you to navigate the conversations with careful consideration of your character's objectives and alignments.
-    - You must answer this question, or react (not necessarily as you must be smart) to the following statement : ${message}
-    - You must answer with the most human way possible. 
-    - In order to make the case more interesting, you can have slip-ups sometimes, participant may choose not to respond, etc...
-    Your response must be meticulously formatted in JSON as follows:
-    {
-      "sender": "Name of the subpoenee / his lawyer (if witness)",
-      "message": "Your detailed response based on the role's perspective and the context provided. Very human way, and make it interesting, helpful or not for the case"
-    }
-    `
+  const prompt = `
+  YOU ARE IN A DEPOSITION. In this immersive legal simulation, you assume the identity of a character deeply involved in a legal case, designated as "${subpoenee.role}". This role comes with a comprehensive background profile: ${subpoenee}, and a specific task: ${message}.
+  
+  ### Contextual Background Information:
+  - **Case Details:** Explore the intricacies of the case, ${caseInfo}. Pay close attention to the key figures, especially caseInfo.owners[0], who is pivotal to the query at hand.
+  - **Conversation History:** Keep in mind the dialogue and events that have transpired, ${messageHistory}, ensuring your responses contribute to a coherent and continuous storyline.
+  
+  ### Role-Specific Guidelines for Response:
+  - **Expert Witness:** Your input should be grounded in honesty and professional integrity, offering expert insights or factual clarifications on the inquiry (${message}), free from any conflicts of interest.
+  - **Plaintiff/Defendant:** Although full transparency is not required, your statements should remain consistent with the established facts (${caseInfo} and ${messageHistory}). Your approach to disclosure should be strategic, aimed at advancing your role's interests within the framework of the case. As the narrative evolves, the complexity may increase, presenting moral quandaries and demanding a nuanced balance between honesty and strategy.
+  - **Engagement with the Inquiry:** Address the question or statement (${message}) directly. Your response, while required to be in alignment with your role, should also be human-like and engaging, potentially incorporating strategic missteps or choosing silence as a tactical response.
+  
+  Your response must be meticulously formatted in JSON, capturing the essence of your role's perspective and the provided context in a manner that's engaging, potentially helpful (or not) for the unfolding case narrative:
+  \`
+  {
+    "message": "Your detailed response, articulated from your character's viewpoint, ensuring it is compelling, authentically human, and aligned with the narrative's demands."
+  }
+  \`
+  `;
 
     return prompt;
 }

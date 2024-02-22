@@ -9,6 +9,7 @@ const users = mongoose.model('userModel');
 const { addAdminFee, compareBalanceToRequiredAmount } = require('../wallet.actions');
 const { OpenAI } = require('openai');
 const { config } = require('../../../config');
+const randomPosition = require('../../../helper/obj.helper');
 const openai = new OpenAI({apiKey: config.APIPASS});
 
 const addCaseToUser = async (tId, caseId) => {
@@ -27,13 +28,14 @@ const addCaseToUser = async (tId, caseId) => {
 
 const createCase = async (uid, caseInfo) => {
     return new Promise(async (resolve, reject) => {
-        const {lawSystem, difficulty, position, fieldOfLaw} = caseInfo;
+        const {lawSystem, difficulty, fieldOfLaw, position} = caseInfo;
+        chosenPosition = position == 'random' ? randomPosition() : position;
         caseSchema.validateAsync({lawSystem, difficulty, position, fieldOfLaw}).catch(err => reject({success: false, message: err.message, stc: 400}))
         const userFound = await users.findOne({_id: uid}).catch(err => reject({stc: 500, message: 'An Error has Occured'}));
         const sufficientBalance = compareBalanceToRequiredAmount(uid, 250);
         if (!userFound || userFound.cases.length === 3 || !sufficientBalance) reject({message: !userFound ? 'User Not Found': cases.length === 3 ?'You are already handeling 3 ongoing cases' : 'Insufficient Balance', stc: !userFound ? 401 : 400});
         const response = await openai.chat.completions.create({
-            messages: [{ role: "system", content: createCasePrompt(uid, caseInfo) }],
+            messages: [{ role: "system", content: createCasePrompt(uid, caseInfo, chosenPosition) }],
     model: "gpt-3.5-turbo",
         });
         const newRes = JSON.parse(response.choices[0].message.content);
@@ -42,20 +44,12 @@ const createCase = async (uid, caseInfo) => {
         newCase.owners = [uid, newRes.oppositionName];
         newCase.difficulty = difficulty;
         
-if (position === 'prosecution') {
+if (chosenPosition === 'prosecution') {
   newCase.prosecution = uid;
   newCase.defense = newRes.oppositionName;
-} else if (position === 'defense') {
+} else if (chosenPosition === 'defense') {
   newCase.prosecution = newRes.oppositionName;
   newCase.defense = uid;
-} else {
-  if (Math.random() < 0.5) {
-      newCase.prosecution = uid;
-      newCase.defense = newRes.oppositionName;
-  } else {
-      newCase.prosecution = newRes.oppositionName;
-      newCase.defense = uid;
-  }
 }
         const newdate = Date.now();
         newCase.date = newdate
