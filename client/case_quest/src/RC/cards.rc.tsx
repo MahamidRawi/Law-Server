@@ -62,7 +62,7 @@ const User: React.FC<UserProps> = ({cId, data, resize=false, participant = false
             <div className="flex-grow-1">
               <p className="mb-2">Name: {participant ? data.name : `${data.firstName} ${data.lastName}`}</p>
               <p className="mb-2">{participant ? `Role: ${data.role}` : `Email: ${data.email}`}</p>
-              {participant && <p className='mb-2'>Description : {data.shortDescription}</p>}
+              {participant && <p className='mb-2 desc'>Description : {data.shortDescription}</p>}
             </div>
             <div className="d-flex flex-column">
               <button className="btn btn-primary mb-2" onClick={() => navigate("/MoreInfo", {state: !participant ? {uId: data._id} : {data, caseId: cId} })}>More</button>

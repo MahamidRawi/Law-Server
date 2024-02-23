@@ -96,7 +96,11 @@ const issueSubpoenaPrompt = (caseInfo, type, justification, entity) => {
       "rationale": "A comprehensive explanation supporting the decision, grounded in legal and factual analysis of the case.",
       "participant": {
         "inList": "Boolean indicating if the participant is already mentioned in the case details (${caseInfo.participants})",
-        "details": "If the participant is not in the list, provide a fabricated yet plausible profile including: name, role in the case, a brief description of their relevance, and their living status. If in the list, this field must contain the following object : {'exactName':'exact name as stated', 'role': 'role of the participant as stated'} "
+        "details": "If the participant is not in the list, provide a fabricated yet plausible profile including: name, role in the case, a brief description of their relevance like the following format : {
+            "name: "fictif name",
+            "role": "role of participant",
+            "shortDescription": "short description of the participant"
+        }. If in the list, this field must contain the following object : {'exactName':'exact name as stated', 'role': 'role of the participant as stated'} "
       }
     }
 ` : `
@@ -117,7 +121,7 @@ Response structure:
   "granted": true or false,
   "rationale": "Provide this only if the subpoena is denied, explaining the decision.",
   "document": ${JSON.stringify(type.template)},
-  "ai_move": [Here you must provide a response to the subpoena, a document like "document" field, but offering a discovery element from your side following the templates. You can choose from the following array : ${JSON.stringify(discoveryTemplates)} or even a motion : ${JSON.stringify(lMPrices)}. In case the response move of the ai, the template must be like the following : ${tmplt}. it can also be testimony. It must be also very well structured.],
+  "ai_move": [Here you must provide a response to the subpoena, a document like "document" field, but offering a discovery element from your side following the templates. You can choose from the following array : ${JSON.stringify(discoveryTemplates)} or even a motion : ${JSON.stringify(lMPrices)}. In case the response move of the ai, the template must be like the following : ${tmplt}. it can also be testimony. It must be also very well structured. The content must defend the side represented by ${caseInfo.oppositionName}],
 }
 
 The document content must be fictional, extremely detailed, as is a simulation for detective / lawyer game, compelling and complete, designed to enrich the gameplay and educational experience, especially in harder cases where the legal system's complexity and challenges are more pronounced. Also, strictly follow the guidance given by the template : ${type.template}. Remember, I don't want overview / summary, I want details.
@@ -210,7 +214,8 @@ const SubpoenaMessagePrompt = (subpoenee, caseInfo, message, messageHistory) => 
   - **Expert Witness:** Your input should be grounded in honesty and professional integrity, offering expert insights or factual clarifications on the inquiry (${message}), free from any conflicts of interest.
   - **Plaintiff/Defendant:** Although full transparency is not required, your statements should remain consistent with the established facts (${caseInfo} and ${messageHistory}). Your approach to disclosure should be strategic, aimed at advancing your role's interests within the framework of the case. As the narrative evolves, the complexity may increase, presenting moral quandaries and demanding a nuanced balance between honesty and strategy.
   - **Engagement with the Inquiry:** Address the question or statement (${message}) directly. Your response, while required to be in alignment with your role, should also be human-like and engaging, potentially incorporating strategic missteps or choosing silence as a tactical response.
-  
+  - Give very short and human answers, very realistic, and generate fictif information on the go, but it must be coherent. 
+  - Please pay attention to the Case Details to be coherent.
   Your response must be meticulously formatted in JSON, capturing the essence of your role's perspective and the provided context in a manner that's engaging, potentially helpful (or not) for the unfolding case narrative:
   \`
   {
@@ -220,6 +225,21 @@ const SubpoenaMessagePrompt = (subpoenee, caseInfo, message, messageHistory) => 
   `;
 
     return prompt;
+}
+
+const endDepositionPrompt = (messageHistory) => {
+    return `
+    Given this deposition transcript, draft a legeal deposition transcript formatted text. The response must be like the followng, strictly JSON : 
+    {
+        "document": {
+            "type": "Testimony",
+            "title": "Witness Name or Identifier",
+            "content": "Essential summary of the testimony, emphasizing its impact on the case.",
+            "exactContent": "Witness: '{{Name}}'\nDate: '{{YYYY-MM-DD}}'\n\nTranscript: Draft Transcript from the following record : ${messageHistory}",
+            "date": "YYYY-MM-DD format"
+          },
+    }
+    `
 }
 
 module.exports = {SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}

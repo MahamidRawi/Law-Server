@@ -34,6 +34,7 @@ const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
                 });
 
                 const parsedRes = JSON.parse(response.choices[0].message.content);
+                console.log('Here is parsed Res : ', parsedRes);
                 return parsedRes;
             } catch (error) {
                 if (error instanceof SyntaxError && attempt < maxRetries) {
@@ -131,7 +132,7 @@ const startDeposition = async (caseId, subpoenee) => {
         }
       );
     
-      return { depositionId: deposition._id };
+      return { depositionId: deposition._id, messages: deposition.messageHistory };
     } catch (err) {
       throw new Error(err.message || 'An error occurred during startDeposition');
     }
@@ -156,13 +157,7 @@ const startDeposition = async (caseId, subpoenee) => {
       if (!deposition) throw new Error('Deposition not found');
       const caseFound = await cases.findOne({_id: deposition.caseId});
       if (!caseFound) throw new Error('Deposition Not Found')
-  
-      
-    //   const response = await openai.createChatCompletion({
-    //     model: "gpt-3.5-turbo",
-    //     prompt: SubpoenaMessagePrompt(deposition.subpoenee, caseFound, message.message, deposition.messageHistory)
-    //   });
-      
+
       const response = await openai.chat.completions.create({
         messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.subpoenee, caseFound, message.message, deposition.messageHistory)}],
         model: "gpt-3.5-turbo-1106",

@@ -1,9 +1,7 @@
-import React, {FormEvent, useState, useEffect, useContext} from 'react';
+import React, {FormEvent, useState, useEffect, useContext, useRef} from 'react';
 import { useLocation } from 'react-router-dom';
 import { Container, Row, Col, Form, Button, ListGroup, Card } from 'react-bootstrap';
 import '../wallet/wallet.css';
-import { formatDate } from '../../helper/res.helper';
-import { getLawyerInformation } from '../../actions/main/home.actions';
 import { userValidate } from '../../actions/auth.actions';
 import { AuthContext } from '../../Providers/auth.provider';
 import { sendMessage as sMessage, startDeposition } from '../../actions/main/cases.actions';
@@ -24,10 +22,12 @@ const DepositionScreen: React.FC = () => {
     const { name, shortDescription, role } = location.state.uinf || { name: 'Unknown', description: '', role: 'guest' };
     const caseId = location.state.caseId;
     const {logout} = useContext(AuthContext);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [currentMessage, setCurrentMessage] = useState<string>('');
     const [myInfo, setMyInfo] = useState<any>();
     const [depositionStarted, setDepositionStarted] = useState(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [depositionId, setDepositionId] = useState<string>('');
     const subpoenee = {name, role, shortDescription};
     useEffect(() => {
@@ -38,34 +38,36 @@ const DepositionScreen: React.FC = () => {
             setMyInfo(res.info);
             return startDeposition(subpoenee, caseId).then((res: any) => {
               setDepositionId(res.depositionId);
-              return setDepositionStarted(true);
+              setMessages(res.messages);
+              setDepositionStarted(true);
+              return setLoading(false);
             }).catch(err => {
               if (err.AR) logout();
               else alert(JSON.stringify(err) || 'An Error has Occurred');
             });
           })
-          .catch(err => {
-            logout();
-          });
+          .catch(err => logout());
       }
     }, [depositionStarted, caseId]);
+    
+    useEffect(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
   
     const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      setLoading(true);
       if (!currentMessage.trim()) return;
-  
+      setCurrentMessage('');
       const newMessage: Message = {
         message: currentMessage,
         sender: `${myInfo.firstName} ${myInfo.lastName}`
       };     
       setMessages(prevMessages => [...prevMessages, newMessage]);
-      console.log(messages)
       try {
         const sentMessage:any = await sMessage(newMessage, depositionId);   
-        console.log(sentMessage);
         setMessages(prevMessages => [...prevMessages, sentMessage.message]);
-        console.log(messages)
-        return setCurrentMessage('');
+        return setLoading(false)
       } catch (err: any) {
         if (err.AR) return logout();
         return alert(JSON.stringify(err) || 'An Error has Occured');
@@ -82,6 +84,9 @@ const DepositionScreen: React.FC = () => {
             <Card.Body>
               <Card.Title>{name || 'Guest'} ({role})</Card.Title>
               <Card.Text>{shortDescription || 'No Description'}</Card.Text>
+              <Form.Text className="text-muted">
+                * Please ensure the deposition is formally concluded upon completion. Even if not concluded, the content will be disclosed to the opposing party.
+              </Form.Text>
             </Card.Body>
           </Card>
           </center>
@@ -91,20 +96,27 @@ const DepositionScreen: React.FC = () => {
                 <strong>{message.sender} :</strong> {message.message}
               </ListGroup.Item>
             ))}
+              <div ref={messagesEndRef} />
           </ListGroup>
           <Form onSubmit={sendMessage}>
             <Form.Group className="mb-3">
               <Form.Control
-                as="textarea"
+                as="input"
+                disabled={loading}
                 value={currentMessage}
                 onChange={(e) => setCurrentMessage(e.target.value)}
                 placeholder="Type your message here..."
-                rows={3}
               />
             </Form.Group>
-            <div className="d-grid">
-              <Button variant="primary" type="submit">Send</Button>
-            </div>
+            <div className="d-flex justify-content-center">
+    <div className="flex-grow-1" style={{ marginRight: '10px', maxWidth: '80%' }}>
+        <Button variant="primary" disabled={loading} type="submit" className="w-100">Send</Button>
+    </div>
+    <div className="flex-grow-0" style={{ maxWidth: '20%' }}>
+        <Button variant="danger" disabled={loading} className="w-100">End Deposition</Button>
+    </div>
+</div>
+
           </Form>
         </Col>
       </Row>

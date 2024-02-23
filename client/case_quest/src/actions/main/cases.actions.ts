@@ -95,7 +95,7 @@ const startDeposition = (subpoenee: object, caseId: string) => {
         if (!token) return reject({success: false, message: 'No Token', AR: true});
         try {
             const res = await axios.post(config.API_BASE_URL + '/main/cases/deposition/startDeposition', {subpoenee, caseId}, {headers: {'x-access-token': token}});
-            return resolve({success: true, depositionId: res.data.depositionId});
+            return resolve({success: true, depositionId: res.data.depositionId, messages: res.data.messages});
         } catch (err: any) {
             const {stc} = err
             return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
