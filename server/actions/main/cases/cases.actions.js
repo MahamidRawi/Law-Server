@@ -9,7 +9,7 @@ const users = mongoose.model('userModel');
 const { addAdminFee, compareBalanceToRequiredAmount } = require('../wallet.actions');
 const { OpenAI } = require('openai');
 const { config } = require('../../../config');
-const randomPosition = require('../../../helper/obj.helper');
+const ObjHelper = require('../../../helper/obj.helper');
 const openai = new OpenAI({apiKey: config.APIPASS});
 
 const addCaseToUser = async (tId, caseId) => {
@@ -29,7 +29,7 @@ const addCaseToUser = async (tId, caseId) => {
 const createCase = async (uid, caseInfo) => {
     return new Promise(async (resolve, reject) => {
         const {lawSystem, difficulty, fieldOfLaw, position} = caseInfo;
-        chosenPosition = position == 'random' ? randomPosition() : position;
+        chosenPosition = position == 'random' ? ObjHelper.randomPosition() : position;
         caseSchema.validateAsync({lawSystem, difficulty, position, fieldOfLaw}).catch(err => reject({success: false, message: err.message, stc: 400}))
         const userFound = await users.findOne({_id: uid}).catch(err => reject({stc: 500, message: 'An Error has Occured'}));
         const sufficientBalance = compareBalanceToRequiredAmount(uid, 250);
@@ -51,8 +51,13 @@ if (chosenPosition === 'prosecution') {
   newCase.prosecution = newRes.oppositionName;
   newCase.defense = uid;
 }
+
+        const oplawyer = ObjHelper.generateLawyer(newRes.oppositionName, chosenPosition == 'defense' ? 'Prosecution' : 'Defense');
+        newCase.participants.push(oplawyer);
         const newdate = Date.now();
+        const courtdate = newdate + 172800000;
         newCase.date = newdate
+        newCase.courtDate = courtdate
         newCase.save().then(async suc => {
         await addAdminFee(250, 'Case Generation Fee', uid, newdate);
         await addCaseToUser(uid, suc._id);

@@ -1,10 +1,10 @@
 import React, {FormEvent, useState, useEffect, useContext, useRef} from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Form, Button, ListGroup, Card } from 'react-bootstrap';
 import '../wallet/wallet.css';
 import { userValidate } from '../../actions/auth.actions';
 import { AuthContext } from '../../Providers/auth.provider';
-import { sendMessage as sMessage, startDeposition } from '../../actions/main/cases.actions';
+import { endDeposition, sendMessage as sMessage, startDeposition } from '../../actions/main/cases.actions';
 
 interface LocationState {
     name: string;
@@ -16,22 +16,33 @@ interface LocationState {
     message: string;
     sender: string;
   }
-  
-const DepositionScreen: React.FC = () => {
+
+interface DepositionScreenProps {
+  settlement?: boolean
+  oplawyer?: {
+    name: string,
+    role: string,
+    shortDescription: string
+  }
+}
+
+const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false }) => {
     const location = useLocation();
-    const { name, shortDescription, role } = location.state.uinf || { name: 'Unknown', description: '', role: 'guest' };
-    const caseId = location.state.caseId;
+    const navigate = useNavigate();
+    const {caseId, pm} = location.state;
+    const { name, shortDescription, role } = location.state.uinf || { name: 'Unknown', description: '', role: 'guest' } || pm;
     const {logout} = useContext(AuthContext);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [currentMessage, setCurrentMessage] = useState<string>('');
     const [myInfo, setMyInfo] = useState<any>();
+    const [ended, setEnded] = useState<boolean>(false);
     const [depositionStarted, setDepositionStarted] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [depositionId, setDepositionId] = useState<string>('');
     const subpoenee = {name, role, shortDescription};
     useEffect(() => {
-      if (!depositionStarted) {
+      if (!depositionStarted || pm) {
         console.log('Starting deposition');
         userValidate(localStorage.getItem('user_token'))
           .then(res => {
@@ -67,25 +78,40 @@ const DepositionScreen: React.FC = () => {
       try {
         const sentMessage:any = await sMessage(newMessage, depositionId);   
         setMessages(prevMessages => [...prevMessages, sentMessage.message]);
-        return setLoading(false)
+        return setLoading(false);
       } catch (err: any) {
         if (err.AR) return logout();
         return alert(JSON.stringify(err) || 'An Error has Occured');
       }
     };
+
+    const endDepo = async () => {
+      setLoading(true);
+      try {
+        await endDeposition(depositionId);
+        setMessages([]);
+        setDepositionStarted(false);
+        setEnded(true);
+        localStorage.setItem('LCC', 'Discoveries');
+        return navigate(-2);
+      } catch (err:any) {
+        if (err.AR) logout();
+        else alert(JSON.stringify(err) || 'An Error has Occurred');
+      }
+    }
   
     return (
         <Container fluid className="py-4 c-room">
       <Row className="mb-4 justify-content-center">
         <Col xs={12} md={10} lg={8}>
             <center>
-            <h2>Deposition Room</h2>
+            <h2>{settlement ? 'Settlement Room' : 'Deposition Room'} ({ended ? 'Ended' : 'Ongoing'})</h2>
           <Card className="mb-4">
             <Card.Body>
               <Card.Title>{name || 'Guest'} ({role})</Card.Title>
               <Card.Text>{shortDescription || 'No Description'}</Card.Text>
               <Form.Text className="text-muted">
-                * Please ensure the deposition is formally concluded upon completion. Even if not concluded, the content will be disclosed to the opposing party.
+                * Please ensure the chat is formally concluded upon completion. Even if not concluded, the content will be disclosed to the opposing party.
               </Form.Text>
             </Card.Body>
           </Card>
@@ -113,7 +139,7 @@ const DepositionScreen: React.FC = () => {
         <Button variant="primary" disabled={loading} type="submit" className="w-100">Send</Button>
     </div>
     <div className="flex-grow-0" style={{ maxWidth: '20%' }}>
-        <Button variant="danger" disabled={loading} className="w-100">End Deposition</Button>
+        <Button variant="danger" disabled={loading} onClick={() => endDepo()} className="w-100">End {settlement ? 'Settlement' : 'Deposition'}</Button>
     </div>
 </div>
 

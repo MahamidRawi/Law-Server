@@ -69,7 +69,7 @@ const MainRoutes: React.FC = () => {
                 </Container>
             </Navbar>
             <Routes>
-                <Route index path='/' element={<Logo />}/>
+                <Route index path='/' element={<Logo name={`${userInfo?.firstName} ${userInfo?.lastName}`} />}/>
                 <Route path='/Cases' element={<Home />}/>
                 <Route path='/ViewCase' element={<ViewCase />}/>
                 <Route path='/Lawyers' element={<Lawyers />}/>
@@ -84,6 +84,7 @@ const MainRoutes: React.FC = () => {
                 <Route path='/FileMotion' element={<SubpoenaScreen formtype='File Motion' />}/>
                 <Route path='/Subpoena' element={<SubpoenaScreen formtype='Subpoena' />}/>
                 <Route path='/Deposition' element={<DepositionScreen />}/>
+                <Route path='/Settle' element={<DepositionScreen settlement />}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen />}/> : null}
             </Routes>
         </div>

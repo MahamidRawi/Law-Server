@@ -20,6 +20,12 @@
     width: 100%;
 }
 
+.greeting {
+    position: absolute;
+    left: 3%;
+    bottom: 2%;
+}
+
 .fc h1 {
     color: white;
     letter-spacing: -40px;

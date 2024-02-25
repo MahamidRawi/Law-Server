@@ -5,7 +5,7 @@ const { createCase } = require('../../actions/main/cases/cases.actions');
 const { getCase } = require('../../actions/main/fetch.actions');
 const { calculatedPrices, lMPrices } = require('../../vars/vars');
 const { caseExists } = require('../../middleware/cases/cases.middleware');
-const { issueSubpoena, fileMotion, sendMessage, startDeposition } = require('../../actions/main/cases/subpoena.actions');
+const { issueSubpoena, fileMotion, sendMessage, startDeposition, endDeposition } = require('../../actions/main/cases/subpoena.actions');
 
 router.post('/createCase', validate, (req, res) => createCase(req.userId, req.body.caseInfo).then(resp => res.json(resp)).catch(err => res.status(err.stc).json(err)));
 
@@ -31,7 +31,7 @@ router.post('/fileMotion', validate, caseExists, async (req, res) => {
     }
 });
 
-router.post('/deposition/startDeposition', async (req, res) => {
+router.post('/deposition/startDeposition', validate, async (req, res) => {
     const {caseId, subpoenee} = req.body;
     try {
         const resp = await startDeposition(caseId, subpoenee);
@@ -41,10 +41,20 @@ router.post('/deposition/startDeposition', async (req, res) => {
     }
 });
 
-router.post('/deposition/sendMessage', validate, async (req, res) => {
-    const {depositionId, message} = req.body;
+router.post('/deposition/endDeposition', validate, async (req, res) => {
+    const {depositionId} = req.body;
     try {
-        const resp = await sendMessage(message, depositionId);
+        const resp = await endDeposition(depositionId);
+        return res.status(resp.stc || 200).json(resp);
+    } catch (err) {
+        return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});
+    }
+});
+
+router.post('/deposition/sendMessage', validate, async (req, res) => {
+    const {depositionId, message, messageHistory} = req.body;
+    try {
+        const resp = await sendMessage(message, depositionId, messageHistory);
         return res.status(resp.stc).json(resp);
     } catch (err) {
         return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});

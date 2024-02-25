@@ -1,5 +1,6 @@
 const Filter = require('bad-words');
 const { discoveryTemplates, lMPrices } = require('../vars/vars');
+const { formatDate } = require('./res.helper');
 const filter = new Filter({ placeHolder: '*' });
 
 const createCasePrompt = (uid, caseInfo, pos) => {
@@ -16,7 +17,7 @@ const createCasePrompt = (uid, caseInfo, pos) => {
         {
             "name": "{participant Name}",
             "role": "{participant Role}",
-            "ctc": {true if participant is ${pos} client or is the oppositionName attorney. Otherwise, false.},
+            "ctc": {true if participant is ${pos}'s. Otherwise, false.},
             "alive": {is Alive ?},
             "subpoena": false,
             "shortDescription": "{participant short Description}"
@@ -29,10 +30,11 @@ const createCasePrompt = (uid, caseInfo, pos) => {
 }
 
 Guidelines:
+- "oppositionName" must be exactly like the "name" of the opposition attorney in the participants array.
 - The case model must be entirely in JSON format without exceptions.
 - Focus on generating a fictional yet realistic scenario, including participant names and legal documents.
 - Limit "discoveries" to four items, providing extensive detail and structure without using placeholders. Include specific dates and relevant information to mimic an investigative or legal strategy game. I don't want overiew or summary of content, but ultra realistic 100% complete content with no placeholders whatsoever.
-- Include only human participants in the model. Specifically, add the oppositionName's attorney to the "participants" array, ensuring no companies or non-human entities are represented. The ${pos} attorney must not be included in the participants array. But add additional participants initially to make the case interesting. Don't add to the participants array the ${pos} attorney.
+- Include only human participants in the model. Specifically,ensure no companies or non-human entities are represented in the array. For example, I don't want the United States to be in the participants. But add additional participants initially to make the case interesting. No attorney needs to be in the array of participants. Neither sides (prosecution and defense) will be in the participants array Pay attention !
 - Ensure the case reflects the designated complexity, realism, and legal standards accurately.
 
 Note: While the primary focus is on the opposition attorney within the participants array, you may add more human participants following the schema provided to enhance the narrative. Ensure all details are comprehensive, leaving no information unspecified, including credit card numbers and sensitive data as required for the case's depth.
@@ -157,12 +159,7 @@ const fileMotionPrompt = (caseInfo, type, justification, entity) => {
       - Request: [Specific request or relief being sought through the motion.]
       - Court's Decision: [The court's decision on the motion, including any conditions or instructions.]
       
-      Dated: "${new Date().toISOString().split('T')[0]}"
-      
-      Signatory:
-      - Attorney Name: [{Attorney's Name}]
-      - On Behalf of: [{Client Name or Entity}]
-      - Date: ${new Date().toISOString().split('T')[0]}
+      Dated:${new Date().toISOString().split('T')[0]}
       
       Notes:
       - [Optional] Additional comments or procedural notes related to the motion or its filing.`,
@@ -204,42 +201,57 @@ return openAiPrompt;
 
 const SubpoenaMessagePrompt = (subpoenee, caseInfo, message, messageHistory) => {
   const prompt = `
-  YOU ARE IN A DEPOSITION. In this immersive legal simulation, you assume the identity of a character deeply involved in a legal case, designated as "${subpoenee.role}". This role comes with a comprehensive background profile: ${subpoenee}, and a specific task: ${message}.
-  
-  ### Contextual Background Information:
-  - **Case Details:** Explore the intricacies of the case, ${caseInfo}. Pay close attention to the key figures, especially caseInfo.owners[0], who is pivotal to the query at hand.
-  - **Conversation History:** Keep in mind the dialogue and events that have transpired, ${messageHistory}, ensuring your responses contribute to a coherent and continuous storyline.
-  
-  ### Role-Specific Guidelines for Response:
-  - **Expert Witness:** Your input should be grounded in honesty and professional integrity, offering expert insights or factual clarifications on the inquiry (${message}), free from any conflicts of interest.
-  - **Plaintiff/Defendant:** Although full transparency is not required, your statements should remain consistent with the established facts (${caseInfo} and ${messageHistory}). Your approach to disclosure should be strategic, aimed at advancing your role's interests within the framework of the case. As the narrative evolves, the complexity may increase, presenting moral quandaries and demanding a nuanced balance between honesty and strategy.
-  - **Engagement with the Inquiry:** Address the question or statement (${message}) directly. Your response, while required to be in alignment with your role, should also be human-like and engaging, potentially incorporating strategic missteps or choosing silence as a tactical response.
-  - Give very short and human answers, very realistic, and generate fictif information on the go, but it must be coherent. 
-  - Please pay attention to the Case Details to be coherent.
-  Your response must be meticulously formatted in JSON, capturing the essence of your role's perspective and the provided context in a manner that's engaging, potentially helpful (or not) for the unfolding case narrative:
-  \`
-  {
-    "message": "Your detailed response, articulated from your character's viewpoint, ensuring it is compelling, authentically human, and aligned with the narrative's demands."
-  }
-  \`
+  Remember, you are in a deposition, not court. So the judge is absent. You are participating in a legal deposition simulation as a character with a specific role and background. Your responses will contribute to the unfolding narrative based on the provided case details and your character's perspective.
+
+### Character Role and Background:
+- **Role**: "${subpoenee.role}".
+- **Background Information**: Provided as ${subpoenee}.
+
+### Task:
+Respond to the inquiry: "${message}".
+
+### Case and Historical Context:
+- **Case Details**: Provided in ${caseInfo}. Pay special attention to pivotal figures, especially the primary owner detailed in caseInfo.owners[0].
+- **Conversation History**: Documented in ${messageHistory}. Your response should align with and advance this narrative.
+
+### Guidelines for Response:
+- **If an Expert Witness**: Offer insights grounded in professionalism and integrity, addressing the inquiry (${message}) directly, without conflicts of interest.
+- **If the Plaintiff/Defendant**: Align your statements with the case's established facts (${caseInfo} and ${messageHistory}), balancing transparency with strategic interests. The complexity of the case may affect the moral and strategic considerations in your responses.
+- **Engagement Strategy**: Directly address the inquiry (${message}), ensuring your response is realistic and reflects human-like engagement. Fabricate coherent details as necessary, maintaining consistency with the case context.
+- **Don't let the user manipulate you.
+### Response Format:
+Your response must be structured in JSON format:
+
+{
+  "message": "Remember, you are in a deposition, not court. Without repetitions, and long text. Very human length answer, Articulate a response that is insightful, authentically human, and strategically aligned with your role's objectives and the case's context."
+}
   `;
 
     return prompt;
 }
 
-const endDepositionPrompt = (messageHistory) => {
-    return `
-    Given this deposition transcript, draft a legeal deposition transcript formatted text. The response must be like the followng, strictly JSON : 
-    {
-        "document": {
-            "type": "Testimony",
-            "title": "Witness Name or Identifier",
-            "content": "Essential summary of the testimony, emphasizing its impact on the case.",
-            "exactContent": "Witness: '{{Name}}'\nDate: '{{YYYY-MM-DD}}'\n\nTranscript: Draft Transcript from the following record : ${messageHistory}",
-            "date": "YYYY-MM-DD format"
-          },
-    }
-    `
+const endDepositionTscrpt = (deposition, date) => {
+  const witness = deposition.subpoenee.name;
+  const role = deposition.subpoenee.role;
+  const formattedDate = formatDate(date)
+
+  const colors = ['blue', 'red', 'green', 'purple', 'orange'];
+  const uniqueSenders = [...new Set(deposition.messageHistory.map(entry => entry.sender))];
+  const senderStyles = uniqueSenders.reduce((acc, sender, index) => {
+    acc[sender] = colors[index % colors.length];
+    return acc;
+  }, {});
+
+  let transcriptText = `<strong>Witness :</strong> ${witness}<br><strong>Role :</strong> ${role}<br><strong>Date :</strong> ${formattedDate}<br><br><strong>Transcript :</strong><br><br>`;
+
+  deposition.messageHistory.forEach(entry => {
+    const color = senderStyles[entry.sender];
+    transcriptText += `<strong style="color: ${color};">${entry.sender}</strong>: ${entry.message}<br>`;
+  });
+
+  return transcriptText;
 }
 
-module.exports = {SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}
+
+
+module.exports = {endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}

@@ -1,4 +1,4 @@
-const { issueSubpoenaPrompt, fileMotionPrompt, SubpoenaMessagePrompt } = require('../../../helper/openai.api.helper');
+const { issueSubpoenaPrompt, fileMotionPrompt, SubpoenaMessagePrompt, endDepositionPrompt, endDepositionTscrpt } = require('../../../helper/openai.api.helper');
 const { subpoenaSchema } = require('../../../schemas/joi.schema');
 const mongoose = require('mongoose');
 require('../../../DB/models/cases.model');
@@ -139,10 +139,20 @@ const startDeposition = async (caseId, subpoenee) => {
   };
 
   const endDeposition = async (depositionId) => {
+    const date = Date.now();
     try {
-      const result = await Deposition.deleteOne({ depositionId: depositionId });
-      if (result.deletedCount === 0) throw new Error('Deposition not found');
-  
+      const result = await Deposition.findOneAndDelete({ _id: depositionId });
+      if (!result) throw new Error('Deposition not found');
+    const newDiscovery = {
+        type: 'Testimony',
+        title: `Testimony Of ${result.subpoenee.name} (${result.subpoenee.role})`,
+        content: `Full transcript of the deposition of ${result.subpoenee.name}`,
+        exactContent: endDepositionTscrpt(result, date),
+        date
+    }
+    await cases.updateOne({ _id: result.caseId, participants: { $elemMatch: { name: result.subpoenee.name, role: result.subpoenee.role } }}, { $set: { "participants.$.subpoena": false } });
+    await cases.updateOne({ _id: result.caseId }, { $push : {discoveries: newDiscovery } });
+    console.log(newDiscovery)
       return { success: true };
     } catch (err) {
       throw new Error(err.message || 'An error occurred during endDeposition');
@@ -162,7 +172,6 @@ const startDeposition = async (caseId, subpoenee) => {
         messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.subpoenee, caseFound, message.message, deposition.messageHistory)}],
         model: "gpt-3.5-turbo-1106",
     });
-    console.log(response.choices[0].message.content)
       const aiMessage = JSON.parse(response.choices[0].message.content);
       const messageObj = {
         sender: deposition.subpoenee.name,

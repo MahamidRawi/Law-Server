@@ -103,4 +103,18 @@ const startDeposition = (subpoenee: object, caseId: string) => {
     })
 }
 
-export {startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}
+const endDeposition = (depositionId: string) => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token) return reject({success: false, message: 'No Token', AR: true});
+        try {
+            await axios.post(config.API_BASE_URL + '/main/cases/deposition/endDeposition', {depositionId}, {headers: {'x-access-token': token}});
+            return resolve({ success: true });
+        } catch (err: any) {
+            const {stc} = err
+            return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
+        }
+    })
+}
+
+export {endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}

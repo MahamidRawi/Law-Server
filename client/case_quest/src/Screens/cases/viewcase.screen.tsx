@@ -23,11 +23,11 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
     const lastLocation = localStorage.getItem('LCC')
     const [activeContent, setActiveContent] = useState(lastLocation || 'Overview');
     const [caseInfo, setCaseInfo] = useState<any>();
-    const caseId = location.state.data.caseId
+    const caseId = location.state.data.caseId;
 
     const caseContent: ContentMap = {
         Overview: <CaseOverView caseId={caseId} caseInfo={caseInfo} />,
-        Actions: <ActionScreen caseId={caseId} />,
+        Actions: <ActionScreen opname={loading ? '' : caseInfo.participants.find((part:any) => part.name == caseInfo.oppositionName)} caseId={caseId} />,
         Discoveries: <DiscoveryScreen data={caseInfo} />,
         Participants: <Participants caseId={caseId} data={caseInfo} />,
         Court: <Participants caseId={caseId}/>,
@@ -41,16 +41,21 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
         }
         console.log('Here');
         getCase(caseId).then(res => {
-            console.log('reached here too')
-            setCaseInfo(res.case)
+            setCaseInfo(res.case);
+            console.log('reached here toos');
+    console.log(caseInfo);
+
+    // console.log(caseInfo.participants)
             return setLoading(false);
         }).catch(err => {
+            // console.error(caseInfo.oppositionName);
             setLoading(false);
             err.AR ? logout() : alert('An Error Has Occured');
         });
     }, [caseId, activeContent]);
 
     const handleButtonClick = (content: string) => {
+        console.log(caseInfo.participants.filter((part:any) => console.log(part.name)))
         localStorage.setItem('LCC', content);
         return setActiveContent(content);
     };
@@ -58,6 +63,7 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
     if (loading) return <ActivityIncicator fullScreen />
 
         return (
+            loading ? <ActivityIncicator fullScreen /> : (
     <div className="p-p-c">
                 <div className="wallet-container">
                     <div className="balance-display">
@@ -81,6 +87,7 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
                 </div>
             </div>
             )
+        )
 }
 
 export default ViewCase

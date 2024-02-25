@@ -13,18 +13,15 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Safely accessing state properties using optional chaining
     const uid = location.state?.uId;
     const caseId = location.state?.caseId;
     const participant = location.state?.data;
 
-    // Using optional chaining to prevent runtime errors if participant is undefined
     const subpoenaAvailability = participant?.subpoena || participant?.ctc;
 
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Added check for uid to prevent running the effect unnecessarily
         if (!participant && uid) {
             getLawyerInformation(uid)
                 .then(res => {
@@ -36,10 +33,10 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                     logout();
                 });
         } else {
-            setUserInformation(participant); // Assuming you want to set participant as information if it exists
+            setUserInformation(participant); 
             setLoading(false);
         }
-    }, [participant, uid, logout]); // Ensure logout is a stable function or omitted if causing unnecessary re-renders
+    }, [participant, uid, logout]); 
 
     if (loading || !information) {
         return <ActivityIncicator fullScreen />;
@@ -63,7 +60,7 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                                     ) : (
                                         <>
                                             <p className='mt-1'>{participant.name}</p>
-                                            <button disabled={!subpoenaAvailability} className="btn btn-primary mt-1" onClick={() => navigate('/Deposition', { state: { caseId, uinf: participant } })}>Deposit</button>
+                                            <button disabled={!subpoenaAvailability} className="btn btn-primary mt-1" onClick={() => navigate('/Deposition', { state: { caseId, uinf: participant,ctc: participant.ctc } })}>{participant.ctc ? 'Contact' : 'Begin Deposition'}</button>
                                         </>
                                     )}
                                     <div className="info-scroll-container"></div>
