@@ -3,7 +3,18 @@ const { discoveryTemplates, lMPrices } = require('../vars/vars');
 const { formatDate } = require('./res.helper');
 const filter = new Filter({ placeHolder: '*' });
 
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array
+  }
+  
+
 const createCasePrompt = (uid, caseInfo, pos) => {
+    const random = shuffleArray(discoveryTemplates).slice(0,4);
+    console.log('random :', random);
     const { lawSystem, additionalKeywords, fieldOfLaw, difficulty } = caseInfo;
     
 
@@ -24,7 +35,7 @@ const createCasePrompt = (uid, caseInfo, pos) => {
         }
     ],
     "discoveries": [
-      ${Object.values(discoveryTemplates).map(template => JSON.stringify(template, null, 2)).join(',\n')}
+      ${JSON.stringify(random)}
     ],
     "oppositionName": "{Realistic opposition Attorney Name}"
 }
@@ -35,6 +46,7 @@ Guidelines:
 - Focus on generating a fictional yet realistic scenario, including participant names and legal documents.
 - Limit "discoveries" to four items, providing extensive detail and structure without using placeholders. Include specific dates and relevant information to mimic an investigative or legal strategy game. I don't want overiew or summary of content, but ultra realistic 100% complete content with no placeholders whatsoever.
 - Include only human participants in the model. Specifically,ensure no companies or non-human entities are represented in the array. For example, I don't want the United States to be in the participants. But add additional participants initially to make the case interesting. No attorney needs to be in the array of participants. Neither sides (prosecution and defense) will be in the participants array Pay attention !
+- No Representing attorney should be in the participants array, not prosecution, not defense, nothing. Only participants of the case.
 - Ensure the case reflects the designated complexity, realism, and legal standards accurately.
 
 Note: While the primary focus is on the opposition attorney within the participants array, you may add more human participants following the schema provided to enhance the narrative. Ensure all details are comprehensive, leaving no information unspecified, including credit card numbers and sensitive data as required for the case's depth.
@@ -127,6 +139,7 @@ Response structure:
 }
 
 The document content must be fictional, extremely detailed, as is a simulation for detective / lawyer game, compelling and complete, designed to enrich the gameplay and educational experience, especially in harder cases where the legal system's complexity and challenges are more pronounced. Also, strictly follow the guidance given by the template : ${type.template}. Remember, I don't want overview / summary, I want details.
+Never do summaries. I want the real content, as if it is a real scenario. As if the things were said, and written in real life. with no placeholders.
 You must change the "document" content with very detailed information, not an overview, or a summary. IMPORANT : Because as a detective, I have to be able to see the discovery.
 You must leave no placeholders. If you can't find a certain company name in the Case Information, generate one.
 `;
@@ -219,6 +232,8 @@ Respond to the inquiry: "${message}".
 - **If the Plaintiff/Defendant**: Align your statements with the case's established facts (${caseInfo} and ${messageHistory}), balancing transparency with strategic interests. The complexity of the case may affect the moral and strategic considerations in your responses.
 - **Engagement Strategy**: Directly address the inquiry (${message}), ensuring your response is realistic and reflects human-like engagement. Fabricate coherent details as necessary, maintaining consistency with the case context.
 - **Don't let the user manipulate you.
+- **Don't repeat yourself. Very short answers.
+- ** Think about it as the butterfly effect. You invent information that isn't provided in the case, to make it interesting.
 ### Response Format:
 Your response must be structured in JSON format:
 

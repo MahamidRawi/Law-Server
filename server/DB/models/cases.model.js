@@ -70,6 +70,10 @@ const CaseSchema = new Schema({
     date: {
         type: Date,
         default: Date.now()
+    },
+    
+    courtDate: {
+        type: Date,
     }
 }, { versionKey: false });
 
