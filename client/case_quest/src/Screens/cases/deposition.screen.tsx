@@ -19,18 +19,13 @@ interface LocationState {
 
 interface DepositionScreenProps {
   settlement?: boolean
-  oplawyer?: {
-    name: string,
-    role: string,
-    shortDescription: string
-  }
 }
 
 const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const {caseId, pm} = location.state;
-    const { name, shortDescription, role } = location.state.uinf || { name: 'Unknown', description: '', role: 'guest' } || pm;
+    const {name, shortDescription, role} = location.state.pm || {name: 'Unknown', role: 'Guest', shortDescription: 'No Description'}
     const {logout} = useContext(AuthContext);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -43,7 +38,6 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false 
     const subpoenee = {name, role, shortDescription};
     useEffect(() => {
       if (!depositionStarted || pm) {
-        console.log('Starting deposition');
         userValidate(localStorage.getItem('user_token'))
           .then(res => {
             setMyInfo(res.info);

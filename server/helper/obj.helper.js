@@ -10,7 +10,7 @@ const generateLawyer = (name, pos) => {
   return {
     name,
     role: `${pos}'s Attorney`,
-    ctc: true,
+    atr: true,
     alive: true,
     subpoena: false,
     shortDescription: `The Representing Attorney of the ${pos}`
@@ -18,4 +18,3 @@ const generateLawyer = (name, pos) => {
 }
 
 module.exports = {randomPosition, generateLawyer};
-// module.exports = updateArray
