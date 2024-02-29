@@ -31,6 +31,15 @@ router.post('/fileMotion', validate, caseExists, async (req, res) => {
     }
 });
 
+router.post('/getRepresentativeLawyer', validate, async (req, res) => {
+    try {
+        const resp = await fileMotion(req.userId, req.caseInfo, req.body.subpoenaInfo);
+        return res.status(resp.stc).json(resp);
+    } catch (err) {
+        return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});
+    }
+});
+
 router.post('/deposition/startDeposition', validate, async (req, res) => {
     const {caseId, subpoenee} = req.body;
     try {
@@ -40,6 +49,7 @@ router.post('/deposition/startDeposition', validate, async (req, res) => {
         return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});
     }
 });
+
 
 router.post('/deposition/endDeposition', validate, async (req, res) => {
     const {depositionId} = req.body;

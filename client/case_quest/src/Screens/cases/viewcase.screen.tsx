@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useLocation } from "react-router-dom";
-import MenuScreen from "../../RC/menu.screens";
 import { ActivityIncicator } from "../../RC/acitivity.incdicator";
-import { title } from "process";
 import '../../wallet.css';
 import { ContentMap } from "../../data/data";
 import ActionScreen from "./caseActions/actions.screen";
@@ -12,9 +10,7 @@ import DiscoveryScreen from "./caseActions/discoveries.screen";
 import { getCase } from "../../actions/main/cases.actions";
 import { AuthContext } from "../../Providers/auth.provider";
 
-interface ViewCaseProps {
-
-}
+interface ViewCaseProps {}
 
 const ViewCase: React.FC<ViewCaseProps> = () => {
     const [loading, setLoading] = useState(true);
@@ -40,16 +36,10 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
             setLoading(false);
             return;
         }
-        console.log('Here');
         getCase(caseId).then(res => {
             setCaseInfo(res.case);
-            console.log('reached here toos');
-    console.log(caseInfo);
-
-    // console.log(caseInfo.participants)
             return setLoading(false);
         }).catch(err => {
-            // console.error(caseInfo.oppositionName);
             setLoading(false);
             err.AR ? logout() : alert('An Error Has Occured');
         });
@@ -64,7 +54,6 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
     if (loading) return <ActivityIncicator fullScreen />
 
         return (
-            loading ? <ActivityIncicator fullScreen /> : (
     <div className="p-p-c">
                 <div className="wallet-container">
                     <div className="balance-display">
@@ -88,7 +77,6 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
                 </div>
             </div>
             )
-        )
 }
 
 export default ViewCase

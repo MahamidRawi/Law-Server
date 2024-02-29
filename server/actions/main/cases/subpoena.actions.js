@@ -8,7 +8,7 @@ const { OpenAI } = require('openai');
 const { config } = require('../../../config');
 const { calculatedPrices, lMPrices } = require('../../../vars/vars');
 require('../../../DB/models/depositions.model');
-const Deposition = mongoose.model('Deposition');
+const Deposition = mongoose.model('Chat');
 
 const openai = new OpenAI({ apiKey: config.APIPASS });
 
@@ -72,6 +72,18 @@ const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
     }
 };
 
+const getRepresentativeLawyer = async (caseId, uid) => {
+  if (!caseId) throw new Error('No Case ID Provided');
+  try {
+    const caseFound = await cases.find({_id: caseId});
+    if (!caseFound || !caseFound.participants.includes(uid)) throw new Error('Case Not Found Or Doesn\'t Belong to You');
+    const representativeLawyer = caseFound.participants.find(user => user.atr == true);
+    return {representativeLawyer, stc: true}
+  } catch (err) {
+
+  }
+}
+
 const fileMotion = async (uid, caseInfo, motionInfo) => {
     try {
         await subpoenaSchema.validateAsync(motionInfo);
@@ -116,15 +128,18 @@ const startDeposition = async (caseId, subpoenee) => {
     try {
       const caseFound = await cases.findOne({ _id: caseId });
       if (!caseFound) throw new Error('Case Not Found');
-    
+      const subpoeneeFound = caseFound.participants.find(part => part.name == subpoenee.name && part.role == subpoenee.role);
+      if (!subpoeneeFound) throw new Error('Participant Not Found');
+      console.log(subpoeneeFound);
+
       let deposition = await Deposition.findOneAndUpdate(
         {
           caseId: caseId,
           'subpoenee.name': subpoenee.name,
-          'subpoenee.role': subpoenee.role
+          'subpoenee.role': subpoenee.role,
         },
         {
-          $setOnInsert: { messageHistory: [] }
+          $setOnInsert: { messageHistory: [], attourney: subpoeneeFound?.atr }
         },
         {
           new: true,

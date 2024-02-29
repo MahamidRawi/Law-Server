@@ -10,6 +10,10 @@ const DepositionSchema = new mongoose.Schema({
     name: String,
     role: String
   },
+  attourney: {
+    type: Boolean,
+    default: false
+  },
   messageHistory: [
     {
       sender: String,
@@ -19,4 +23,4 @@ const DepositionSchema = new mongoose.Schema({
 
 });
 
-mongoose.model('Deposition', DepositionSchema);
+mongoose.model('Chat', DepositionSchema);

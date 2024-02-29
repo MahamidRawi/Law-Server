@@ -8,7 +8,7 @@ import { endDeposition, sendMessage as sMessage, startDeposition } from '../../a
 
 interface LocationState {
     name: string;
-    description: string;
+    shortDescription: string;
     role: string;
   }
   
@@ -18,14 +18,15 @@ interface LocationState {
   }
 
 interface DepositionScreenProps {
-  settlement?: boolean
+  settlement?: boolean;
+  lawyer?: any;
 }
 
-const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false }) => {
+const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false, lawyer }) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const {caseId, pm} = location.state;
-    const {name, shortDescription, role} = location.state.pm || {name: 'Unknown', role: 'Guest', shortDescription: 'No Description'}
+    const {caseId, uinf} = location.state;
+    const {name, shortDescription, role}: LocationState = uinf || {name: 'Unknown', role: 'Guest', shortDescription: 'No Description'} 
     const {logout} = useContext(AuthContext);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -37,7 +38,7 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false 
     const [depositionId, setDepositionId] = useState<string>('');
     const subpoenee = {name, role, shortDescription};
     useEffect(() => {
-      if (!depositionStarted || pm) {
+      if (!depositionStarted || uinf) {
         userValidate(localStorage.getItem('user_token'))
           .then(res => {
             setMyInfo(res.info);
@@ -52,6 +53,8 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false 
             });
           })
           .catch(err => logout());
+      } else {
+        
       }
     }, [depositionStarted, caseId]);
     

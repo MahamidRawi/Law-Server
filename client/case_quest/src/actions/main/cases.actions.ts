@@ -114,7 +114,22 @@ const endDeposition = (depositionId: string) => {
             const {stc} = err
             return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
         }
-    })
+    });
 }
 
-export {endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}
+const getRepresentativeLawyer = async (caseId: string) => {
+    try {
+        const token = localStorage.getItem('user_token');
+        if (!token) throw new Error('No Token');
+        const response = await axios.get(config.API_BASE_URL + '/main/cases/deposition/getRepresentativeLawyer', {headers: {
+            'caseId': caseId,
+            'x-access-token': token
+        }});
+        const {lawyerInfo} = response.data;
+        return {lawyerInfo}
+    } catch (err: any) {
+        const {stc} = err
+        return stc != 200 ? {success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false} : {success: true, message : err.response?.data.message};
+    }
+}
+export {getRepresentativeLawyer, endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}
