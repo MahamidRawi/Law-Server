@@ -69,7 +69,8 @@ const fileMotion = (caseId: string, subpoenaInfo: any): Promise<{message?: strin
             const res = await axios.post(config.API_BASE_URL + '/main/cases/fileMotion', {subpoenaInfo, caseId}, {headers: {'x-access-token': token}});
             return resolve({success: true, message: res.data.message, granted: res.data.granted});
         } catch (err: any) {
-            const {stc} = err
+            const axiosErr = err as AxiosError<{message: string}>;
+            const stc = axiosErr.status;
             return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
         }
     })
@@ -83,7 +84,8 @@ const sendMessage = (message: object, depositionId: string): Promise<{message?: 
             const res = await axios.post(config.API_BASE_URL + '/main/cases/deposition/sendMessage', {depositionId, message}, {headers: {'x-access-token': token}});
             return resolve({success: true, message: res.data.message});
         } catch (err: any) {
-            const {stc} = err
+            const axiosErr = err as AxiosError<{message: string}>;
+            const stc = axiosErr.status;
             return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
         }
     })
@@ -97,7 +99,8 @@ const startDeposition = (subpoenee: object, caseId: string) => {
             const res = await axios.post(config.API_BASE_URL + '/main/cases/deposition/startDeposition', {subpoenee, caseId}, {headers: {'x-access-token': token}});
             return resolve({success: true, depositionId: res.data.depositionId, messages: res.data.messages});
         } catch (err: any) {
-            const {stc} = err
+            const axiosErr = err as AxiosError<{message: string}>;
+            const stc = axiosErr.status;
             return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
         }
     })
@@ -111,7 +114,8 @@ const endDeposition = (depositionId: string) => {
             await axios.post(config.API_BASE_URL + '/main/cases/deposition/endDeposition', {depositionId}, {headers: {'x-access-token': token}});
             return resolve({ success: true });
         } catch (err: any) {
-            const {stc} = err
+            const axiosErr = err as AxiosError<{message: string}>;
+            const stc = axiosErr.status;
             return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
         }
     });
@@ -121,14 +125,16 @@ const getRepresentativeLawyer = async (caseId: string) => {
     try {
         const token = localStorage.getItem('user_token');
         if (!token) throw new Error('No Token');
-        const response = await axios.get(config.API_BASE_URL + '/main/cases/deposition/getRepresentativeLawyer', {headers: {
+        const response = await axios.get(config.API_BASE_URL + '/main/cases/getRepresentativeLawyer', {headers: {
             'caseId': caseId,
             'x-access-token': token
         }});
-        const {lawyerInfo} = response.data;
-        return {lawyerInfo}
+        console.log(response.data)
+        const {representativeLawyer} = response.data;
+        return {lawyerInfo: representativeLawyer}
     } catch (err: any) {
-        const {stc} = err
+        const axiosErr = err as AxiosError<{message: string}>;
+        const stc = axiosErr.status;
         return stc != 200 ? {success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false} : {success: true, message : err.response?.data.message};
     }
 }

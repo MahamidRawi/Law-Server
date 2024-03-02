@@ -4,7 +4,7 @@ import { Container, Row, Col, Form, Button, ListGroup, Card } from 'react-bootst
 import '../wallet/wallet.css';
 import { userValidate } from '../../actions/auth.actions';
 import { AuthContext } from '../../Providers/auth.provider';
-import { endDeposition, sendMessage as sMessage, startDeposition } from '../../actions/main/cases.actions';
+import { endDeposition, getRepresentativeLawyer, sendMessage as sMessage, startDeposition } from '../../actions/main/cases.actions';
 
 interface LocationState {
     name: string;
@@ -26,7 +26,8 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false,
     const location = useLocation();
     const navigate = useNavigate();
     const {caseId, uinf} = location.state;
-    const {name, shortDescription, role}: LocationState = uinf || {name: 'Unknown', role: 'Guest', shortDescription: 'No Description'} 
+    const [userInfo, setUserInfo] = useState<any>(uinf || {name: 'Unknown', role: 'Guest', shortDescription: 'No Description'});
+    let {name, shortDescription, role} = userInfo
     const {logout} = useContext(AuthContext);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -38,23 +39,24 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false,
     const [depositionId, setDepositionId] = useState<string>('');
     const subpoenee = {name, role, shortDescription};
     useEffect(() => {
-      if (!depositionStarted || uinf) {
+      getRepresentativeLawyer(caseId).then(res => setUserInfo(res.lawyerInfo)).catch(err => err.AR ? logout() : alert(err.message));
+
+      if (!depositionStarted || userInfo.name == 'Unknown') {
+        console.log(userInfo, caseId)
         userValidate(localStorage.getItem('user_token'))
           .then(res => {
             setMyInfo(res.info);
-            return startDeposition(subpoenee, caseId).then((res: any) => {
+            return startDeposition(userInfo, caseId).then((res: any) => {
               setDepositionId(res.depositionId);
               setMessages(res.messages);
               setDepositionStarted(true);
               return setLoading(false);
             }).catch(err => {
               if (err.AR) logout();
-              else alert(JSON.stringify(err) || 'An Error has Occurred');
+              else !userInfo && alert(JSON.stringify(err) || 'An Error has Occurred');
             });
           })
           .catch(err => logout());
-      } else {
-        
       }
     }, [depositionStarted, caseId]);
     

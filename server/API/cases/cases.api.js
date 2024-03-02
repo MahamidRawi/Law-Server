@@ -5,7 +5,7 @@ const { createCase } = require('../../actions/main/cases/cases.actions');
 const { getCase } = require('../../actions/main/fetch.actions');
 const { calculatedPrices, lMPrices } = require('../../vars/vars');
 const { caseExists } = require('../../middleware/cases/cases.middleware');
-const { issueSubpoena, fileMotion, sendMessage, startDeposition, endDeposition } = require('../../actions/main/cases/subpoena.actions');
+const { issueSubpoena, fileMotion, sendMessage, startDeposition, endDeposition, getRepresentativeLawyer } = require('../../actions/main/cases/subpoena.actions');
 
 router.post('/createCase', validate, (req, res) => createCase(req.userId, req.body.caseInfo).then(resp => res.json(resp)).catch(err => res.status(err.stc).json(err)));
 
@@ -31,9 +31,11 @@ router.post('/fileMotion', validate, caseExists, async (req, res) => {
     }
 });
 
-router.post('/getRepresentativeLawyer', validate, async (req, res) => {
+router.get('/getRepresentativeLawyer', validate, async (req, res) => {
+    const caseId = req.headers['caseid'];
+    console.log(caseId);
     try {
-        const resp = await fileMotion(req.userId, req.caseInfo, req.body.subpoenaInfo);
+        const resp = await getRepresentativeLawyer(caseId, req.userId);
         return res.status(resp.stc).json(resp);
     } catch (err) {
         return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});
@@ -42,6 +44,7 @@ router.post('/getRepresentativeLawyer', validate, async (req, res) => {
 
 router.post('/deposition/startDeposition', validate, async (req, res) => {
     const {caseId, subpoenee} = req.body;
+    console.log(subpoenee)
     try {
         const resp = await startDeposition(caseId, subpoenee);
         return res.status(resp.stc || 200).json(resp);

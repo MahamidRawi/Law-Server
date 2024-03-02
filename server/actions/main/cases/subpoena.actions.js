@@ -72,15 +72,23 @@ const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
     }
 };
 
-const getRepresentativeLawyer = async (caseId, uid) => {
-  if (!caseId) throw new Error('No Case ID Provided');
-  try {
-    const caseFound = await cases.find({_id: caseId});
-    if (!caseFound || !caseFound.participants.includes(uid)) throw new Error('Case Not Found Or Doesn\'t Belong to You');
-    const representativeLawyer = caseFound.participants.find(user => user.atr == true);
-    return {representativeLawyer, stc: true}
-  } catch (err) {
+const newErr = (message, stc) => {
+    const error = new Error(message);
+    error.stc = stc
+    return error
+}
 
+const getRepresentativeLawyer = async (caseId, uid) => {
+  if (!caseId) throw newErr('No Case ID Provided', 404); 
+  try {
+    const caseFound = await cases.findOne({_id: caseId});
+    console.log(caseFound)
+    if (!caseFound || !caseFound.owners.includes(uid)) throw newErr('Case Not Found Or Doesn\'t Belong to You', 404);
+        
+    const representativeLawyer = caseFound.participants.find(user => user.atr == true);
+    return {representativeLawyer, stc: 200}
+  } catch (err) {
+        return {message: err.message, stc: err.stc}
   }
 }
 
@@ -216,4 +224,4 @@ const startDeposition = async (caseId, subpoenee) => {
   module.exports = sendMessage;
 
 
-module.exports = { endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena };
+module.exports = { getRepresentativeLawyer, endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena };

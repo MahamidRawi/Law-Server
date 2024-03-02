@@ -1,11 +1,8 @@
 import React, {useState, useEffect, useContext} from 'react';
 import { getLawyers } from '../actions/main/lawyers.actions';
-import { Icon } from '@iconify/react';
-import { User } from '../RC/cards.rc';
 import { UserInfo } from '../data/types';
 import { AuthContext } from '../Providers/auth.provider';
 import ScrollWindow from '../RC/scroll.window';
-import { Button, Form, InputGroup } from 'react-bootstrap';
 
 interface LawyersProps {
 
