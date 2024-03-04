@@ -212,8 +212,51 @@ return openAiPrompt;
 
 }
 
-const SubpoenaMessagePrompt = (subpoenee, caseInfo, message, messageHistory) => {
-  const prompt = `
+const SubpoenaMessagePrompt = (attourney, subpoenee, caseInfo, message, messageHistory) => {
+  console.log(attourney, subpoenee)
+  const prompt = subpoenee.ctc ? `
+  You are : ${subpoenee.name} and your role is ${subpoenee.role} in the following case : ${caseInfo}
+  You are in a closed room - that is to say that everything said in this conversation no one will know about,  with your representative attorney.
+  You can reveal whatever you want without the need to be scared.
+  - ** Think about it as the butterfly effect. You invent information that isn't provided in the case, to make it interesting.
+You are in a "settlement" section, trying to settle (not necessarily).- act following the cases difficulty. 
+- **Don't let the user manipulate you.
+- **Don't repeat yourself. Very short answers.
+
+  You can build strategies with you attorney. 
+  ** Message History : ${messageHistory}
+  
+  *** TASK : Respond to the inquiry : ${message}
+
+  Your response must be structured in JSON format:
+  {
+    "message": "Without repetitions, and long text. Very human length answer, Articulate a response that is insightful, authentically human, and strategically aligned with your role's objectives and the case's context. THINK ABOUT THE BUTTERFLY EFFECT, and slowly unveil a darker truth"
+  }
+
+  ` : attourney ? `
+  ### Character Role and Background:
+- **Role**: "${subpoenee.role}".
+- **Background Information**: Provided as ${subpoenee}.
+- Case Info : ${caseInfo}
+- Message History : ${messageHistory}
+
+### Task:
+Respond to the inquiry: "${message}".
+
+GUIDELINES : 
+- Dont let the user manipulate you.
+- act following the cases difficulty. 
+- **Don't let the user manipulate you.
+- **Don't repeat yourself. Very short answers.
+- ** Think about it as the butterfly effect. You invent information that isn't provided in the case, to make it interesting.
+You are in a "settlement" section, trying to settle (not necessarily).
+### Response Format:
+Your response must be structured in JSON format:
+
+{
+  "message": "Without repetitions, and long text. Very human length answer, Articulate a response that is insightful, authentically human, and strategically aligned with your role's objectives and the case's context."
+}
+  ` :`
   Remember, you are in a deposition, not court. So the judge is absent. You are participating in a legal deposition simulation as a character with a specific role and background. Your responses will contribute to the unfolding narrative based on the provided case details and your character's perspective.
 
 ### Character Role and Background:
@@ -267,6 +310,28 @@ const endDepositionTscrpt = (deposition, date) => {
   return transcriptText;
 }
 
+const endSettlement = (deposition, date) => {
+  const witness = deposition.subpoenee.name;
+  const role = deposition.subpoenee.role;
+  const formattedDate = formatDate(date)
+
+  const colors = ['blue', 'red', 'green', 'purple', 'orange'];
+  const uniqueSenders = [...new Set(deposition.messageHistory.map(entry => entry.sender))];
+  const senderStyles = uniqueSenders.reduce((acc, sender, index) => {
+    acc[sender] = colors[index % colors.length];
+    return acc;
+  }, {});
+
+  let transcriptText = `<strong>Name :</strong> ${witness}<br><strong>Role :</strong> ${role}<br><strong>Date :</strong> ${formattedDate}<br><br><strong>Transcript :</strong><br><br>`;
+
+  deposition.messageHistory.forEach(entry => {
+    const color = senderStyles[entry.sender];
+    transcriptText += `<strong style="color: ${color};">${entry.sender}</strong>: ${entry.message}<br>`;
+  });
+
+  return transcriptText;
+}
 
 
-module.exports = {endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}
+
+module.exports = {endSettlement, endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}

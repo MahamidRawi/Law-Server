@@ -129,7 +129,6 @@ const getRepresentativeLawyer = async (caseId: string) => {
             'caseId': caseId,
             'x-access-token': token
         }});
-        console.log(response.data)
         const {representativeLawyer} = response.data;
         return {lawyerInfo: representativeLawyer}
     } catch (err: any) {

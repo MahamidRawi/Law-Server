@@ -19,12 +19,11 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
     const lastLocation = localStorage.getItem('LCC')
     const [activeContent, setActiveContent] = useState(lastLocation || 'Overview');
     const [caseInfo, setCaseInfo] = useState<any>();
-    const [linfo, setlinfo] = useState<object>({});
     const caseId = location.state.data.caseId;
 
     const caseContent: ContentMap = {
         Overview: <CaseOverView caseId={caseId} caseInfo={caseInfo} />,
-        Actions: <ActionScreen opname={linfo} caseId={caseId}  />,
+        Actions: <ActionScreen caseId={caseId}  />,
         Discoveries: <DiscoveryScreen data={caseInfo} />,
         Participants: <Participants caseId={caseId} data={caseInfo} />,
         Court: <Participants caseId={caseId}/>,
@@ -45,9 +44,8 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
         });
     }, [caseId, activeContent]);
 
-    const handleButtonClick = (content: string, lInfo: object) => {
+    const handleButtonClick = (content: string) => {
         localStorage.setItem('LCC', content);
-        setlinfo(lInfo);
         return setActiveContent(content);
     };
 
@@ -64,7 +62,7 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
                             <button
                                 key={key}
                                 className={activeContent === key ? 'active' : ''}
-                                onClick={() => handleButtonClick(key, caseInfo.participants.find((part: any) => part.name == caseInfo.oppositionName))}>
+                                onClick={() => handleButtonClick(key)}>
                                 {key} {key === 'Discoveries' ? `(${caseInfo.discoveries.length})` : key == 'Participants' ? `(${caseInfo.participants.length})` : ''}
                             </button>
                         ))}

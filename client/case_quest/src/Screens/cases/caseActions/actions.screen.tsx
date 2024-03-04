@@ -6,10 +6,9 @@ import { ActionCard } from '../../../RC/cards.rc';
 
 interface ActionScreenProps {
 caseId: string;
-opname: object;
 }
 
-const ActionScreen: React.FC<ActionScreenProps> = ({caseId, opname}) => {
+const ActionScreen: React.FC<ActionScreenProps> = ({caseId}) => {
 
     useEffect(() => {
         return localStorage.setItem('LCC', 'Actions')
@@ -23,7 +22,7 @@ const ActionScreen: React.FC<ActionScreenProps> = ({caseId, opname}) => {
             <div className="ac coi-container">
                 <ActionCard caseId={caseId} icon={<IoDocumentTextOutline />} type='Subpoena' txt='Command individuals to testify or present evidence in court through a subpoena.' />
                 <ActionCard caseId={caseId} icon={<IoFileTrayFullOutline />} type='File Motion' txt='Initiate a legal request by filing a motion to prompt a court ruling on a specific matter.' />
-                <ActionCard pm={opname} caseId={caseId} icon={<MdOutlineHandshake />} type='Settle' txt='Negotiate a settlement to resolve a dispute outside of court.' />
+                <ActionCard caseId={caseId} icon={<MdOutlineHandshake />} type='Settle' txt='Negotiate a settlement to resolve a dispute outside of court.' />
             </div>
         </div>
     )

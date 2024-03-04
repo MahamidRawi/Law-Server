@@ -169,12 +169,11 @@ interface ActionCardProps {
   txt: string,
   icon: any,
   caseId: string,
-  pm?: object
 }
-const ActionCard: React.FC<ActionCardProps> = ({ pm, type, txt, icon, caseId }) => {
+const ActionCard: React.FC<ActionCardProps> = ({ type, txt, icon, caseId }) => {
   const navigate = useNavigate();
   return (
-    <div className='action-card' onClick={() => navigate(`/${type.replace(' ', '')}`, {state: {caseId, uinf: pm, type: type == 'Subpoena' ? 1 : 2}})}>
+    <div className='action-card' onClick={() => navigate(`/${type.replace(' ', '')}`, {state: {caseId, type: type == 'Subpoena' ? 1 : 2}})}>
       <div className="icon-container">
         <div className="icon">{icon}</div>
         <div className="content">

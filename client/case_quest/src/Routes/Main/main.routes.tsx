@@ -84,7 +84,7 @@ const MainRoutes: React.FC = () => {
                 <Route path='/FileMotion' element={<SubpoenaScreen formtype='File Motion' />}/>
                 <Route path='/Subpoena' element={<SubpoenaScreen formtype='Subpoena' />}/>
                 <Route path='/Deposition' element={<DepositionScreen />}/>
-                <Route path='/Settle' element={<DepositionScreen settlement />}/>
+                <Route path='/Settle' element={<DepositionScreen settlement={true} />}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen />}/> : null}
             </Routes>
         </div>

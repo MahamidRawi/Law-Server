@@ -19,10 +19,9 @@ interface LocationState {
 
 interface DepositionScreenProps {
   settlement?: boolean;
-  lawyer?: any;
 }
 
-const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false, lawyer }) => {
+const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const {caseId, uinf} = location.state;
@@ -37,11 +36,20 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false,
     const [depositionStarted, setDepositionStarted] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [depositionId, setDepositionId] = useState<string>('');
-    const subpoenee = {name, role, shortDescription};
     useEffect(() => {
-      getRepresentativeLawyer(caseId).then(res => setUserInfo(res.lawyerInfo)).catch(err => err.AR ? logout() : alert(err.message));
+      if (settlement) {
+        getRepresentativeLawyer(caseId).then(res => {
+          const {name, role, shortDescription} = res.lawyerInfo;
+          console.log(name, role, shortDescription)
+          setUserInfo({name, role, shortDescription})}).catch(err => err.AR ? logout() : alert(err.message));
+          console.log(userInfo)
+        }
+      
+    }, [depositionStarted, caseId]);
 
-      if (!depositionStarted || userInfo.name == 'Unknown') {
+    useEffect(() => {
+      console.log(userInfo)
+      if (!depositionStarted) {
         console.log(userInfo, caseId)
         userValidate(localStorage.getItem('user_token'))
           .then(res => {
@@ -58,7 +66,8 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false,
           })
           .catch(err => logout());
       }
-    }, [depositionStarted, caseId]);
+    }, [userInfo]);
+    
     
     useEffect(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -67,7 +76,7 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false,
     const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setLoading(true);
-      if (!currentMessage.trim()) return;
+      if (!currentMessage.trim()) return setLoading(false);
       setCurrentMessage('');
       const newMessage: Message = {
         message: currentMessage,

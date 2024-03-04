@@ -1,4 +1,4 @@
-const { issueSubpoenaPrompt, fileMotionPrompt, SubpoenaMessagePrompt, endDepositionPrompt, endDepositionTscrpt } = require('../../../helper/openai.api.helper');
+const { issueSubpoenaPrompt, fileMotionPrompt, SubpoenaMessagePrompt, endDepositionPrompt, endDepositionTscrpt, endSettlement } = require('../../../helper/openai.api.helper');
 const { subpoenaSchema } = require('../../../schemas/joi.schema');
 const mongoose = require('mongoose');
 require('../../../DB/models/cases.model');
@@ -9,6 +9,8 @@ const { config } = require('../../../config');
 const { calculatedPrices, lMPrices } = require('../../../vars/vars');
 require('../../../DB/models/depositions.model');
 const Deposition = mongoose.model('Chat');
+const { uuid } = require('uuidv4');
+
 
 const openai = new OpenAI({ apiKey: config.APIPASS });
 
@@ -166,14 +168,23 @@ const startDeposition = async (caseId, subpoenee) => {
     try {
       const result = await Deposition.findOneAndDelete({ _id: depositionId });
       if (!result) throw new Error('Deposition not found');
-    const newDiscovery = {
+    const newDiscovery = result.attourney ? {
+        type: 'Settlement',
+        title: 'Settlement',
+        content: 'Full Transcript of the settlement',
+        exactContent: endSettlement(result, date),
+        date,
+        id: uuid()
+    } : {
         type: 'Testimony',
         title: `Testimony Of ${result.subpoenee.name} (${result.subpoenee.role})`,
         content: `Full transcript of the deposition of ${result.subpoenee.name}`,
         exactContent: endDepositionTscrpt(result, date),
         date
     }
-    await cases.updateOne({ _id: result.caseId, participants: { $elemMatch: { name: result.subpoenee.name, role: result.subpoenee.role } }}, { $set: { "participants.$.subpoena": false } });
+    await cases.updateOne({ _id: result.caseId, participants: { $elemMatch: { name: result.subpoenee.name, role: result.subpoenee.role } }}, { $set: { "participants.$.subpoena": false },  ...(newDiscovery.type === 'Settlement' ? [{
+        $push: { dealHistory: newDiscovery.id }
+      }] : []) });
     await cases.updateOne({ _id: result.caseId }, { $push : {discoveries: newDiscovery } });
     console.log(newDiscovery)
       return { success: true };
@@ -189,10 +200,11 @@ const startDeposition = async (caseId, subpoenee) => {
       console.log(deposition, depositionId);
       if (!deposition) throw new Error('Deposition not found');
       const caseFound = await cases.findOne({_id: deposition.caseId});
-      if (!caseFound) throw new Error('Deposition Not Found')
-
+      if (!caseFound) throw new Error('Deposition Not Found');
+      const foundUser = await caseFound.participants.find(use => use.name == deposition.subpoenee.name && use.role == deposition.subpoenee.role);
+    if (!foundUser) throw new Error('Participant Not Found');
       const response = await openai.chat.completions.create({
-        messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.subpoenee, caseFound, message.message, deposition.messageHistory)}],
+        messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.attourney, foundUser, caseFound, message.message, deposition.messageHistory)}],
         model: "gpt-3.5-turbo-1106",
     });
       const aiMessage = JSON.parse(response.choices[0].message.content);
