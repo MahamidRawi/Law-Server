@@ -35,8 +35,8 @@ const createCase = async (uid, caseInfo) => {
         const sufficientBalance = compareBalanceToRequiredAmount(uid, 250);
         if (!userFound || userFound.cases.length === 3 || !sufficientBalance) reject({message: !userFound ? 'User Not Found': cases.length === 3 ?'You are already handeling 3 ongoing cases' : 'Insufficient Balance', stc: !userFound ? 401 : 400});
         const response = await openai.chat.completions.create({
-            messages: [{ role: "system", content: createCasePrompt(uid, caseInfo, chosenPosition) }],
-    model: "gpt-3.5-turbo",
+            messages: [{role: "system", content: "You are the creator of the cases"}, { role: "user", content: 'Generate a case in the field : corporate law, with difficulty : high, with the law system : USA (Common Law)' }],
+    model: "ft:gpt-3.5-turbo-1106:personal:create-case-v1:90FyhbPu",
         });
         const newRes = JSON.parse(response.choices[0].message.content);
         const newCase = new cases(newRes);
