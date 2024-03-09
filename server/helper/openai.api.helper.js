@@ -41,7 +41,6 @@ const createCasePrompt = (uid, caseInfo, pos) => {
 }
 
 Guidelines:
-- "oppositionName" must be exactly like the "name" of the opposition attorney in the participants array.
 - The case model must be entirely in JSON format without exceptions.
 - Focus on generating a fictional yet realistic scenario, including participant names and legal documents.
 - Limit "discoveries" to four items, providing extensive detail and structure without using placeholders. Include specific dates and relevant information to mimic an investigative or legal strategy game. I don't want overiew or summary of content, but ultra realistic 100% complete content with no placeholders whatsoever.
