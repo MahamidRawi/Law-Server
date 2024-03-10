@@ -119,8 +119,10 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false 
               <Card.Title>{name || 'Guest'} ({role})</Card.Title>
               <Card.Text>{shortDescription || 'No Description'}</Card.Text>
               <Form.Text className="text-muted">
-                * Please ensure the chat is formally concluded upon completion. Even if not concluded, the content will be disclosed to the opposing party.
+              * Please formally close the chat upon completion. Unfinished chats will still be disclosed to the opposing party.
               </Form.Text>
+              <br />
+              <Form.Text className='text-muted'>{settlement && `* Termination of proceedings within the settlement room shall invariably result in the conclusion of the case. It is to be noted that, under certain circumstances, such termination may lead to an adverse outcome for the party(ies) involved.`}</Form.Text>
             </Card.Body>
           </Card>
           </center>
