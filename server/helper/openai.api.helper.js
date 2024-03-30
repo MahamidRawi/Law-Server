@@ -41,6 +41,8 @@ const createCasePrompt = (uid, caseInfo, pos) => {
     "solution": "text containing the truth that will guide the game. It must say what truly happened, so that the responses will follow it."
 }
 
+Guidelines
+- VERY VERY IMPORTANT : THE RESPONSE MUST HAVE THE NECESSARY INFORMATION (IN THE DISCOVERIES) FOR THE USER TO BE ABLE TO PROCEED WORKING ON THE CASE. SO CONSTRUCT IT IN A VERY INTERESTING WAY.
 Guidelines:
 - Make sure it's complete JSON.
 - The case model must be entirely in JSON format without exceptions.
