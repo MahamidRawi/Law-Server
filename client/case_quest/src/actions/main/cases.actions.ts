@@ -91,6 +91,36 @@ const sendMessage = (message: object, depositionId: string): Promise<{message?: 
     })
 }
 
+const sendCourtMessage = (message: object, hearingId: string, target: string): Promise<{message?: string, success: boolean, granted?: boolean, AR?: boolean}> => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token) return reject({success: false, message: 'No Token', AR: true});
+        try {
+            const res = await axios.post(config.API_BASE_URL + '/main/cases/court/sendCourtMessage', {hearingId, message, target}, {headers: {'x-access-token': token}});
+            return resolve({success: true, message: res.data.message});
+        } catch (err: any) {
+            const axiosErr = err as AxiosError<{message: string}>;
+            const stc = axiosErr.status;
+            return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
+        }
+    })
+}
+
+const councilRest = (hearingId: string): Promise<{message?: string, success: boolean, granted?: boolean, AR?: boolean}> => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token) return reject({success: false, message: 'No Token', AR: true});
+        try {
+            const res = await axios.post(config.API_BASE_URL + '/main/cases/court/rest', { hearingId }, {headers: {'x-access-token': token}});
+            return resolve({success: true, message: res.data.message});
+        } catch (err: any) {
+            const axiosErr = err as AxiosError<{message: string}>;
+            const stc = axiosErr.status;
+            return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
+        }
+    })
+}
+
 const startDeposition = (subpoenee: object, caseId: string) => {
     return new Promise(async (resolve, reject) => {
         const token = localStorage.getItem('user_token');
@@ -98,6 +128,22 @@ const startDeposition = (subpoenee: object, caseId: string) => {
         try {
             const res = await axios.post(config.API_BASE_URL + '/main/cases/deposition/startDeposition', {subpoenee, caseId}, {headers: {'x-access-token': token}});
             return resolve({success: true, depositionId: res.data.depositionId, messages: res.data.messages});
+        } catch (err: any) {
+            const axiosErr = err as AxiosError<{message: string}>;
+            const stc = axiosErr.status;
+            return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
+        }
+    })
+}
+
+const startHearing = (caseId: string | undefined) => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token) return reject({success: false, message: 'No Token', AR: true});
+        try {
+            const res = await axios.post(config.API_BASE_URL + '/main/cases/court/startHearing', {caseId}, {headers: {'x-access-token': token}});
+            console.log(res.data)
+            return resolve({hearingId: res.data.hearingId, messages: res.data.transcript, judge: res.data.judge});
         } catch (err: any) {
             const axiosErr = err as AxiosError<{message: string}>;
             const stc = axiosErr.status;
@@ -137,4 +183,4 @@ const getRepresentativeLawyer = async (caseId: string) => {
         return stc != 200 ? {success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false} : {success: true, message : err.response?.data.message};
     }
 }
-export {getRepresentativeLawyer, endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}
+export {councilRest, sendCourtMessage, startHearing, getRepresentativeLawyer, endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}

@@ -37,10 +37,12 @@ const createCasePrompt = (uid, caseInfo, pos) => {
     "discoveries": [
       ${JSON.stringify(random)}
     ],
-    "oppositionName": "{Realistic opposition Attorney Name}"
+    "oppositionName": "{Realistic opposition Attorney Name}",
+    "solution": "text containing the truth that will guide the game. It must say what truly happened, so that the responses will follow it."
 }
 
 Guidelines:
+- Make sure it's complete JSON.
 - The case model must be entirely in JSON format without exceptions.
 - Focus on generating a fictional yet realistic scenario, including participant names and legal documents.
 - Limit "discoveries" to four items, providing extensive detail and structure without using placeholders. Include specific dates and relevant information to mimic an investigative or legal strategy game. I don't want overiew or summary of content, but ultra realistic 100% complete content with no placeholders whatsoever.
@@ -259,8 +261,9 @@ Your response must be structured in JSON format:
   Remember, you are in a deposition, not court. So the judge is absent. You are participating in a legal deposition simulation as a character with a specific role and background. Your responses will contribute to the unfolding narrative based on the provided case details and your character's perspective.
 
 ### Character Role and Background:
+You are in the body and mind of : ${subpoenee.name}
 - **Role**: "${subpoenee.role}".
-- **Background Information**: Provided as ${subpoenee}.
+- **Background Information**: Provided as ${subpoenee.shortDescription}.
 
 ### Task:
 Respond to the inquiry: "${message}".
@@ -268,7 +271,7 @@ Respond to the inquiry: "${message}".
 ### Case and Historical Context:
 - **Case Details**: Provided in ${caseInfo}. Pay special attention to pivotal figures, especially the primary owner detailed in caseInfo.owners[0].
 - **Conversation History**: Documented in ${messageHistory}. Your response should align with and advance this narrative.
-
+- No matter what you're asked do not give the solution, nor guide it. However, you may have slip ups depending on the difficulty, and give hints (INDIRECTLY!!) following the following solution : ${caseInfo.solution}.
 ### Guidelines for Response:
 - **If an Expert Witness**: Offer insights grounded in professionalism and integrity, addressing the inquiry (${message}) directly, without conflicts of interest.
 - **If the Plaintiff/Defendant**: Align your statements with the case's established facts (${caseInfo} and ${messageHistory}), balancing transparency with strategic interests. The complexity of the case may affect the moral and strategic considerations in your responses.
@@ -280,7 +283,7 @@ Respond to the inquiry: "${message}".
 Your response must be structured in JSON format:
 
 {
-  "message": "Remember, you are in a deposition, not court. Without repetitions, and long text. Very human length answer, Articulate a response that is insightful, authentically human, and strategically aligned with your role's objectives and the case's context."
+  "message": "Remember, you are in a deposition, not court. Without repetitions, or long text. Very human length answer, Articulate a response that is insightful, authentically human, and strategically aligned with your role's objectives and the case's context."
 }
   `;
 
@@ -331,6 +334,84 @@ const endSettlement = (deposition, date) => {
   return transcriptText;
 }
 
+const prosecutionFirstMessage = (caseInfo) => {
+    return `
+      You are playing the role of the prosecutor. You must follow this level of difficulty level : ${caseInfo.difficulty}.
+      The difficulties in the simulation are the following : easy, medium, hard, extreme.
+      The harder the difficulty is the the more arrogant and eloquent you become. 
+
+      Given the following case : ${JSON.stringify(caseInfo)}
+      Do it as close to reality as possible.
+      You must do the opening argument following this structure, in JSON : 
+      {
+        "message": "the content of the opening statement, with the text very human-like"
+      }
+    `
+}
+
+const correspondingResponse = (caseInfo, target, judge, message, messageHistory) => {
+  return `
+  This is the transcript history : ${JSON.stringify(messageHistory)}
+  You are playing the role of ${target} in the case : ${caseInfo}. However, at any given moment, you can play the role of the judge : ${judge.name} who's caracteristics are the following : ${judge.caracteristics}, and intervene and react to a statement like in real life. 
+
+  You must respond to the following question or statement : ${message.message}, stated by : ${message.sender}
+
+  Do it as realistic and as serious as you can be. According to how a trial must go. 
+  To any statement, the opposition attorney must response. 
+  If you notice that the sender finished his part (asking, presenting or something), the opposition side may proceed. You can ask questions for the witnesses (and provide answers to them), etc... like in the provided format to respect.
+  Please respect the format given (JSON array of objects) and make it interesting and as realistic as possible.
+  Add an objection message only if there is an objection. Don't write a message. * Do not add * to the array a "No objection" message from opposing team if there are no objections.
+  In case there are objections, add also a message from the judge telling if granted or overruled.
+  The response must be as human as possible. And the person is under oath. The response must be in JSON strictly following this format : Always array (even if 1 message) :
+  [{
+    "sender": "Whoever you are role playing, or the judge except the sender of ${message.sender}",
+    "message: "content of the message, as human style as possible"
+  }, {
+    "sender": "The opposition attorney's name",
+    "message": "The message / reaction / any objection"
+  }, {
+    "sender": "the name of whoever decides to say anything",
+    "message": "the content of the message"
+  }]
+  `
+}
+
+const opposingTeamTurn = (caseInfo, status, transcript, judge, name) => {
+  const roleToPlay = status === 'Prosecution' ? 'Defense' : 'Prosecution';
+
+  return `
+  ${status} rested.
+    Previous transcript : ${transcript}
+    The ${status} is represented by me : ${name}.
+    You must never play the role ${status}
+    Context: In a courtroom simulation involving a case described as ${JSON.stringify(caseInfo)}, the ${status} has just rested. You are now playing the role of the ${roleToPlay} attorney, ${caseInfo.oppositionName}, known for your arrogance. The judge overseeing this case is ${judge.name}. Be brutal, extremely eloquent.
+    If rested without presenting a case, the judge compells the side to present their case. And you don't move on : return empty array.
+    Instructions: Perform the entire turn for the ${roleToPlay} side. This includes presenting your case, questioning witnesses, responding to objections, and interacting with the judge. Your approach and language should reflect the difficulty level of the case, which is ${caseInfo.difficulty}. Be as realistic and detailed as possible, maintaining a serious tone throughout.
+
+    Your task is to continue the transcript in a manner that reflects a comprehensive understanding of courtroom procedures, incorporating the appropriate legal strategies and responses based on the case's complexity and the characteristics of the participants involved.
+
+    Please format your continuation of the transcript in strict JSON format, as shown below. Include all relevant actions and exchanges, ensuring a dynamic and engaging narrative that adheres to the simulation's requirements.
+
+    You must not involve the opposing council during your turn. Do not say anything on his behalf.
+
+    Must be following JSON Response Format:
+    [
+      {
+        "sender": "Name of the person speaking (e.g., ${caseInfo.oppositionName}, Witness Name, Judge ${judge.name})",
+        "message": "The content of their statement or question."
+      },
+      {
+        "sender": "The respondent or the next speaker",
+        "message": "Their response, reaction, or the next question."
+      }
+      // Add as many objects as needed to complete the narrative of the turn.
+    ]
+    You Must Play all the roles other than that of the attorney ${name}.
+    Note: Your response must cover the entirety of the turn, including questions posed to witnesses on the stand, their answers, any documents presented, and responses from the judge. The aim is to create a continuous and engaging dialogue that seamlessly extends the existing transcript.
+  `
+}
 
 
-module.exports = {endSettlement, endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}
+
+
+module.exports = {opposingTeamTurn, correspondingResponse, prosecutionFirstMessage, endSettlement, endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}

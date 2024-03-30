@@ -8,6 +8,7 @@ const { OpenAI } = require('openai');
 const { config } = require('../../../config');
 const { calculatedPrices, lMPrices } = require('../../../vars/vars');
 require('../../../DB/models/depositions.model');
+require('../../../DB/models/hearing.model');
 const Deposition = mongoose.model('Chat');
 const { uuid } = require('uuidv4');
 
@@ -32,7 +33,7 @@ const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
             try {
                 const response = await openai.chat.completions.create({
                     messages: [{ role: "system", content: issueSubpoenaPrompt(caseInfo, validSubpoenaType, subpoenaInfo.justification, subpoenaInfo.entity) }],
-                    model: "gpt-3.5-turbo-1106",
+                    model: "gpt-4",
                 });
 
                 const parsedRes = JSON.parse(response.choices[0].message.content);
@@ -140,7 +141,6 @@ const startDeposition = async (caseId, subpoenee) => {
       if (!caseFound) throw new Error('Case Not Found');
       const subpoeneeFound = caseFound.participants.find(part => part.name == subpoenee.name && part.role == subpoenee.role);
       if (!subpoeneeFound) throw new Error('Participant Not Found');
-      console.log(subpoeneeFound);
 
       let deposition = await Deposition.findOneAndUpdate(
         {
@@ -197,6 +197,46 @@ const startDeposition = async (caseId, subpoenee) => {
     try {
 
       const deposition = await Deposition.findOne({ _id: depositionId });
+      console.log(deposition, depositionId);
+      if (!deposition) throw new Error('Deposition not found');
+      const caseFound = await cases.findOne({_id: deposition.caseId});
+      if (!caseFound) throw new Error('Deposition Not Found');
+      const foundUser = await caseFound.participants.find(use => use.name == deposition.subpoenee.name && use.role == deposition.subpoenee.role);
+    if (!foundUser) throw new Error('Participant Not Found');
+      const response = await openai.chat.completions.create({
+        messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.attourney, foundUser, caseFound, message.message, deposition.messageHistory)}],
+        model: "gpt-4",
+    });
+      const aiMessage = JSON.parse(response.choices[0].message.content);
+      const messageObj = {
+        sender: deposition.subpoenee.name,
+        message: aiMessage.message,
+      };
+  
+      deposition.messageHistory.push(message);
+      deposition.messageHistory.push(messageObj);
+      console.log(aiMessage);
+      await deposition.save();
+  
+      return {
+        success: true,
+        message: messageObj,
+        stc: 200
+      };
+    } catch (error) {
+      console.error('Error in sendMessage:', error);
+      return {
+        success: false,
+        message: error.message || 'An error occurred while sending the message',
+        stc: 500
+      };
+    }
+  };
+
+    const sendCourtMessage = async (message, hearingId) => {
+    try {
+
+      const deposition = await hearings.findOne({ _id: depositionId });
       console.log(deposition, depositionId);
       if (!deposition) throw new Error('Deposition not found');
       const caseFound = await cases.findOne({_id: deposition.caseId});

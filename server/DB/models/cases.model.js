@@ -25,7 +25,11 @@ const CaseSchema = new Schema({
     difficulty: {
         type: String,
         required: true,
-    }, 
+    },
+    solution: {
+        type: String,
+        required: true
+    },
     oppositionName: {
         type: String,
         required: true

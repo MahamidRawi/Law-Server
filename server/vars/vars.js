@@ -343,5 +343,33 @@ const lMPrices = legalMotions.map(motion => ({
       }
     ];
 
+    const judges = [
+      { name: "Judge Anderson", reputation: "Fair and patient", difficulty: "easy" },
+      { name: "Judge Bennett", reputation: "Quick and decisive", difficulty: "medium" },
+      { name: "Judge Carter", reputation: "Thorough and detailed", difficulty: "hard" },
+      { name: "Judge Daniels", reputation: "Innovative and strategic", difficulty: "extreme" },
+      { name: "Judge Evans", reputation: "Empathetic and understanding", difficulty: "easy" },
+      { name: "Judge Fisher", reputation: "Rigorous and stern", difficulty: "medium" },
+      { name: "Judge Green", reputation: "Adaptable and insightful", difficulty: "hard" },
+      { name: "Judge Harris", reputation: "Precise and meticulous", difficulty: "extreme" },
+      { name: "Judge Ingram", reputation: "Dynamic and persuasive", difficulty: "easy" },
+      { name: "Judge Jenkins", reputation: "Resolute and fearless", difficulty: "medium" },
+      { name: "Judge Knight", reputation: "Compassionate and fair", difficulty: "hard" },
+      { name: "Judge Lloyd", reputation: "Efficient and practical", difficulty: "extreme" },
+      { name: "Judge Morris", reputation: "Probing and analytical", difficulty: "easy" },
+      { name: "Judge Nelson", reputation: "Inquisitive and thoughtful", difficulty: "medium" },
+      { name: "Judge Owens", reputation: "Bold and authoritative", difficulty: "hard" },
+      { name: "Judge Patel", reputation: "Direct and uncompromising", difficulty: "extreme" },
+      { name: "Judge Quinn", reputation: "Sympathetic and lenient", difficulty: "easy" },
+      { name: "Judge Rivera", reputation: "Disciplined and structured", difficulty: "medium" },
+      { name: "Judge Stewart", reputation: "Creative and adaptive", difficulty: "hard" },
+      { name: "Judge Turner", reputation: "Astute and sharp", difficulty: "extreme" },
+      { name: "Judge Underwood", reputation: "Generous and kind", difficulty: "easy" },
+      { name: "Judge Vaughn", reputation: "Stern and challenging", difficulty: "medium" },
+      { name: "Judge Wallace", reputation: "Exacting and firm", difficulty: "hard" },
+      { name: "Judge Xander", reputation: "Innovative and boundary-pushing", difficulty: "extreme" },
+      { name: "Judge Young", reputation: "Energetic and passionate", difficulty: "easy" }
+    ];
 
-module.exports = { discoveryTemplates, lMPrices, typesOfSubpoenas, calculatedPrices, Err500, transactionMessageSuccess, fieldsOfLaw, lawSystems}
+
+module.exports = { judges, discoveryTemplates, lMPrices, typesOfSubpoenas, calculatedPrices, Err500, transactionMessageSuccess, fieldsOfLaw, lawSystems}

@@ -21,6 +21,7 @@ import ViewCase from '../../Screens/cases/viewcase.screen';
 import MenuScreen from '../../RC/menu.screens';
 import SubpoenaScreen from '../../Screens/cases/caseActions/subpoena.screen';
 import DepositionScreen from '../../Screens/cases/deposition.screen';
+import CourtRoom from '../../Screens/cases/court.screen';
 
 
 const MainRoutes: React.FC = () => {
@@ -85,6 +86,7 @@ const MainRoutes: React.FC = () => {
                 <Route path='/Subpoena' element={<SubpoenaScreen formtype='Subpoena' />}/>
                 <Route path='/Deposition' element={<DepositionScreen />}/>
                 <Route path='/Settle' element={<DepositionScreen settlement={true} />}/>
+                <Route path='/CourtRoom' element={<CourtRoom />}/>
                 {userInfo ? <Route path='/Notifications' element={<NotificationScreen />}/> : null}
             </Routes>
         </div>

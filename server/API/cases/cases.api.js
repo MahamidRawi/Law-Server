@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { alreadyExists, validate } = require('../../middleware/auth/auth.middleware');
-const { createCase } = require('../../actions/main/cases/cases.actions');
+const { createCase, startHearing, handleMessage, rest } = require('../../actions/main/cases/cases.actions');
 const { getCase } = require('../../actions/main/fetch.actions');
 const { calculatedPrices, lMPrices } = require('../../vars/vars');
 const { caseExists } = require('../../middleware/cases/cases.middleware');
@@ -47,6 +47,41 @@ router.post('/deposition/startDeposition', validate, async (req, res) => {
     console.log(subpoenee)
     try {
         const resp = await startDeposition(caseId, subpoenee);
+        return res.status(resp.stc || 200).json(resp);
+    } catch (err) {
+        return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});
+    }
+});
+
+router.post('/court/sendCourtMessage', validate, async (req, res) => {
+    const {hearingId, message, target} = req.body;
+
+    try {
+        const resp = await handleMessage(hearingId, message, req.userId, target);
+        console.log(resp);
+            return res.status(200).json(resp);
+        } catch (err) {
+            console.log('ONE : ', err);
+            return res.status(err?.stc || 500).json({ message: err.message, stc: err.stc});
+        }
+});
+
+router.post('/court/rest', validate, async (req, res) => {
+    const {hearingId} = req.body;
+
+    try {
+        const resp = await rest(hearingId, req.userId);
+            return res.status(200).json(resp);
+        } catch (err) {
+            console.log(err);
+            return res.status(err?.stc || 500).json({ message: err.message, stc: err.stc});
+        }
+});
+
+router.post('/court/startHearing', validate, async (req, res) => {
+    const {caseId} = req.body;
+    try {
+        const resp = await startHearing(caseId, req.userId);
         return res.status(resp.stc || 200).json(resp);
     } catch (err) {
         return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});

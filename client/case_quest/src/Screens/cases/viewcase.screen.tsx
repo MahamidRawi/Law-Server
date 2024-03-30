@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ActivityIncicator } from "../../RC/acitivity.incdicator";
 import '../../wallet.css';
 import { ContentMap } from "../../data/data";
@@ -9,10 +9,12 @@ import Participants from "./caseActions/case.participants";
 import DiscoveryScreen from "./caseActions/discoveries.screen";
 import { getCase } from "../../actions/main/cases.actions";
 import { AuthContext } from "../../Providers/auth.provider";
+import CourtRoom from "./court.screen";
 
 interface ViewCaseProps {}
 
 const ViewCase: React.FC<ViewCaseProps> = () => {
+    const navigate = useNavigate()
     const [loading, setLoading] = useState(true);
     const {logout} = useContext(AuthContext);
     const location = useLocation();
@@ -26,7 +28,7 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
         Actions: <ActionScreen caseId={caseId}  />,
         Discoveries: <DiscoveryScreen data={caseInfo} />,
         Participants: <Participants caseId={caseId} data={caseInfo} />,
-        Court: <Participants caseId={caseId}/>,
+        Court: <CourtRoom caseId={caseId}/>,
     }
 
     useEffect(() => {
@@ -62,7 +64,7 @@ const ViewCase: React.FC<ViewCaseProps> = () => {
                             <button
                                 key={key}
                                 className={activeContent === key ? 'active' : ''}
-                                onClick={() => handleButtonClick(key)}>
+                                onClick={() => {key == 'Court' ? navigate('/CourtRoom', {state: {cId: caseId}}) : handleButtonClick(key)}}>
                                 {key} {key === 'Discoveries' ? `(${caseInfo.discoveries.length})` : key == 'Participants' ? `(${caseInfo.participants.length})` : ''}
                             </button>
                         ))}

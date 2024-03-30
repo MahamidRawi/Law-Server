@@ -1,16 +1,25 @@
-const {createCasePrompt} = require('../../../helper/openai.api.helper');
+const {createCasePrompt, prosecutionFirstMessage, correspondingResponse, opposingTeamTurn} = require('../../../helper/openai.api.helper');
 const {caseSchema} = require('../../../schemas/joi.schema');
-
 const mongoose = require('mongoose');
 require('../../../DB/models/cases.model');
+require('../../../DB/models/hearing.model');
 require('../../../DB/models/user.model');
 const cases = mongoose.model('casesModel');
 const users = mongoose.model('userModel');
+const hearings = mongoose.model('HearingModel');
 const { addAdminFee, compareBalanceToRequiredAmount } = require('../wallet.actions');
 const { OpenAI } = require('openai');
 const { config } = require('../../../config');
 const ObjHelper = require('../../../helper/obj.helper');
+const { judges } = require('../../../vars/vars');
+const { initiateCourt, presentOtherSide } = require('../../../helper/court.helper');
 const openai = new OpenAI({apiKey: config.APIPASS});
+
+const newErr = (message, stc) => {
+  const error = new Error(message);
+  error.stc = stc
+  return error
+}
 
 const addCaseToUser = async (tId, caseId) => {
     const userCasesUpdate = {
@@ -55,7 +64,7 @@ if (chosenPosition === 'prosecution') {
         const oplawyer = ObjHelper.generateLawyer(newRes.oppositionName, chosenPosition == 'defense' ? 'Prosecution' : 'Defense');
         newCase.participants.push(oplawyer);
         const newdate = Date.now();
-        const courtdate = newdate + 172800000;
+        const courtdate = newdate + 57600000;
         newCase.date = newdate
         newCase.courtDate = courtdate
         newCase.save().then(async suc => {
@@ -66,4 +75,129 @@ if (chosenPosition === 'prosecution') {
     });
 }
 
-module.exports = {createCase}
+const startHearing = async (caseId, uid) => {
+  try {
+    const caseFound = await cases.findOne({_id: caseId});
+    if (!caseFound || caseFound.owners[0] !== uid) return newErr('Case Not Found', 404);
+    const hearingFound = await hearings.findOne({caseId});
+    if (hearingFound) return {hearingId: hearingFound._id, transcript: hearingFound.transcript, judge: hearingFound.judge}
+    const designatedJudge = judges.filter(judge => judge.difficulty == caseFound.difficulty)
+    const judge = designatedJudge[Math.floor(Math.random() * designatedJudge.length)].name
+    const resp = uid !== caseFound.prosecution ? await openai.chat.completions.create({
+      messages: [{ role: "system", content: prosecutionFirstMessage(caseFound) }],
+      model: "gpt-3.5-turbo-1106",
+  }) : false;
+
+  const initialTranscript = caseFound.prosecution !== uid ? [
+    initiateCourt(judge),
+    {
+      sender: caseFound.oppositionName,
+      message: JSON.parse(resp.choices[0].message.content).message
+    }, 
+    presentOtherSide(judge)
+  ] : [
+    initiateCourt(judge)
+  ];
+
+    const hearing = await hearings.findOneAndUpdate(
+      {
+        caseId: caseId,
+      },
+      {
+        $setOnInsert: { transcript: initialTranscript, judge}
+      },
+      {
+        new: true,
+        upsert: true
+      }
+    );
+    return {hearingId: hearing._id, transcript: hearing.transcript, judge}
+  } catch (err) {
+    console.log(err);
+    throw newErr(err | 'An Erro has Occured', 500);
+  }
+}
+
+const handleMessage = async (hearingId, message, userId, targetName) => {
+  try {
+    const hearing = await hearings.findOne({ _id: hearingId });
+    if (!hearing) throw newErr('Hearing not found', 404);
+
+    const user = await users.findOne({ _id: userId });
+    if (!user) throw newErr('User not found', 404);
+
+    const caseDetails = await cases.findOne({ _id: hearing.caseId });
+    if (!caseDetails || caseDetails.owners[0] !== userId) {
+      throw newErr('Unauthorized or case not found', 403);
+    }
+
+    const participantName = caseDetails.participants.find(participant => participant.name === targetName)?.name || targetName;
+    if (!targetName.includes('Judge') && !participantName) {
+      throw newErr('Participant not found', 404);
+    }
+
+    hearing.transcript.push(message);
+    await hearing.save();
+
+    const judge = judges.find(judge => judge.name === hearing.judge);
+    const systemMessage = correspondingResponse(caseDetails, participantName, judge, message, hearing.transcript);
+
+    const response = await openai.chat.completions.create({
+      messages: [{ role: "system", content: systemMessage }],
+      model: "gpt-3.5-turbo-1106",
+    });
+
+    const parsedResponse = JSON.parse(response.choices[0].message.content);
+    parsedResponse.map(msg => {
+      hearing.transcript.push(msg);
+    });
+    const saved = await hearing.save()
+    return {message: parsedResponse, newHistory: saved.transcript}
+  } catch (err) {
+    console.error(err);
+    // Ensure newErr is a function that correctly formats your error responses.
+    throw newErr(err.message || 'An error has occurred', 500);
+  }
+};
+
+const rest = async (hearingId, uid) => {
+  try {
+    const hearing = await hearings.findOne({ _id: hearingId });
+    if (!hearing) throw newErr('Hearing not found', 404);
+
+    const user = await users.findOne({ _id: uid });
+    if (!user) throw newErr('User not found', 404);
+
+    const caseDetails = await cases.findOne({ _id: hearing.caseId });
+    if (!caseDetails || !caseDetails.owners.includes(uid)) {
+      throw newErr('Unauthorized or case not found', 403);
+    }
+    const status = await caseDetails.prosecution == uid ? 'Prosecution' : 'Defense'
+    
+    const judge = judges.find(judge => judge.name === hearing.judge);
+    hearing.transcript.push(`${status} rests.`);
+
+    if (!hearing.transcript.length <= 2) {
+      
+      const systemMessage = opposingTeamTurn(caseDetails, status, hearing.transcript, judge, `${user.firstName} ${user.lastName}`);
+      
+      const response = await openai.chat.completions.create({
+        messages: [{ role: "system", content: systemMessage }],
+        model: "gpt-3.5-turbo-1106",
+      });
+      console.log(response.choices[0].message.content);
+      const parsedResponse = JSON.parse(response.choices[0].message.content);
+      parsedResponse.map(msg => {
+        hearing.transcript.push(msg);
+      });
+      hearing.rested = true;
+    }
+    
+    await hearing.save();
+    return {message: parsedResponse}
+  } catch (err) {
+    throw newErr(err.message || 'An error has occurred', 500);
+  }
+}
+
+module.exports = {rest, handleMessage, createCase, startHearing}

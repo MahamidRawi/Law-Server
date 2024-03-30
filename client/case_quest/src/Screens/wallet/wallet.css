@@ -6,6 +6,36 @@
     align-items: center;
 }
 
+.court-container {
+  display: flex;
+}
+
+.court-container div {
+  margin-left: 2%;
+}
+
+.court-container div button {
+  margin-top: 10px;
+}
+
+.screencontainer {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 350px;
+  width: 13%;
+  padding: 2px;
+}
+
+.screencontainer-2 {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 350px;
+  width: 17%;
+  padding: 2px;
+}
+
 .clr {
     padding: 3%;
     color: black;
@@ -21,6 +51,7 @@
     border: 2px solid #ced4da;
     border-width: 2px;
     max-height: 350px;
+    width: 85%;
     overflow-y: auto;
     padding: 5px;
   }
