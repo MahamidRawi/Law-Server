@@ -352,51 +352,45 @@ const prosecutionFirstMessage = (caseInfo) => {
     `
 }
 
-const correspondingResponse = (caseInfo, target, judge, message, messageHistory) => {
-  console.log('HERE WE ARE : ', message, target)
+const correspondingResponse = (caseInfo, judge, message, messageHistory) => {
+  console.log('HERE WE ARE : ', message)
   return `
-  {
-    "context": "Use this transcript history for consistency: ${JSON.stringify(messageHistory)}",
-    "roles": {
-      "target": "You will be role playing ${target}",
-      "opposing Council": "${caseInfo.oppositionName}",
-      "caseInfo": "${caseInfo}",
-      "judge": {
-        "name": "${judge.name}",
-        "characteristics": "${judge.characteristics}"
-      }
-    },
-    "interaction": {
-      "currentQuestion": "${message.message}",
-      "currentSender": "${message.sender}",
-      "Addressing": "${target}"
-    },
-    "instructions": {
-      "responseFormat": "JSON array of objects; array size may vary based on the scenario.",
-      "realism": "Respond realistically and seriously as per a trial setting. Invent details only if relevant and necessary for the case.",
-      "objections": {
-        "includeIfPresent": "Include an objection message only if there is an actual objection.",
-        "judgeResponseOnObjection": "Include a judge's decision on the objection if applicable."
-      },
-      "errorsToAvoid": [
-        "Do not mistake ${message.sender} for a client; they are an attorney representative.",
-        "The trial must be as realistic as possible ; I don't want the judge to object",
-        "Ensure the response is in JSON format, always as an array, even if it contains only one message."
-      ],
-      "note": "Responses must be as human as possible, with the person responding under oath."
-    },
-    "responseExample": [
-      {
-        "sender": "The name of the character you are role-playing, or the judge, except for ${message.sender}",
-        "message": "Content of the response or statement in a human-like style"
-      },
-      {
-        "sender": "Additional characters as required by the context of the trial",
-        "message": "Relevant responses, reactions, or objections"
-      }
-    ],
-    "dynamicResponse": "The number of messages in the array can vary depending on the number of participants and the flow of the trial. Include as many message objects as necessary to portray the trial accurately."
-  }
+  You are the opposing council ${caseInfo.oppositionName} in the following case : ${caseInfo}
+  judge information : ${judge.name}, with caracteristics : ${judge.caracteristics}
+  For context, we are in closing arguments : 
+
+  this is the closing argument given by ${message.sender} (100 % not a client, but a council) : ${message.message}.
+
+  provide your closing argument, while also putting the accent on the difficulty.
+
+  the format must be like this one, in JSON : 
+  [{
+    "sender": "${caseInfo.oppositionName}",
+    "message": "The opposition\'s closing argument"
+  }]
+  `
+}
+
+const verdict = (hearing, caseInfo, judge, depositions) => {
+  const postograde = caseInfo.defense == caseInfo.oppositionName ? "prosecution" : "defense"
+  return `
+  keep in mind there are also depositions : ${depositions}
+  It is time for the judge to give the verdict. 
+  this is the hearing : ${hearing}
+  judge information : 
+    judge name : ${judge.name}
+    judge caracteristics : ${judge.caracteristics}
+  
+  this is the case information : ${caseInfo}
+
+  What you are required, since it is a law simulation is to give, based on the facts and arguments, while being completely neutral : 
+
+  - score out of 100 based on the performance
+  - verdict
+  - reputation points for ${postograde} depending on how he acted. 
+  - compensation (realistic amount) for ${postograde}
+
+  Note : you must follow the jurisdiction of ${caseInfo.lawSystem}
   `
 }
 
@@ -445,4 +439,4 @@ const opposingTeamTurn = (caseInfo, status, transcript, judge, name) => {
 
 
 
-module.exports = {opposingTeamTurn, correspondingResponse, prosecutionFirstMessage, endSettlement, endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}
+module.exports = {verdict, opposingTeamTurn, correspondingResponse, prosecutionFirstMessage, endSettlement, endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}

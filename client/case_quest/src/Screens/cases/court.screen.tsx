@@ -32,9 +32,8 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
     const [caseInfo, setCaseInfo] = useState<any>({});
     const [judge, setJudge] = useState<string>('');
     const [isResult, setIsResult] = useState<boolean>(false);
-    
+
     const [loadingInfo, setLoadingInfo] = useState(true);
-    const [currentlyAddressing, setCurrentlyAddressing] = useState<string>('...');
     const [depositionId, setDepositionId] = useState<string>('');
 
     useEffect(() => {
@@ -48,7 +47,6 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
               setMessages(resn.messages);
               setDepositionStarted(true);
               setJudge(resn.judge);
-              setCurrentlyAddressing(resn.judge)
               setCaseInfo(resp.case);
               setLoading(false);
               setRested(resn.rested);
@@ -76,7 +74,7 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
       setCurrentMessage('');
       setMessages(prevMessages => [...prevMessages, newMessage]);
       try {
-        const sentMessage:any = await sendCourtMessage(newMessage, depositionId, currentlyAddressing);   
+        const sentMessage:any = await sendCourtMessage(newMessage, depositionId);   
         setMessages(prevMessages => [...prevMessages, ...sentMessage.message]);
         return setLoading(false);
       } catch (err: any) {
@@ -113,6 +111,7 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
     }
 
     const endHearing = async () => {
+      console.log(depositionId)
       try {
         const result = await endTrial(depositionId);
         
@@ -148,21 +147,6 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
             ))}
               <div ref={messagesEndRef} />
           </ListGroup>
-          <div className="screencontainer">
-            Talk To...
-            <Button onClick={() => setCurrentlyAddressing(judge)}>{judge}</Button>
-            {caseInfo && caseInfo.participants.map((part: any) => (
-              <Button key={part.name} onClick={() => setCurrentlyAddressing(part.name)}>{part.name}</Button>
-            ))}
-          </div>
-          <div className="screencontainer-2">
-            Discoveries : 
-            {caseInfo && caseInfo.discoveries.map((part: any) => (
-              <Card className='mb-4'>
-                <Card.Text><center>{part.title}</center></Card.Text> 
-              </Card>
-            ))}
-          </div>
           </div>
           <Form onSubmit={sendMessage}>
             <Form.Group className="mb-3">
@@ -171,7 +155,7 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
                 disabled={loadingInfo}
                 value={currentMessage}
                 onChange={(e) => setCurrentMessage(e.target.value)}
-                placeholder={`You Are Currently Addressing : ${currentlyAddressing}`}
+                placeholder="Write your closing argument here"
               />
             </Form.Group>
             <div className="d-flex justify-content-center">
@@ -180,8 +164,7 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
     </div>
     <div className="flex-grow-0" style={{ maxWidth: '50%' }}>
         <Button variant="secondary" disabled={loading || rested} onClick={() => rest()} className="w-35">Rest</Button>
-        <Button variant="secondary" disabled={loading || !rested} onClick={(e: any) => sendMessage(e)} style={{marginLeft: '10px'}} className="w-35">Closing Arguments</Button>
-        <Button variant="danger" disabled={loading} onClick={() => endDepo()} style={{marginLeft: '10px'}} className="w-35">End Trial</Button>
+        <Button variant="danger" disabled={loading} onClick={() => endHearing()} style={{marginLeft: '10px'}} className="w-35">Verdict</Button>
     </div>
 </div>
 

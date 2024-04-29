@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { alreadyExists, validate } = require('../../middleware/auth/auth.middleware');
-const { createCase, startHearing, handleMessage, rest } = require('../../actions/main/cases/cases.actions');
+const { createCase, startHearing, handleMessage, rest, endHearing } = require('../../actions/main/cases/cases.actions');
 const { getCase } = require('../../actions/main/fetch.actions');
 const { calculatedPrices, lMPrices } = require('../../vars/vars');
 const { caseExists } = require('../../middleware/cases/cases.middleware');
@@ -82,6 +82,17 @@ router.post('/court/startHearing', validate, async (req, res) => {
     const {caseId} = req.body;
     try {
         const resp = await startHearing(caseId, req.userId);
+        return res.status(resp.stc || 200).json(resp);
+    } catch (err) {
+        return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});
+    }
+});
+
+router.post('/court/endTrial', validate, async (req, res) => {
+    const trialId = req.headers['hearingid'];
+    console.log(trialId)
+    try {
+        const resp = await endHearing(trialId, req.userId);
         return res.status(resp.stc || 200).json(resp);
     } catch (err) {
         return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});

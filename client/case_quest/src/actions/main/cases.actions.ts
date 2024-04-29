@@ -91,12 +91,12 @@ const sendMessage = (message: object, depositionId: string): Promise<{message?: 
     })
 }
 
-const sendCourtMessage = (message: object, hearingId: string, target: string): Promise<{message?: string, success: boolean, granted?: boolean, AR?: boolean}> => {
+const sendCourtMessage = (message: object, hearingId: string): Promise<{message?: string, success: boolean, granted?: boolean, AR?: boolean}> => {
     return new Promise(async (resolve, reject) => {
         const token = localStorage.getItem('user_token');
         if (!token) return reject({success: false, message: 'No Token', AR: true});
         try {
-            const res = await axios.post(config.API_BASE_URL + '/main/cases/court/sendCourtMessage', {hearingId, message, target}, {headers: {'x-access-token': token}});
+            const res = await axios.post(config.API_BASE_URL + '/main/cases/court/sendCourtMessage', {hearingId, message}, {headers: {'x-access-token': token}});
             return resolve({success: true, message: res.data.message});
         } catch (err: any) {
             const axiosErr = err as AxiosError<{message: string}>;
@@ -187,9 +187,10 @@ const getRepresentativeLawyer = async (caseId: string) => {
 const endTrial = async (trialId: string) => {
     try {
         const token = localStorage.getItem('user_token');
+        console.log(token)
         if (!token) throw new Error('No Token');
-        const response = await axios.post(config.API_BASE_URL + '/main/cases/endTrial', {headers: {
-            'hearingId': trialId,
+        const response = await axios.post(config.API_BASE_URL + '/main/cases/court/endTrial', {}, {headers: {
+            'hearingid': trialId,
             'x-access-token': token
         }});
         const {result} = response.data;

@@ -1,4 +1,4 @@
-const {createCasePrompt, prosecutionFirstMessage, correspondingResponse, opposingTeamTurn} = require('../../../helper/openai.api.helper');
+const {createCasePrompt, prosecutionFirstMessage, correspondingResponse, opposingTeamTurn, verdict} = require('../../../helper/openai.api.helper');
 const {caseSchema} = require('../../../schemas/joi.schema');
 const mongoose = require('mongoose');
 require('../../../DB/models/cases.model');
@@ -14,6 +14,8 @@ const ObjHelper = require('../../../helper/obj.helper');
 const { judges } = require('../../../vars/vars');
 const { initiateCourt, presentOtherSide } = require('../../../helper/court.helper');
 const openai = new OpenAI({apiKey: config.APIPASS});
+require('../../../DB/models/depositions.model');
+const Deposition = mongoose.model('Chat');
 
 const newErr = (message, stc) => {
   const error = new Error(message);
@@ -75,6 +77,32 @@ if (chosenPosition === 'prosecution') {
     });
 }
 
+const endHearing = async (hearingId, uid) => {
+  console.log(hearingId, uid)
+  try {
+    const hearing = await hearings.findOne({_id: hearingId});
+    if (!hearing) console.log('reached here');
+    console.log('step 1');
+    const caseFound = await cases.findOne({_id: hearing.caseId});
+    console.log('step 2');
+
+  console.log(caseFound)
+    if (!caseFound || caseFound.owners[0] !== uid) console.log('reached here')
+    const depos = await Deposition.find({caseId: caseFound.id});
+    const designatedJudge = judges.filter(judge => judge.name == hearing.judge);
+    console.log('sending request')
+    const response = await openai.chat.completions.create({
+      messages: [{ role: "system", content: verdict(hearing, caseFound, designatedJudge, depos) }],
+      model: "gpt-3.5-turbo-1106",
+    });
+    console.log(response.choices[0].message.content);
+
+  } catch (err) {
+    throw newErr(err.message || 'An error has occurred', 500);
+
+  }
+}
+
 const startHearing = async (caseId, uid) => {
   try {
     const caseFound = await cases.findOne({_id: caseId});
@@ -118,7 +146,7 @@ const startHearing = async (caseId, uid) => {
   }
 }
 
-const handleMessage = async (hearingId, message, userId, targetName) => {
+const handleMessage = async (hearingId, message, userId) => {
   console.log(hearingId);
   try {
     const hearing = await hearings.findOne({ _id: hearingId });
@@ -132,16 +160,11 @@ const handleMessage = async (hearingId, message, userId, targetName) => {
       throw newErr('Unauthorized or case not found', 403);
     }
 
-    const participantName = caseDetails.participants.find(participant => participant.name === targetName)?.name || targetName;
-    if (!targetName.includes('Judge') && !participantName) {
-      throw newErr('Participant not found', 404);
-    }
-
     hearing.transcript.push(message);
     await hearing.save();
 
     const judge = judges.find(judge => judge.name === hearing.judge);
-    const systemMessage = correspondingResponse(caseDetails, participantName, judge, message, hearing.transcript);
+    const systemMessage = correspondingResponse(caseDetails, judge, message, hearing.transcript);
 
     const response = await openai.chat.completions.create({
       messages: [{ role: "system", content: systemMessage }],
@@ -207,4 +230,4 @@ const rest = async (hearingId, uid) => {
   }
 }
 
-module.exports = {rest, handleMessage, createCase, startHearing}
+module.exports = {endHearing, rest, handleMessage, createCase, startHearing}
