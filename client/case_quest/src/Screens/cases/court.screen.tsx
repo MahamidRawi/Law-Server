@@ -4,7 +4,7 @@ import { Container, Row, Col, Form, Button, ListGroup, Card } from 'react-bootst
 import '../wallet/wallet.css';
 import { userValidate } from '../../actions/auth.actions';
 import { AuthContext } from '../../Providers/auth.provider';
-import { councilRest, endDeposition, getCase, getRepresentativeLawyer, sendCourtMessage, startDeposition, startHearing } from '../../actions/main/cases.actions';
+import { councilRest, endDeposition, endTrial, getCase, getRepresentativeLawyer, sendCourtMessage, startDeposition, startHearing } from '../../actions/main/cases.actions';
 import { ActivityIncicator } from '../../RC/acitivity.incdicator';
   
   interface Message {
@@ -31,6 +31,8 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [caseInfo, setCaseInfo] = useState<any>({});
     const [judge, setJudge] = useState<string>('');
+    const [isResult, setIsResult] = useState<boolean>(false);
+    
     const [loadingInfo, setLoadingInfo] = useState(true);
     const [currentlyAddressing, setCurrentlyAddressing] = useState<string>('...');
     const [depositionId, setDepositionId] = useState<string>('');
@@ -67,11 +69,11 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
       e.preventDefault();
       setLoading(true);
       if (!currentMessage.trim()) return setLoading(false);
-      setCurrentMessage('');
       const newMessage: Message = {
         message: currentMessage,
         sender: `${myInfo.firstName} ${myInfo.lastName}`
       };     
+      setCurrentMessage('');
       setMessages(prevMessages => [...prevMessages, newMessage]);
       try {
         const sentMessage:any = await sendCourtMessage(newMessage, depositionId, currentlyAddressing);   
@@ -105,6 +107,16 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
         localStorage.setItem('LCC', 'Discoveries');
         return navigate(-2);
       } catch (err:any) {
+        if (err.AR) logout();
+        else alert(JSON.stringify(err) || 'An Error has Occurred');
+      }
+    }
+
+    const endHearing = async () => {
+      try {
+        const result = await endTrial(depositionId);
+        
+      } catch (err: any) {
         if (err.AR) logout();
         else alert(JSON.stringify(err) || 'An Error has Occurred');
       }
@@ -167,9 +179,9 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
         <Button variant="primary" disabled={loading} type="submit" className="w-100">Send</Button>
     </div>
     <div className="flex-grow-0" style={{ maxWidth: '50%' }}>
-        <Button variant="secondary" disabled={loading} onClick={() => rest()} className="w-35">Rest</Button>
+        <Button variant="secondary" disabled={loading || rested} onClick={() => rest()} className="w-35">Rest</Button>
         <Button variant="secondary" disabled={loading || !rested} onClick={(e: any) => sendMessage(e)} style={{marginLeft: '10px'}} className="w-35">Closing Arguments</Button>
-        <Button variant="danger" disabled={loading} onClick={() => endDepo()} style={{marginLeft: '10px'}} className="w-35">End Hearing</Button>
+        <Button variant="danger" disabled={loading} onClick={() => endDepo()} style={{marginLeft: '10px'}} className="w-35">End Trial</Button>
     </div>
 </div>
 

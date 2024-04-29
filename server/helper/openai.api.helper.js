@@ -14,7 +14,6 @@ function shuffleArray(array) {
 
 const createCasePrompt = (uid, caseInfo, pos) => {
     const random = shuffleArray(discoveryTemplates).slice(0,4);
-    console.log('random :', random);
     const { lawSystem, additionalKeywords, fieldOfLaw, difficulty } = caseInfo;
     
 
@@ -41,7 +40,9 @@ const createCasePrompt = (uid, caseInfo, pos) => {
     "solution": "text containing the truth that will guide the game. It must say what truly happened, so that the responses will follow it."
 }
 
-Guidelines
+Guidelines : 
+- IMPORTANT : You must add only human in the participants (not entities / teams etc...).
+- The participants array must include only the main participants, in addition to witnesses, etc...
 - VERY VERY IMPORTANT : THE RESPONSE MUST HAVE THE NECESSARY INFORMATION (IN THE DISCOVERIES) FOR THE USER TO BE ABLE TO PROCEED WORKING ON THE CASE. SO CONSTRUCT IT IN A VERY INTERESTING WAY.
 Guidelines:
 - Make sure it's complete JSON.
@@ -216,7 +217,7 @@ return openAiPrompt;
 }
 
 const SubpoenaMessagePrompt = (attourney, subpoenee, caseInfo, message, messageHistory) => {
-  console.log(attourney, subpoenee)
+  console.log('HERE WE ARE : ', attourney, subpoenee)
   const prompt = subpoenee.ctc ? `
   You are : ${subpoenee.name} and your role is ${subpoenee.role} in the following case : ${caseInfo}
   You are in a closed room - that is to say that everything said in this conversation no one will know about,  with your representative attorney.
@@ -352,65 +353,93 @@ const prosecutionFirstMessage = (caseInfo) => {
 }
 
 const correspondingResponse = (caseInfo, target, judge, message, messageHistory) => {
+  console.log('HERE WE ARE : ', message, target)
   return `
-  This is the transcript history : ${JSON.stringify(messageHistory)}
-  You are playing the role of ${target} in the case : ${caseInfo}. However, at any given moment, you can play the role of the judge : ${judge.name} who's caracteristics are the following : ${judge.caracteristics}, and intervene and react to a statement like in real life. 
-
-  You must respond to the following question or statement : ${message.message}, stated by : ${message.sender}
-
-  Do it as realistic and as serious as you can be. According to how a trial must go. 
-  To any statement, the opposition attorney must response. 
-  If you notice that the sender finished his part (asking, presenting or something), the opposition side may proceed. You can ask questions for the witnesses (and provide answers to them), etc... like in the provided format to respect.
-  Please respect the format given (JSON array of objects) and make it interesting and as realistic as possible.
-  Add an objection message only if there is an objection. Don't write a message. * Do not add * to the array a "No objection" message from opposing team if there are no objections.
-  In case there are objections, add also a message from the judge telling if granted or overruled.
-  The response must be as human as possible. And the person is under oath. The response must be in JSON strictly following this format : Always array (even if 1 message) :
-  [{
-    "sender": "Whoever you are role playing, or the judge except the sender of ${message.sender}",
-    "message: "content of the message, as human style as possible"
-  }, {
-    "sender": "The opposition attorney's name",
-    "message": "The message / reaction / any objection"
-  }, {
-    "sender": "the name of whoever decides to say anything",
-    "message": "the content of the message"
-  }]
+  {
+    "context": "Use this transcript history for consistency: ${JSON.stringify(messageHistory)}",
+    "roles": {
+      "target": "You will be role playing ${target}",
+      "opposing Council": "${caseInfo.oppositionName}",
+      "caseInfo": "${caseInfo}",
+      "judge": {
+        "name": "${judge.name}",
+        "characteristics": "${judge.characteristics}"
+      }
+    },
+    "interaction": {
+      "currentQuestion": "${message.message}",
+      "currentSender": "${message.sender}",
+      "Addressing": "${target}"
+    },
+    "instructions": {
+      "responseFormat": "JSON array of objects; array size may vary based on the scenario.",
+      "realism": "Respond realistically and seriously as per a trial setting. Invent details only if relevant and necessary for the case.",
+      "objections": {
+        "includeIfPresent": "Include an objection message only if there is an actual objection.",
+        "judgeResponseOnObjection": "Include a judge's decision on the objection if applicable."
+      },
+      "errorsToAvoid": [
+        "Do not mistake ${message.sender} for a client; they are an attorney representative.",
+        "The trial must be as realistic as possible ; I don't want the judge to object",
+        "Ensure the response is in JSON format, always as an array, even if it contains only one message."
+      ],
+      "note": "Responses must be as human as possible, with the person responding under oath."
+    },
+    "responseExample": [
+      {
+        "sender": "The name of the character you are role-playing, or the judge, except for ${message.sender}",
+        "message": "Content of the response or statement in a human-like style"
+      },
+      {
+        "sender": "Additional characters as required by the context of the trial",
+        "message": "Relevant responses, reactions, or objections"
+      }
+    ],
+    "dynamicResponse": "The number of messages in the array can vary depending on the number of participants and the flow of the trial. Include as many message objects as necessary to portray the trial accurately."
+  }
   `
 }
 
 const opposingTeamTurn = (caseInfo, status, transcript, judge, name) => {
+  // Determine the role to play based on the current status
   const roleToPlay = status === 'Prosecution' ? 'Defense' : 'Prosecution';
+  
+  // Generate a dynamic and complex prompt
+  let prompt = `
+  The courtroom is charged with tension as the ${status} team, led by ${name}, has just rested their case. You, playing the role of ${roleToPlay} attorney ${caseInfo.oppositionName}, are known for your sharp wit and unyielding pursuit of justice. With the gavel's echo still lingering, it's your turn to steer the fate of the case described as ${JSON.stringify(caseInfo)}.
 
-  return `
-  ${status} rested.
-    Previous transcript : ${transcript}
-    The ${status} is represented by me : ${name}.
-    You must never play the role ${status}
-    Context: In a courtroom simulation involving a case described as ${JSON.stringify(caseInfo)}, the ${status} has just rested. You are now playing the role of the ${roleToPlay} attorney, ${caseInfo.oppositionName}, known for your arrogance. The judge overseeing this case is ${judge.name}. Be brutal, extremely eloquent.
-    If rested without presenting a case, the judge compells the side to present their case. And you don't move on : return empty array.
-    Instructions: Perform the entire turn for the ${roleToPlay} side. This includes presenting your case, questioning witnesses, responding to objections, and interacting with the judge. Your approach and language should reflect the difficulty level of the case, which is ${caseInfo.difficulty}. Be as realistic and detailed as possible, maintaining a serious tone throughout.
+  Judge ${judge.name}, a figure of stern demeanor and incisive legal acumen, turns their gaze upon you, expecting a performance that matches the gravity of the proceedings. The courtroom awaits, silent but for the shuffling of notes and the quiet breaths of its occupants.
 
-    Your task is to continue the transcript in a manner that reflects a comprehensive understanding of courtroom procedures, incorporating the appropriate legal strategies and responses based on the case's complexity and the characteristics of the participants involved.
+  Your challenge is multifaceted:
+  - Engage with witnesses through a series of calculated questions designed to unravel the narrative spun by the ${status}.
+  - Present evidence with precision, painting a vivid picture that supports your argument, compelling the jury and satisfying the rigorous standards of Judge ${judge.name}.
+  - Navigate objections, both raising and countering them, in a manner that demonstrates not only your legal expertise but also your strategic acumen.
+  - Maintain a dialogue with Judge ${judge.name} that respects the court's protocols while advancing your case's interests.
 
-    Please format your continuation of the transcript in strict JSON format, as shown below. Include all relevant actions and exchanges, ensuring a dynamic and engaging narrative that adheres to the simulation's requirements.
+  Each move you make, each word you utter, must be carefully considered, contributing to a seamless narrative that encapsulates your legal strategy and the complexities of the case.
 
-    You must not involve the opposing council during your turn. Do not say anything on his behalf.
+  Craft your actions and exchanges in a JSON format that mirrors the flow of a real courtroom battle. This format not only demands precision but also encourages creativity within the structured confines of legal proceedings.
 
-    Must be following JSON Response Format:
-    [
-      {
-        "sender": "Name of the person speaking (e.g., ${caseInfo.oppositionName}, Witness Name, Judge ${judge.name})",
-        "message": "The content of their statement or question."
-      },
-      {
-        "sender": "The respondent or the next speaker",
-        "message": "Their response, reaction, or the next question."
-      }
-      // Add as many objects as needed to complete the narrative of the turn.
-    ]
-    You Must Play all the roles other than that of the attorney ${name}.
-    Note: Your response must cover the entirety of the turn, including questions posed to witnesses on the stand, their answers, any documents presented, and responses from the judge. The aim is to create a continuous and engaging dialogue that seamlessly extends the existing transcript.
-  `
+  Example JSON Response Format:
+  [
+    {
+      "sender": "Name of the person speaking (e.g., ${caseInfo.oppositionName}, Witness Name, Judge ${judge.name})",
+      "message": "What is delivered or asked."
+    },
+    {
+      "sender": "The respondent or the next speaker",
+      "message": "The reply, reaction, or the following inquiry."
+    }
+    // Continue adding objects to fully encapsulate the engagement of your turn.
+  ]
+
+  This simulation is your arena. Beyond merely responding, you're to weave a narrative that's both compelling and logically sound, reflecting the depth of your understanding and the breadth of your legal creativity. The weight of the ${roleToPlay} now rests on your shoulders.
+  It must be complete, from the beginning to The announcement of resting of the ${roleToPlay}
+  Remember: Your portrayal should not only adhere to the procedural and ethical standards expected in a court of law but also push the boundaries of legal strategy and courtroom dynamics. This is your chance to shine as a beacon of justice or a master of defense, shaping the outcome with each decision you make.
+  `;
+
+  // Return the dynamically constructed, enhanced prompt
+  return prompt;
 }
 
 

@@ -126,7 +126,7 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false 
             </Card.Body>
           </Card>
           </center>
-          <ListGroup className="messages-list mb-3">
+          <ListGroup className="messages-list-depos mb-3">
             {messages.map((message, index) => (
               <ListGroup.Item key={index} className="text-wrap">
                 <strong>{message.sender} :</strong> {message.message}

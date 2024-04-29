@@ -119,6 +119,7 @@ const startHearing = async (caseId, uid) => {
 }
 
 const handleMessage = async (hearingId, message, userId, targetName) => {
+  console.log(hearingId);
   try {
     const hearing = await hearings.findOne({ _id: hearingId });
     if (!hearing) throw newErr('Hearing not found', 404);
@@ -147,6 +148,8 @@ const handleMessage = async (hearingId, message, userId, targetName) => {
       model: "gpt-3.5-turbo-1106",
     });
 
+    console.log(response.choices[0].message)
+
     const parsedResponse = JSON.parse(response.choices[0].message.content);
     parsedResponse.map(msg => {
       hearing.transcript.push(msg);
@@ -161,9 +164,12 @@ const handleMessage = async (hearingId, message, userId, targetName) => {
 };
 
 const rest = async (hearingId, uid) => {
+  let parsedResponse;
   try {
     const hearing = await hearings.findOne({ _id: hearingId });
     if (!hearing) throw newErr('Hearing not found', 404);
+
+    if (hearing.rested) return {message: []}
 
     const user = await users.findOne({ _id: uid });
     if (!user) throw newErr('User not found', 404);
@@ -175,7 +181,7 @@ const rest = async (hearingId, uid) => {
     const status = await caseDetails.prosecution == uid ? 'Prosecution' : 'Defense'
     
     const judge = judges.find(judge => judge.name === hearing.judge);
-    hearing.transcript.push(`${status} rests.`);
+    hearing.transcript.push({sender: `${user.firstName} ${user.lastName}`, message: `${status} rests.`});
 
     if (!hearing.transcript.length <= 2) {
       
@@ -185,8 +191,9 @@ const rest = async (hearingId, uid) => {
         messages: [{ role: "system", content: systemMessage }],
         model: "gpt-3.5-turbo-1106",
       });
-      console.log(response.choices[0].message.content);
-      const parsedResponse = JSON.parse(response.choices[0].message.content);
+      // console.log(response.choices[0].message.content);
+      parsedResponse = JSON.parse(response.choices[0].message.content);
+      console.log(parsedResponse)
       parsedResponse.map(msg => {
         hearing.transcript.push(msg);
       });

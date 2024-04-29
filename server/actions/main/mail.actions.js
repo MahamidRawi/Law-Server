@@ -1,5 +1,7 @@
 require('../../DB/models/user.model');
 require('../../DB/models/notification.model');
+const Filter = require('bad-words');
+const filter = new Filter({ placeHolder: '*' });
 const mongoose = require('mongoose');
 const user = mongoose.model('userModel');
 const Mail = mongoose.model('mailModel');
@@ -33,7 +35,7 @@ const sendMail = (uid, targetMail, subject, body) => {
                 associated: [userFound.id, senderUserFound.id],
                 targetId: userFound._id,
                 subject,
-                body,
+                body: filter.clean(body),
                 date: Date.now()
             };
 

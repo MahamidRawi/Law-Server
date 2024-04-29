@@ -56,6 +56,18 @@
     padding: 5px;
   }
 
+  .messages-list-depos {
+    height: 350px;
+    border-radius: 10px;
+    border: 2px solid #ced4da;
+    border-width: 2px;
+    max-height: 350px;
+    width: 100%;
+    overflow-y: auto;
+    padding: 5px;
+  }
+
+
   .custom-card {
     background-color: transparent; /* Example: a blue background */
     color: black; /* White text */

@@ -143,7 +143,7 @@ const startHearing = (caseId: string | undefined) => {
         try {
             const res = await axios.post(config.API_BASE_URL + '/main/cases/court/startHearing', {caseId}, {headers: {'x-access-token': token}});
             console.log(res.data)
-            return resolve({hearingId: res.data.hearingId, messages: res.data.transcript, judge: res.data.judge});
+            return resolve({hearingId: res.data.hearingId, messages: res.data.transcript, rested: res.data.rested, judge: res.data.judge});
         } catch (err: any) {
             const axiosErr = err as AxiosError<{message: string}>;
             const stc = axiosErr.status;
@@ -183,4 +183,22 @@ const getRepresentativeLawyer = async (caseId: string) => {
         return stc != 200 ? {success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false} : {success: true, message : err.response?.data.message};
     }
 }
-export {councilRest, sendCourtMessage, startHearing, getRepresentativeLawyer, endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}
+
+const endTrial = async (trialId: string) => {
+    try {
+        const token = localStorage.getItem('user_token');
+        if (!token) throw new Error('No Token');
+        const response = await axios.post(config.API_BASE_URL + '/main/cases/endTrial', {headers: {
+            'hearingId': trialId,
+            'x-access-token': token
+        }});
+        const {result} = response.data;
+        return {result}
+    } catch (err: any) {
+        const axiosErr = err as AxiosError<{message: string}>;
+        const stc = axiosErr.status;
+        return stc != 200 ? {success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false} : {success: true, message : err.response?.data.message};
+    }
+}
+
+export {endTrial, councilRest, sendCourtMessage, startHearing, getRepresentativeLawyer, endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}

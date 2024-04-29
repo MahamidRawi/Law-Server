@@ -64,8 +64,6 @@ const MainRoutes: React.FC = () => {
                         <Link to="/" className="navbar-brand ml-25">CaseQuest</Link>
                         <Link className='nav-link' to="/Cases">Cases</Link>
                         <Link className='nav-link' to="/Lawyers">Lawyers</Link>
-                        <Link className='nav-link' to="/Firms">Firms</Link>
-                        <Link className='nav-link' to="/My-Firm">My Firm</Link>
                     </Nav>
                 </Container>
             </Navbar>
@@ -74,8 +72,6 @@ const MainRoutes: React.FC = () => {
                 <Route path='/Cases' element={<Home />}/>
                 <Route path='/ViewCase' element={<ViewCase />}/>
                 <Route path='/Lawyers' element={<Lawyers />}/>
-                <Route path='/Firms' element={<>Firms</>}/>
-                <Route path='/My-Firm' element={<>My Firm</>}/>
                 <Route path='/MoreInfo' element={<LawyerInformationScreen />}/>
                 <Route path='/Mail' element={<MailScreen />} />
                 <Route path='/ViewMail' element={<ViewMail/>}/>
