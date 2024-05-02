@@ -159,12 +159,11 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
               />
             </Form.Group>
             <div className="d-flex justify-content-center">
-    <div className="flex-grow-1" style={{ marginRight: '10px', maxWidth: '50%' }}>
+    <div className="flex-grow-1" style={{ marginRight: '10px', maxWidth: '75%' }}>
         <Button variant="primary" disabled={loading} type="submit" className="w-100">Send</Button>
     </div>
-    <div className="flex-grow-0" style={{ maxWidth: '50%' }}>
-        <Button variant="secondary" disabled={loading || rested} onClick={() => rest()} className="w-35">Rest</Button>
-        <Button variant="danger" disabled={loading} onClick={() => endHearing()} style={{marginLeft: '10px'}} className="w-35">Verdict</Button>
+    <div className="flex-grow-0" style={{ maxWidth: '25%' }}>
+        <Button variant="danger" disabled={loading} onClick={() => endHearing()} style={{marginLeft: '10px'}} className="w-100">Verdict</Button>
     </div>
 </div>
 

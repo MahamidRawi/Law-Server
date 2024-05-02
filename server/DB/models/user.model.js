@@ -11,6 +11,11 @@ const UserSchema = new Schema({
         maxlength: [20, 'Username must be less than 20 characters long']
     },
 
+    reputation: {
+        type: Number,
+        default: 0
+    },
+
     email: {
         type: String,
         required: [true, 'Email is required'],

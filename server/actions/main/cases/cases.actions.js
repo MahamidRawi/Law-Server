@@ -1,9 +1,10 @@
 const {createCasePrompt, prosecutionFirstMessage, correspondingResponse, opposingTeamTurn, verdict} = require('../../../helper/openai.api.helper');
 const {caseSchema} = require('../../../schemas/joi.schema');
-const mongoose = require('mongoose');
 require('../../../DB/models/cases.model');
 require('../../../DB/models/hearing.model');
 require('../../../DB/models/user.model');
+const mongoose = require('mongoose');
+const wallet = mongoose.model('walletModel');
 const cases = mongoose.model('casesModel');
 const users = mongoose.model('userModel');
 const hearings = mongoose.model('HearingModel');
@@ -79,25 +80,76 @@ if (chosenPosition === 'prosecution') {
 
 const endHearing = async (hearingId, uid) => {
   console.log(hearingId, uid)
+  let response;
   try {
+    const newdate = Date.now();
+    const fetchedAdmin = await users.findOne({admin: true});
     const hearing = await hearings.findOne({_id: hearingId});
-    if (!hearing) console.log('reached here');
-    console.log('step 1');
+    if (!hearing) return newErr('Hearing Not Found', 404)
     const caseFound = await cases.findOne({_id: hearing.caseId});
-    console.log('step 2');
-
-  console.log(caseFound)
-    if (!caseFound || caseFound.owners[0] !== uid) console.log('reached here')
+  console.log(Boolean(caseFound.verdict));
+    if (!caseFound || caseFound.owners[0] !== uid || Object.keys(caseFound.verdict).length !== 0) return newErr(caseFound.verict ? 'Case Already Concluded' : 'Case Not Found', 404);
     const depos = await Deposition.find({caseId: caseFound.id});
     const designatedJudge = judges.filter(judge => judge.name == hearing.judge);
-    console.log('sending request')
-    const response = await openai.chat.completions.create({
+    response = await openai.chat.completions.create({
       messages: [{ role: "system", content: verdict(hearing, caseFound, designatedJudge, depos) }],
       model: "gpt-3.5-turbo-1106",
     });
     console.log(response.choices[0].message.content);
+    const final = JSON.parse(response.choices[0].message.content)
+    await cases.findOneAndUpdate({_id: caseFound._id}, {
+      verdict: final
+    });
+
+    if (final.compensation > 0) {
+    await wallet.findOneAndUpdate({owner: uid}, {
+      $inc: {
+        balance: final.compensation * 0.97
+      },
+      $push: {
+        income: {
+          $each: [{sender: fetchedAdmin._id, reason: `${caseFound.title} Compensation`, amount: final.compensation * 0.97, date: Date.now()}],
+          $position: 0
+        }
+      }
+    })
+  } else {
+    await wallet.findOneAndUpdate({owner: uid}, {
+      $inc: {
+        balance: final.compensation
+      },
+      $push: {
+        expenses: {
+          $each: [{target: fetchedAdmin._id, reason: `${caseFound.title} Compensation`, amount: final.compensation * 0.97, date: Date.now()}],
+          $position: 0
+        }
+      }
+    })
+  }
+    await users.findOneAndUpdate({_id: uid}, {
+      $inc: {
+        reputation: final.rptnpts
+      },
+      $pull: {
+        cases: caseFound._id
+      },
+      $push: {
+        caseHistory: caseFound._id
+      }
+    });
+    
+    if (final.compensation !== 0) {
+    if (final.compensation < 0) {
+      await addAdminFee(-final.compensation, 'Case Loss', uid, newdate);
+    } else {
+      await addAdminFee(final.compensation * 0.03, 'Case Conclusion Fee', uid, newdate);
+    }
+  }
+
+
 
   } catch (err) {
+    console.log(err);
     throw newErr(err.message || 'An error has occurred', 500);
 
   }

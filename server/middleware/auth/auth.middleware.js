@@ -18,7 +18,6 @@ const alreadyExists = async (req, res, next) => {
 const validate = (req, res, next) => {
 
     const token = req.headers['x-access-token']
-    console.log(token);
     
     if (!token) return res.status(401).json({ validated: false, errors: [{text:"No token was provided"}] });
 

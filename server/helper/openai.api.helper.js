@@ -373,25 +373,38 @@ const correspondingResponse = (caseInfo, judge, message, messageHistory) => {
 
 const verdict = (hearing, caseInfo, judge, depositions) => {
   const postograde = caseInfo.defense == caseInfo.oppositionName ? "prosecution" : "defense"
-  return `
-  keep in mind there are also depositions : ${depositions}
-  It is time for the judge to give the verdict. 
-  this is the hearing : ${hearing}
-  judge information : 
-    judge name : ${judge.name}
-    judge caracteristics : ${judge.caracteristics}
-  
-  this is the case information : ${caseInfo}
+  console.log(postograde)
+return `As part of a law simulation, you are required to provide a judicial evaluation of a party involved in a legal case, referred to as "${postograde}". Using the provided data, simulate a judge's decision-making process, focusing on adherence to legal principles, professionalism, and effectiveness in legal proceedings. The evaluation must be presented in a structured JSON format, detailed below, which includes scores, verdicts, compensation, and justifications based on the observed behavior and legal outcomes.
 
-  What you are required, since it is a law simulation is to give, based on the facts and arguments, while being completely neutral : 
+Inputs:
+- Deposition Transcripts: ${depositions}
+- Hearing Details: ${hearing}
+- Judge Profile:
+  - Name: ${judge.name}
+  - Characteristics: ${judge.caracteristics}
+- Case Summary: ${caseInfo}
+- Jurisdiction: ${caseInfo.lawSystem}
 
-  - score out of 100 based on the performance
-  - verdict
-  - reputation points for ${postograde} depending on how he acted. 
-  - compensation (realistic amount) for ${postograde}
+Evaluation Criteria:
+1. Performance Score: An integer out of 100, reflecting ${postograde}'s legal acumen and conduct. A score below 50 indicates inadequate performance, while a score above 75 signifies exceptional advocacy.
+2. Reputation Points: Range from -10 to +10, indicating ${postograde}'s ethical standing and professionalism. Points are deducted for misconduct and awarded for commendable behavior.
+3. Financial Compensation: Determined by the outcome and merits of the case. Penalties may apply for losing cases or ethical violations, whereas rewards may be up to $5,000 USD for winning cases or outstanding legal ethics.
+4. If in the hearings the ${postograde} didn't well behave or didn't participate at all, they must be evaluated as a loss.
+Required JSON Response Format:
+{
+  "score": "integer score out of 100 reflecting overall performance",
+  "verdict": "detailed explanation of the judge's decision, based on legal facts and proceedings",
+  "rptnpts": "integer reputation points assessing ethical and professional behavior",
+  "compensation": "integer amount reflecting the legal outcome, ranging from a potential penalty to a maximum reward",
+  "status": "${postograde}'s case outcome ('won' or 'lost')",
+  "justification": "detailed reasoning behind the scores, compensation, and reputation points awarded, including specific references to behavior and legal arguments during the proceedings"
+}
 
-  Note : you must follow the jurisdiction of ${caseInfo.lawSystem}
-  `
+Notes:
+- Your assessment should meticulously evaluate ${postograde}'s demeanor, strategy, and adherence to legal standards during depositions and hearings.
+- Decisions must strictly follow the legal protocols and ethics as dictated by ${caseInfo.lawSystem}.
+- The justification must provide a clear, comprehensive explanation for all scores and decisions to ensure transparency and educational value in the simulation.
+`
 }
 
 const opposingTeamTurn = (caseInfo, status, transcript, judge, name) => {
