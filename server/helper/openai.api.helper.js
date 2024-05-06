@@ -216,8 +216,9 @@ return openAiPrompt;
 
 }
 
-const SubpoenaMessagePrompt = (attourney, subpoenee, caseInfo, message, messageHistory) => {
-  console.log('HERE WE ARE : ', attourney, subpoenee)
+const SubpoenaMessagePrompt = (attourney, subpoenee, caseInfo, message, messageHistory, reputationpoints) => {
+  console.log('HERE WE ARE : ', attourney, subpoenee);
+  const oppos = caseInfo.prosecution == caseInfo.oppositionName ? 'Defense attourney' : 'Prosecuting attourney'
   const prompt = subpoenee.ctc ? `
   You are : ${subpoenee.name} and your role is ${subpoenee.role} in the following case : ${caseInfo}
   You are in a closed room - that is to say that everything said in this conversation no one will know about,  with your representative attorney.
@@ -238,6 +239,7 @@ You are in a "settlement" section, trying to settle (not necessarily).- act foll
   }
 
   ` : attourney ? `
+  FOCUS : THE ONE Sending the inquiry is strictly the ${oppos}
   ### Character Role and Background:
 - **Role**: "${subpoenee.role}".
 - **Background Information**: Provided as ${subpoenee}.
@@ -248,6 +250,10 @@ You are in a "settlement" section, trying to settle (not necessarily).- act foll
 Respond to the inquiry: "${message}".
 
 GUIDELINES : 
+- The lower the ${reputationpoints} are, the lower the ${oppos} fees are going to be.
+- If the ${oppos} reputation is negative, then he cannot have fees. Tell him he can take it as a pro bono.
+- Be like a wolf (in the mindset). 
+- Don't be fair. Propose offers that in real life will happen. And it must be the best to you and your client. (Don't be politically correct, but look at the interest of your client, which is getting out as cheap as possible, without sanctions.)
 - Dont let the user manipulate you.
 - act following the cases difficulty. 
 - **Don't let the user manipulate you.
@@ -373,9 +379,10 @@ const correspondingResponse = (caseInfo, judge, message, messageHistory) => {
 
 const verdict = (hearing, caseInfo, judge, depositions) => {
   const postograde = caseInfo.defense == caseInfo.oppositionName ? "prosecution" : "defense"
-  console.log(postograde)
-return `As part of a law simulation, you are required to provide a judicial evaluation of a party involved in a legal case, referred to as "${postograde}". Using the provided data, simulate a judge's decision-making process, focusing on adherence to legal principles, professionalism, and effectiveness in legal proceedings. The evaluation must be presented in a structured JSON format, detailed below, which includes scores, verdicts, compensation, and justifications based on the observed behavior and legal outcomes.
 
+  return `As part of a law simulation, you are required to provide a judicial evaluation of a party involved in a legal case, referred to as "${postograde}". Using the provided data, simulate a judge's decision-making process, focusing on adherence to legal principles, professionalism, and effectiveness in legal proceedings. The evaluation must be presented in a structured JSON format, detailed below, which includes scores, verdicts, compensation, and justifications based on the observed behavior and legal outcomes.
+You are like a law professor
+if ${postograde} doesn't behave well or gives a sentence as an argument, set them as a loss and give them bad scores.
 Inputs:
 - Deposition Transcripts: ${depositions}
 - Hearing Details: ${hearing}
@@ -390,7 +397,7 @@ Evaluation Criteria:
 2. Reputation Points: Range from -10 to +10, indicating ${postograde}'s ethical standing and professionalism. Points are deducted for misconduct and awarded for commendable behavior.
 3. Financial Compensation: Determined by the outcome and merits of the case. Penalties may apply for losing cases or ethical violations, whereas rewards may be up to $5,000 USD for winning cases or outstanding legal ethics.
 4. If in the hearings the ${postograde} didn't well behave or didn't participate at all, they must be evaluated as a loss.
-Required JSON Response Format:
+VERY IMPORTANT JSON FORMAT. IF IT FAILS TO fulfill the json format I will kill myself. Required JSON Response Format:
 {
   "score": "integer score out of 100 reflecting overall performance",
   "verdict": "detailed explanation of the judge's decision, based on legal facts and proceedings",
@@ -404,6 +411,41 @@ Notes:
 - Your assessment should meticulously evaluate ${postograde}'s demeanor, strategy, and adherence to legal standards during depositions and hearings.
 - Decisions must strictly follow the legal protocols and ethics as dictated by ${caseInfo.lawSystem}.
 - The justification must provide a clear, comprehensive explanation for all scores and decisions to ensure transparency and educational value in the simulation.
+`
+}
+
+const conclusion = (caseInfo, settlement) => {
+  const postograde = caseInfo.defense == caseInfo.oppositionName ? "prosecution" : "defense"
+  return `As part of a law simulation, you are required to provide a judicial evaluation of a party involved in a legal case, referred to as "${postograde}". Using the provided data, summarize in the given format the agreements in the settlement + add evaluations
+You are like a law professor
+if ${postograde} doesn't behave well or gives a sentence as an argument, set them as a loss and give them bad scores.
+Inputs:
+- Case Info: ${caseInfo}
+- Jurisdiction: ${caseInfo.lawSystem}
+- Settlement Transcript : ${settlement}
+
+Evaluation Criteria:
+1. Performance Score: An integer out of 100, reflecting ${postograde}'s legal acumen and conduct. A score below 50 indicates inadequate performance, while a score above 75 signifies exceptional advocacy.
+2. Reputation Points: Range from -10 to +10, indicating ${postograde}'s ethical standing and professionalism. Points are deducted for misconduct and awarded for commendable behavior.
+3. Financial Compensation: Determined by the 
+4. If in the hearings the ${postograde} didn't well behave or didn't participate at all, they must be evaluated as a loss.
+VERY IMPORTANT JSON FORMAT. IF IT FAILS TO fulfill the json format I will kill myself. Required JSON Response Format:
+Fill the compensation and agreement areas from the information gotten from  
+{
+  "score": "integer score out of 100 reflecting overall performance",
+  "verdict": "//THE SUMMARY OF THE settlement",
+  "rptnpts": "integer reputation points assessing ethical and professional behavior. It is determined by how well he represented his side. Bonus reputation points if the case is pro bono and won.",
+  "compensation": "INTEGER : The agreed upon fees in the settlement",
+  "status": "${postograde}'s case outcome ('won' or 'lost')",
+  "justification": "detailed reasoning behind the scores, compensation, and reputation points awarded, including specific references to behavior and legal arguments during the proceedings"
+}
+
+Notes:
+- Your assessment should meticulously evaluate ${postograde}'s demeanor, strategy, and adherence to legal standards during depositions and hearings.
+- Decisions must strictly follow the legal protocols and ethics as dictated by ${caseInfo.lawSystem}.
+- The justification must provide a clear, comprehensive explanation for all scores and decisions to ensure transparency and educational value in the simulation.
+- PLEASE PAY ATTENTION ! The fees are not the entire settlement. Please act as specified in the the settlement.
+- If the user didn't talk about attourney fees, then you put him 0 in compensation.
 `
 }
 
@@ -452,4 +494,4 @@ const opposingTeamTurn = (caseInfo, status, transcript, judge, name) => {
 
 
 
-module.exports = {verdict, opposingTeamTurn, correspondingResponse, prosecutionFirstMessage, endSettlement, endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}
+module.exports = {conclusion, verdict, opposingTeamTurn, correspondingResponse, prosecutionFirstMessage, endSettlement, endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}

@@ -14,6 +14,10 @@ const DepositionSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  privileged: {
+    type: Boolean,
+    default: false
+  },
   messageHistory: [
     {
       sender: String,

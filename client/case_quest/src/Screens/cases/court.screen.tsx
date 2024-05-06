@@ -114,7 +114,8 @@ const CourtRoom: React.FC<CourtRoomProps> = ({caseId}) => {
       console.log(depositionId)
       try {
         const result = await endTrial(depositionId);
-        
+        console.log(result)
+        return navigate('/Verdict', {state: {caseInfo}})
       } catch (err: any) {
         if (err.AR) logout();
         else alert(JSON.stringify(err) || 'An Error has Occurred');

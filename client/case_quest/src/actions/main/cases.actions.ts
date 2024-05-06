@@ -39,8 +39,9 @@ const getCase = (caseId: string): Promise<{success: boolean, case: any, AR?: boo
             const res = await axios.get(config.API_BASE_URL + '/main/cases/getCase', {headers: {'caseid' : caseId, 'x-access-token': token}});
             return resolve({success: true, case: res.data.case});
         } catch (err) {
+            console.warn(err);
             const axiosErr = err as AxiosError<{message: string}>;
-            const stc = axiosErr.status;
+            const stc = axiosErr.response?.status;
             return reject({success: false, message: axiosErr.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false});
         }
     })
@@ -167,6 +168,23 @@ const endDeposition = (depositionId: string) => {
     });
 }
 
+
+const endSettlement = (depositionId: string) => {
+    return new Promise(async (resolve, reject) => {
+        const token = localStorage.getItem('user_token');
+        if (!token) return reject({success: false, message: 'No Token', AR: true});
+        try {
+            const response = await axios.post(config.API_BASE_URL + '/main/cases/settlement/endSettlement', {depositionId}, {headers: {'x-access-token': token}});
+            console.log(response.data)
+            return resolve({ success: true });
+        } catch (err: any) {
+            const axiosErr = err as AxiosError<{message: string}>;
+            const stc = axiosErr.status;
+            return stc != 200 ? reject({success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false}) : resolve({success: true, message : err.response?.data.message});
+        }
+    });
+}
+
 const getRepresentativeLawyer = async (caseId: string) => {
     try {
         const token = localStorage.getItem('user_token');
@@ -179,6 +197,7 @@ const getRepresentativeLawyer = async (caseId: string) => {
         return {lawyerInfo: representativeLawyer}
     } catch (err: any) {
         const axiosErr = err as AxiosError<{message: string}>;
+        console.log(err.response.data)
         const stc = axiosErr.status;
         return stc != 200 ? {success: false, message: err.response?.data.message, AR: stc === 401 || stc === 404 ? true :  false} : {success: true, message : err.response?.data.message};
     }
@@ -189,11 +208,14 @@ const endTrial = async (trialId: string) => {
         const token = localStorage.getItem('user_token');
         console.log(token)
         if (!token) throw new Error('No Token');
+        console.log('sending request');
         const response = await axios.post(config.API_BASE_URL + '/main/cases/court/endTrial', {}, {headers: {
             'hearingid': trialId,
             'x-access-token': token
         }});
-        const {result} = response.data;
+        console.log('processing response...', response.data)
+        const {result} = response.data.verdict;
+        console.warn(result)
         return {result}
     } catch (err: any) {
         const axiosErr = err as AxiosError<{message: string}>;
@@ -202,4 +224,4 @@ const endTrial = async (trialId: string) => {
     }
 }
 
-export {endTrial, councilRest, sendCourtMessage, startHearing, getRepresentativeLawyer, endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}
+export {endSettlement, endTrial, councilRest, sendCourtMessage, startHearing, getRepresentativeLawyer, endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena, createCase, getCase, getSubpoenasPricings}

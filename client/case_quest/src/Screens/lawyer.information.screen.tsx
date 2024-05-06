@@ -51,6 +51,8 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                             <div className="row g-3">
                                 <div className="col-12 col-md-4 d-flex flex-column align-items-center">
                                     <Icon icon="solar:user-linear" width={100} height={100} />
+                                    <p className="mt-3"><b>Reputation : </b>{information.reputation || 'N/A'}</p>
+
                                     {!participant ? (
                                         <>
                                             <button className="btn btn-primary mt-3" onClick={() => navigate('/Mail', { state: { targetMail: information.email } })}>Contact</button>
@@ -85,6 +87,7 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                                                     <p><b>Email:</b> {information.email}</p>
                                                     <p><b>Lawyer Since:</b> {formatDate(information.date).split(' ')[0]}</p>
                                                     <p><b>Wallet Number:</b> {information.walletAddress}</p>
+
                                                 </>
                                             </div>
                                         )}

@@ -370,6 +370,17 @@ const lMPrices = legalMotions.map(motion => ({
       { name: "Judge Xander", reputation: "Innovative and boundary-pushing", difficulty: "extreme" },
       { name: "Judge Young", reputation: "Energetic and passionate", difficulty: "easy" }
     ];
+  
+const generateInstantLossVerdict = (caseInfo, uid) => {
+  const userPos = caseInfo.prosecution == uid ? 'Prosecution' : 'Defense'
+  return {
+    verdict: `In this case, due to the lack of cooperation and unprofessional conduct exhibited by ${userPos}, the Court is compelled to enter a default judgment. Accordingly, the case is resolved in favor of ${userPos == 'Prosecution' ? 'Defense' : 'Prosecution'}, effective immediately. This decision ensures the maintenance of judicial integrity and the expedient administration of justice.`,
+    score: 0,
+    rptnpts: -10,
+    compensation: -3500,
+    status: 'lost',
+    justification: 'Due to unprofessionalism, you lost.'
+  }
+}
 
-
-module.exports = { judges, discoveryTemplates, lMPrices, typesOfSubpoenas, calculatedPrices, Err500, transactionMessageSuccess, fieldsOfLaw, lawSystems}
+module.exports = { generateInstantLossVerdict, judges, discoveryTemplates, lMPrices, typesOfSubpoenas, calculatedPrices, Err500, transactionMessageSuccess, fieldsOfLaw, lawSystems}

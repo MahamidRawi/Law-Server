@@ -1,7 +1,9 @@
-const { issueSubpoenaPrompt, fileMotionPrompt, SubpoenaMessagePrompt, endDepositionPrompt, endDepositionTscrpt, endSettlement } = require('../../../helper/openai.api.helper');
+const { issueSubpoenaPrompt, fileMotionPrompt, SubpoenaMessagePrompt, endDepositionPrompt, endDepositionTscrpt, endSettlement, conclusion } = require('../../../helper/openai.api.helper');
 const { subpoenaSchema } = require('../../../schemas/joi.schema');
 const mongoose = require('mongoose');
 require('../../../DB/models/cases.model');
+require('../../../DB/models/wallet.model');
+const wallet = mongoose.model('walletModel');
 const cases = mongoose.model('casesModel');
 const { compareBalanceToRequiredAmount, addAdminFee } = require('../wallet.actions');
 const { OpenAI } = require('openai');
@@ -9,6 +11,9 @@ const { config } = require('../../../config');
 const { calculatedPrices, lMPrices } = require('../../../vars/vars');
 require('../../../DB/models/depositions.model');
 require('../../../DB/models/hearing.model');
+require('../../../DB/models/user.model');
+const users = mongoose.model('userModel');
+
 const Deposition = mongoose.model('Chat');
 const { uuid } = require('uuidv4');
 
@@ -147,6 +152,7 @@ const startDeposition = async (caseId, subpoenee) => {
           caseId: caseId,
           'subpoenee.name': subpoenee.name,
           'subpoenee.role': subpoenee.role,
+          privileged: subpoeneeFound.ctc
         },
         {
           $setOnInsert: { messageHistory: [], attourney: subpoeneeFound?.atr }
@@ -181,6 +187,21 @@ const startDeposition = async (caseId, subpoenee) => {
         content: `Full transcript of the deposition of ${result.subpoenee.name}`,
         exactContent: endDepositionTscrpt(result, date),
         date
+    }
+    
+    if (result.attourney) {
+      try {
+      const res = await openai.chat.completions.create({
+        messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.attourney, foundUser, caseFound, message.message, deposition.messageHistory)}],
+        model: "gpt-4",
+    });
+    const parsedRes = JSON.parse(res.choices[0].message.content);
+
+    await cases.updateOne({_id: result.caseId}, {verdict: parsedRes, $push: {discoveries: newDiscovery}});
+    return {success: true}
+  } catch (err) {
+    throw new Error(err.message || 'An Error has Occured')
+  }
     }
     await cases.updateOne({ _id: result.caseId, participants: { $elemMatch: { name: result.subpoenee.name, role: result.subpoenee.role } }}, { $set: { "participants.$.subpoena": false },  ...(newDiscovery.type === 'Settlement' ? [{
         $push: { dealHistory: newDiscovery.id }
@@ -233,6 +254,8 @@ const startDeposition = async (caseId, subpoenee) => {
     }
   };
 
+
+
     const sendCourtMessage = async (message, hearingId) => {
     try {
 
@@ -275,5 +298,56 @@ const startDeposition = async (caseId, subpoenee) => {
   
   module.exports = sendMessage;
 
+const endSettlementProc = async (settlementId, uid) => {
+  const date = Date.now();
+  try {
+    const result = await Deposition.findOneAndDelete({ _id: settlementId, attourney: true });
+    if (!result) throw new Error('Settlement not found');
+    const caseInfo = await cases.findOne({_id: result.caseId});
+    const fetchedAdmin = await users.findOne({admin: true});
+    if (!caseInfo || caseInfo.owners[0] !== uid) throw newErr('Case Not Found', 404)
+      if (Object.keys(caseInfo.verdict).length !== 0) throw new Error('Case Already Concluded');
+      console.log('launched')
+  const newDiscovery = {
+      type: 'Settlement',
+      title: 'Settlement',
+      content: 'Full Transcript of the settlement',
+      exactContent: endSettlement(result, date),
+      date,
+      id: uuid()
+  }
+  
+  
+    const res = await openai.chat.completions.create({
+      messages: [{ role: "user", content: conclusion(caseInfo, result.messageHistory)}],
+      model: "gpt-4",
+  });
+  const finalVerdict = JSON.parse(res.choices[0].message.content);
 
-module.exports = { getRepresentativeLawyer, endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena };
+  await cases.updateOne({_id: result.caseId}, {verdict: finalVerdict, $push: {discoveries: newDiscovery}});
+  if (finalVerdict.compensation !== 0) {
+    const transactionUpdate = {
+        $inc: { balance: finalVerdict.compensation * 0.97 },
+        $push: { income: { $each: [{ sender: fetchedAdmin._id, reason: `${caseInfo.title} Compensation`, amount: finalVerdict.compensation, date: Date.now() }], $position: 0 } }
+    };
+    await wallet.findOneAndUpdate({ owner: uid }, transactionUpdate);
+
+    if (finalVerdict.compensation > 0) {
+        await addAdminFee(finalVerdict.compensation * 0.03, 'Case Conclusion Fee', uid, Date.now());
+    } else {
+        await addAdminFee(-finalVerdict.compensation, 'Case Loss', uid, Date.now());
+    }
+}
+
+await users.findOneAndUpdate({ _id: uid }, {
+    $inc: { reputation: finalVerdict.rptnpts },
+    $pull: { cases: caseInfo._id },
+    $push: { caseHistory: caseInfo._id }
+});
+  return {success: true}
+  } catch (err) {
+    console.log(err);
+    throw new Error(err.message || 'An error occurred during endDeposition');
+  }
+}
+module.exports = { endSettlementProc, getRepresentativeLawyer, endDeposition, startDeposition, sendMessage, fileMotion, issueSubpoena };

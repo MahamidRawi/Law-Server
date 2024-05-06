@@ -5,7 +5,7 @@ const { createCase, startHearing, handleMessage, rest, endHearing } = require('.
 const { getCase } = require('../../actions/main/fetch.actions');
 const { calculatedPrices, lMPrices } = require('../../vars/vars');
 const { caseExists } = require('../../middleware/cases/cases.middleware');
-const { issueSubpoena, fileMotion, sendMessage, startDeposition, endDeposition, getRepresentativeLawyer } = require('../../actions/main/cases/subpoena.actions');
+const { issueSubpoena, fileMotion, sendMessage, startDeposition, endDeposition, getRepresentativeLawyer, endSettlementProc } = require('../../actions/main/cases/subpoena.actions');
 
 router.post('/createCase', validate, (req, res) => createCase(req.userId, req.body.caseInfo).then(resp => res.json(resp)).catch(err => res.status(err.stc).json(err)));
 
@@ -104,6 +104,16 @@ router.post('/deposition/endDeposition', validate, async (req, res) => {
     const {depositionId} = req.body;
     try {
         const resp = await endDeposition(depositionId);
+        return res.status(resp.stc || 200).json(resp);
+    } catch (err) {
+        return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});
+    }
+});
+
+router.post('/settlement/endSettlement', validate, async (req, res) => {
+    const {depositionId} = req.body;
+    try {
+        const resp = await endSettlementProc(depositionId, req.userId);
         return res.status(resp.stc || 200).json(resp);
     } catch (err) {
         return res.status(err.stc || 500).json({ message: err.message, stc: err.stc});

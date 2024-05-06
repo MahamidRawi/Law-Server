@@ -4,7 +4,7 @@ import { Container, Row, Col, Form, Button, ListGroup, Card } from 'react-bootst
 import '../wallet/wallet.css';
 import { userValidate } from '../../actions/auth.actions';
 import { AuthContext } from '../../Providers/auth.provider';
-import { endDeposition, getRepresentativeLawyer, sendMessage as sMessage, startDeposition } from '../../actions/main/cases.actions';
+import { endDeposition, endSettlement, getCase, getRepresentativeLawyer, sendMessage as sMessage, startDeposition } from '../../actions/main/cases.actions';
 
 interface LocationState {
     name: string;
@@ -36,6 +36,7 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false 
     const [depositionStarted, setDepositionStarted] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [depositionId, setDepositionId] = useState<string>('');
+    const [caseInfo, setCaseInfo] = useState<any>({});
     useEffect(() => {
       if (settlement) {
         getRepresentativeLawyer(caseId).then(res => {
@@ -54,6 +55,8 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false 
         userValidate(localStorage.getItem('user_token'))
           .then(res => {
             setMyInfo(res.info);
+            getCase(caseId).then(resp => {
+              setCaseInfo(resp.case);
             return startDeposition(userInfo, caseId).then((res: any) => {
               setDepositionId(res.depositionId);
               setMessages(res.messages);
@@ -63,6 +66,7 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false 
               if (err.AR) logout();
               else !userInfo && alert(JSON.stringify(err) || 'An Error has Occurred');
             });
+          })
           })
           .catch(err => logout());
       }
@@ -96,12 +100,12 @@ const DepositionScreen: React.FC<DepositionScreenProps> = ({ settlement = false 
     const endDepo = async () => {
       setLoading(true);
       try {
-        await endDeposition(depositionId);
+        const stlmt: any = settlement ? await endSettlement(depositionId) : await endDeposition(depositionId);
         setMessages([]);
         setDepositionStarted(false);
         setEnded(true);
         localStorage.setItem('LCC', 'Discoveries');
-        return navigate(-2);
+        return settlement && stlmt.success == true ? navigate('/verdict', {state: {caseInfo}}) : navigate(-2);
       } catch (err:any) {
         if (err.AR) logout();
         else alert(JSON.stringify(err) || 'An Error has Occurred');
