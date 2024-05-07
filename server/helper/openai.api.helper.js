@@ -33,14 +33,13 @@ const createCasePrompt = (uid, caseInfo, pos) => {
             "shortDescription": "{participant short Description}"
         }
     ],
-    "discoveries": [
-      ${JSON.stringify(random)}
-    ],
     "oppositionName": "{Realistic opposition Attorney Name}",
     "solution": "text containing the truth that will guide the game. It must say what truly happened, so that the responses will follow it."
 }
 
 Guidelines : 
+- Never, but never forget the plaintiff and the defendant.
+- the ${pos}'s client must have ctc: true.
 - IMPORTANT : You must add only human in the participants (not entities / teams etc...).
 - The participants array must include only the main participants, in addition to witnesses, etc...
 - VERY VERY IMPORTANT : THE RESPONSE MUST HAVE THE NECESSARY INFORMATION (IN THE DISCOVERIES) FOR THE USER TO BE ABLE TO PROCEED WORKING ON THE CASE. SO CONSTRUCT IT IN A VERY INTERESTING WAY.
@@ -358,6 +357,37 @@ const prosecutionFirstMessage = (caseInfo) => {
     `
 }
 
+const createDiscoveriesPrompt = (summary, difficulty, guide) => {
+  return `
+  {
+    "task": "Generate a JSON array of four discovery documents based on the provided case summary and the specified difficulty. Each document must be detailed and realistic, adhering to predefined templates without directly revealing the real case story.",
+    "caseContext": {
+      "caseSummary": "${summary}",
+      "caseDifficulty": "${difficulty}",
+      "storyGuidance": "${guide}"
+    },
+    "requirements": {
+      "documentDetailLevel": "Each document should mirror the complexity and depth of real-world legal documents, with fully developed content instead of placeholders. All necessary information should be realistically filled to simulate actual legal documents, including timestamps, exact values, and comprehensive descriptions.",
+      "format": "Each discovery document should be a JSON object structured according to the templates provided. These should include detailed content, reflecting various aspects of the case (legal, financial, personal). The structure is as follows: {
+        'type': 'Document type as a string',
+        'title': 'Document title as a string',
+        'content': 'Content summary as a string',
+        'exactContent': 'Detailed and structured content as described below in the example, including timestamps, exact values, and other specific details, structured like a legal document. No placeholders.',
+        'date': 'Date in YYYY-MM-DD format'
+      }"
+    },
+    "outputFormat": "The result should be a JSON array containing four objects. Each object represents a different type of discovery document, strictly adhering to the structure and content specifications from the provided templates. The output should include only the specified fields, without additional text or paratext.",
+    "example": {
+      "type": "Surveillance Footage",
+      "title": "Main Street Bank Incident",
+      "content": "Detailed summary of surveillance footage capturing a robbery.",
+      "exactContent": "Location: 'Main Street Bank'\nDate and Time: '2024-05-01 14:30'\n\nEvents:\n14:30 - Suspect enters the bank.\n14:32 - Suspect approaches the teller.\n14:35 - Suspect displays a weapon and demands cash.\n14:37 - Suspect leaves with $5,000.\n\nAnalysis:\nThis footage is crucial as it captures the suspect in the act, providing clear evidence of the crime. The suspect's identity matches that of the individual seen in earlier surveillance videos at different locations, increasing the reliability of this evidence.",
+      "date": "2024-05-01"
+    }
+  }
+  `
+}
+
 const correspondingResponse = (caseInfo, judge, message, messageHistory) => {
   console.log('HERE WE ARE : ', message)
   return `
@@ -414,38 +444,44 @@ Notes:
 `
 }
 
-const conclusion = (caseInfo, settlement) => {
+const conclusion = (caseInfo, settlement, privilegedConvo) => {
+  console.log(privilegedConvo);
   const postograde = caseInfo.defense == caseInfo.oppositionName ? "prosecution" : "defense"
-  return `As part of a law simulation, you are required to provide a judicial evaluation of a party involved in a legal case, referred to as "${postograde}". Using the provided data, summarize in the given format the agreements in the settlement + add evaluations
-You are like a law professor
-if ${postograde} doesn't behave well or gives a sentence as an argument, set them as a loss and give them bad scores.
-Inputs:
-- Case Info: ${caseInfo}
-- Jurisdiction: ${caseInfo.lawSystem}
-- Settlement Transcript : ${settlement}
-
-Evaluation Criteria:
-1. Performance Score: An integer out of 100, reflecting ${postograde}'s legal acumen and conduct. A score below 50 indicates inadequate performance, while a score above 75 signifies exceptional advocacy.
-2. Reputation Points: Range from -10 to +10, indicating ${postograde}'s ethical standing and professionalism. Points are deducted for misconduct and awarded for commendable behavior.
-3. Financial Compensation: Determined by the 
-4. If in the hearings the ${postograde} didn't well behave or didn't participate at all, they must be evaluated as a loss.
-VERY IMPORTANT JSON FORMAT. IF IT FAILS TO fulfill the json format I will kill myself. Required JSON Response Format:
-Fill the compensation and agreement areas from the information gotten from  
-{
-  "score": "integer score out of 100 reflecting overall performance",
-  "verdict": "//THE SUMMARY OF THE settlement",
-  "rptnpts": "integer reputation points assessing ethical and professional behavior. It is determined by how well he represented his side. Bonus reputation points if the case is pro bono and won.",
-  "compensation": "INTEGER : The agreed upon fees in the settlement",
-  "status": "${postograde}'s case outcome ('won' or 'lost')",
-  "justification": "detailed reasoning behind the scores, compensation, and reputation points awarded, including specific references to behavior and legal arguments during the proceedings"
-}
-
-Notes:
-- Your assessment should meticulously evaluate ${postograde}'s demeanor, strategy, and adherence to legal standards during depositions and hearings.
-- Decisions must strictly follow the legal protocols and ethics as dictated by ${caseInfo.lawSystem}.
-- The justification must provide a clear, comprehensive explanation for all scores and decisions to ensure transparency and educational value in the simulation.
-- PLEASE PAY ATTENTION ! The fees are not the entire settlement. Please act as specified in the the settlement.
-- If the user didn't talk about attourney fees, then you put him 0 in compensation.
+  return `{
+    "task": "Generate a JSON response for a law simulation. Evaluate the performance of a legal practitioner, ${postograde}, based on the provided inputs and criteria. Consider all aspects of ${postograde}'s conduct, strategy, and adherence to the legal standards within the specified jurisdiction.",
+    "inputs": {
+      "privilegedConversation": "${privilegedConvo}",
+      "caseInformation": "${caseInfo}",
+      "jurisdiction": "${caseInfo.lawSystem}",
+      "settlementTranscript": "${settlement}"
+    },
+    "evaluationCriteria": {
+      "performanceScore": {
+        "description": "An integer from 0 to 100, reflecting legal acumen and conduct. Scores below 50 indicate inadequate performance, while scores above 75 suggest exceptional advocacy."
+      },
+      "reputationPoints": {
+        "description": "An integer from -10 to +10, reflecting ethical standing and professionalism. Points are deducted for misconduct and added for commendable behavior."
+      },
+      "financialCompensation": {
+        "description": "The monetary amount agreed upon in the settlement or discussed in the privileged conversation, considering the context of the case outcome."
+      },
+      "behavioralAssessment": {
+        "description": "Evaluate ${postograde}'s demeanor and participation in legal proceedings. A 'loss' status should be assigned if ${postograde} behaved poorly or was non-participative."
+      }
+    },
+    "requiredResponseFormat": {
+      "score": "Integer score out of 100 reflecting overall performance.",
+      "verdict": "Summary of the agreements in the settlement.",
+      "rptnpts": "Integer reputation points assessing ethical and professional behavior.",
+      "compensation": "Integer representing agreed upon fees in the settlement or those discussed in privileged conversations.",
+      "status": "${postograde}'s case outcome ('won' or 'lost').",
+      "justification": "Detailed reasoning behind the scores, compensation, and reputation points awarded, including specific references to behavior and legal arguments during the proceedings."
+    },
+    "notes": {
+      "evaluationDetail": "The assessment must meticulously evaluate all aspects of ${postograde}'s performance during depositions and hearings according to the legal standards of the specified jurisdiction.",
+      "compensationClarification": "The financial compensation only includes the attorney fees as specified in the settlement or privileged conversation."
+    }
+  }
 `
 }
 
@@ -494,4 +530,4 @@ const opposingTeamTurn = (caseInfo, status, transcript, judge, name) => {
 
 
 
-module.exports = {conclusion, verdict, opposingTeamTurn, correspondingResponse, prosecutionFirstMessage, endSettlement, endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}
+module.exports = {createDiscoveriesPrompt, conclusion, verdict, opposingTeamTurn, correspondingResponse, prosecutionFirstMessage, endSettlement, endDepositionTscrpt, SubpoenaMessagePrompt, createCasePrompt, issueSubpoenaPrompt, fileMotionPrompt}

@@ -304,6 +304,7 @@ const endSettlementProc = async (settlementId, uid) => {
     const result = await Deposition.findOneAndDelete({ _id: settlementId, attourney: true });
     if (!result) throw new Error('Settlement not found');
     const caseInfo = await cases.findOne({_id: result.caseId});
+    const privilegedConvo = await Deposition.findOneAndDelete({caseId: caseInfo._id, privileged: true});
     const fetchedAdmin = await users.findOne({admin: true});
     if (!caseInfo || caseInfo.owners[0] !== uid) throw newErr('Case Not Found', 404)
       if (Object.keys(caseInfo.verdict).length !== 0) throw new Error('Case Already Concluded');
@@ -316,14 +317,26 @@ const endSettlementProc = async (settlementId, uid) => {
       date,
       id: uuid()
   }
-  
-  
-    const res = await openai.chat.completions.create({
-      messages: [{ role: "user", content: conclusion(caseInfo, result.messageHistory)}],
+console.log(privilegedConvo)
+  let res; 
+  let finalVerdict;
+
+  if (result.messageHistory.length < 2) {
+    finalVerdict = {
+      score: 0,
+      verdict: 'Due to lack of cooperation, you have lost the case.',
+      rptnpts: -20,
+      compensation: -1000,
+      status: 'lost',
+      justification: 'Due to your negligence, you have lost the case.'
+    }
+  } else {
+  res = await openai.chat.completions.create({
+      messages: [{ role: "user", content: conclusion(caseInfo, result.messageHistory, privilegedConvo)}],
       model: "gpt-4",
   });
-  const finalVerdict = JSON.parse(res.choices[0].message.content);
-
+  finalVerdict = JSON.parse(res.choices[0].message.content);
+  }
   await cases.updateOne({_id: result.caseId}, {verdict: finalVerdict, $push: {discoveries: newDiscovery}});
   if (finalVerdict.compensation !== 0) {
     const transactionUpdate = {

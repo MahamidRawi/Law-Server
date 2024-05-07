@@ -1,4 +1,4 @@
-const {createCasePrompt, prosecutionFirstMessage, correspondingResponse, opposingTeamTurn, verdict} = require('../../../helper/openai.api.helper');
+const {createCasePrompt, prosecutionFirstMessage, correspondingResponse, opposingTeamTurn, verdict, createDiscoveriesPrompt} = require('../../../helper/openai.api.helper');
 const {caseSchema} = require('../../../schemas/joi.schema');
 require('../../../DB/models/cases.model');
 require('../../../DB/models/hearing.model');
@@ -51,7 +51,16 @@ const createCase = async (uid, caseInfo) => {
     model: "ft:gpt-3.5-turbo-1106:personal:create-case-v1:90FyhbPu",
         });
         const newRes = JSON.parse(response.choices[0].message.content);
-        const newCase = new cases(newRes);
+        const caseSolution = newRes.solution;
+        // delete newRes.solution;
+        const discoveries = await openai.chat.completions.create({
+          messages: [{role: "system", content: "You are the creator of the discoveries"}, { role: "user", content: createDiscoveriesPrompt(newRes.summary, caseSolution)}],
+  model: "gpt-3.5-turbo-16k",
+      });
+
+      newRes.discoveries = JSON.parse(discoveries.choices[0].message.content);
+      console.log(newRes.discoveries)  
+      const newCase = new cases(newRes);
         newCase.lawSystem = lawSystem;
         newCase.owners = [uid, newRes.oppositionName];
         newCase.difficulty = difficulty;
@@ -74,10 +83,11 @@ if (chosenPosition === 'prosecution') {
         await addAdminFee(250, 'Case Generation Fee', uid, newdate);
         await addCaseToUser(uid, suc._id);
         return resolve({success: true, message: 'Case Generated Successfully'});
-    }).catch(err => reject({success: false, message: 'An Error has Occured', stc: 500, err}));
+    }).catch(err => console.log(err));
     });
 }
 
+//reject({success: false, message: 'An Error has Occured', stc: 500, err})
 const endHearing = async (hearingId, uid) => {
   console.log(hearingId, uid);
   try {
