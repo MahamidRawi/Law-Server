@@ -49,14 +49,18 @@ const createCase = async (uid, caseInfo) => {
         const response = await openai.chat.completions.create({
             messages: [{role: "system", content: "You are the creator of the cases"}, { role: "user", content: createCasePrompt(uid, caseInfo, chosenPosition)}],
     model: "ft:gpt-3.5-turbo-1106:personal:create-case-v1:90FyhbPu",
+    response_format: {type: 'json_object'}
+
         });
         const newRes = JSON.parse(response.choices[0].message.content);
         const caseSolution = newRes.solution;
         // delete newRes.solution;
         const discoveries = await openai.chat.completions.create({
-          messages: [{role: "system", content: "You are the creator of the discoveries"}, { role: "user", content: createDiscoveriesPrompt(newRes.summary, caseSolution)}],
-  model: "gpt-3.5-turbo-16k",
+          messages: [{role: "system", content: "You are the creator of the discoveries"}, { role: "user", content: createDiscoveriesPrompt(newRes.discoveries, caseSolution)}],
+  model: "gpt-3.5-turbo-1106",
+  response_format: {type: 'json_object'}
       });
+      console.log(discoveries.choices[0].message.content);
 
       newRes.discoveries = JSON.parse(discoveries.choices[0].message.content);
       console.log(newRes.discoveries)  

@@ -33,6 +33,9 @@ const createCasePrompt = (uid, caseInfo, pos) => {
             "shortDescription": "{participant short Description}"
         }
     ],
+    "discoveries": [
+      ${JSON.stringify(random)}
+    ],
     "oppositionName": "{Realistic opposition Attorney Name}",
     "solution": "text containing the truth that will guide the game. It must say what truly happened, so that the responses will follow it."
 }
@@ -357,34 +360,50 @@ const prosecutionFirstMessage = (caseInfo) => {
     `
 }
 
-const createDiscoveriesPrompt = (summary, difficulty, guide) => {
+// const createDiscoveriesPrompt = (summary, difficulty, guide) => {
+//   return `
+//   Generate an array of four detailed discoveries formatted as legal documents, based on the provided parameters: Summary, Storyline, and Difficulty. Each document should reflect these inputs and be rich in detail, resembling the structure of intricate real-life legal documents. The details for each discovery are as follows:
+
+//   1. Summary: ${summary}
+//   2. Storyline: ${guide}
+//   3. Difficulty: ${difficulty}
+
+//   Take inspo from the following templates : ${discoveryTemplates}
+  
+//   Each entry in the response should be a JSON object with the following fields:
+//   - type: The nature of the document (e.g., "Contract", "Testimony", "Security footage", among others).
+//   - title: A title that reflects the content and purpose of the document.
+//   - content: A concise summary in exactly 10 words.
+//   - exactContent: A meticulously structured text that includes a detailed preamble, comprehensive clauses, and specific articles. Incorporate advanced legal terminology and precise citations from relevant laws. Include clauses such as Definitions, Scope of License, Financial Terms, Confidentiality Obligations, Intellectual Property Rights, Liability Limitations, Termination Conditions, and Governing Law, each with subsections detailing specific provisions and legal references. also well structured.
+//   - date: The date of the document, formatted as "YYYY-MM-DD".
+  
+//   The response must be an array of four such objects, ensuring each document is distinct and thoroughly elaborates on the themes derived from the provided summary, storyline, and difficulty. Aim for outputs that are informative, realistic, and suitable for professional use.
+//   You must provide 4 initial discoveries for the user.
+//   Remember, 4 objects. Not 1. I repeat 4 objects.
+//   Example JSON structure:
+//   [
+//     {
+//       "type": "Contract",
+//       "title": "Comprehensive Software Licensing Agreement",
+//       "content": "Detailed software licensing contract with extensive terms",
+//       "exactContent": "This Comprehensive Software Licensing Agreement ('Agreement'), effective as of 2024-05-10, is made between Developer Co ('Licensor') and Business Co ('Licensee').\n\nPreamble:\nThis Agreement outlines the terms under which the Licensor grants the Licensee the right to use the specified software.\n\nArticle 1 - Definitions:\n'Software' refers to the computer program as described in Appendix A.\n'Confidential Information' includes any data disclosed between the parties.\n\nArticle 2 - License Grant:\nThe Licensor grants the Licensee a non-exclusive, non-transferable license to use the Software within the territory described in Schedule B.\n\nArticle 3 - Financial Terms:\nLicensee shall pay Licensor a royalty based on a percentage of gross revenue from the Software, as detailed in Schedule C.\n\nArticle 4 - Intellectual Property:\nLicensor retains all rights to the Software, except as expressly granted in this Agreement.\n\nArticle 5 - Governing Law:\nThis Agreement shall be governed by the laws of the State of Delaware, as detailed in Section 5.1.\n\nArticle 6 - Dispute Resolution:\nAny disputes under this Agreement shall be resolved through arbitration in accordance with the rules of the American Arbitration Association.\n\nAppendices include detailed Software Specifications, Royalty Payment Schedule, and Confidentiality Agreements.",
+//       "date": "2024-05-10"
+//     },
+//     // Include three more objects with similar structure but different details
+//   ]
+  
+//   `
+  
+ 
+// }
+
+const createDiscoveriesPrompt = (discoveries, summary, stln) => {
   return `
-  {
-    "task": "Generate a JSON array of four discovery documents based on the provided case summary and the specified difficulty. Each document must be detailed and realistic, adhering to predefined templates without directly revealing the real case story.",
-    "caseContext": {
-      "caseSummary": "${summary}",
-      "caseDifficulty": "${difficulty}",
-      "storyGuidance": "${guide}"
-    },
-    "requirements": {
-      "documentDetailLevel": "Each document should mirror the complexity and depth of real-world legal documents, with fully developed content instead of placeholders. All necessary information should be realistically filled to simulate actual legal documents, including timestamps, exact values, and comprehensive descriptions.",
-      "format": "Each discovery document should be a JSON object structured according to the templates provided. These should include detailed content, reflecting various aspects of the case (legal, financial, personal). The structure is as follows: {
-        'type': 'Document type as a string',
-        'title': 'Document title as a string',
-        'content': 'Content summary as a string',
-        'exactContent': 'Detailed and structured content as described below in the example, including timestamps, exact values, and other specific details, structured like a legal document. No placeholders.',
-        'date': 'Date in YYYY-MM-DD format'
-      }"
-    },
-    "outputFormat": "The result should be a JSON array containing four objects. Each object represents a different type of discovery document, strictly adhering to the structure and content specifications from the provided templates. The output should include only the specified fields, without additional text or paratext.",
-    "example": {
-      "type": "Surveillance Footage",
-      "title": "Main Street Bank Incident",
-      "content": "Detailed summary of surveillance footage capturing a robbery.",
-      "exactContent": "Location: 'Main Street Bank'\nDate and Time: '2024-05-01 14:30'\n\nEvents:\n14:30 - Suspect enters the bank.\n14:32 - Suspect approaches the teller.\n14:35 - Suspect displays a weapon and demands cash.\n14:37 - Suspect leaves with $5,000.\n\nAnalysis:\nThis footage is crucial as it captures the suspect in the act, providing clear evidence of the crime. The suspect's identity matches that of the individual seen in earlier surveillance videos at different locations, increasing the reliability of this evidence.",
-      "date": "2024-05-01"
-    }
-  }
+  - Discoveries : ${discoveries}
+  - Summary : ${summary}
+  - Truth : ${stln} // only you know it. You must not disclose it to the other side. It should aid you in detailing the discoveries. 
+
+  Add more details, numbers, everything to the discoveries array and return it as JSON, only array. Not object containing array, no nothing.
   `
 }
 
