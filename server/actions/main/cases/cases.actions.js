@@ -62,7 +62,7 @@ const createCase = async (uid, caseInfo) => {
       });
       console.log(discoveries.choices[0].message.content);
 
-      newRes.discoveries = JSON.parse(discoveries.choices[0].message.content);
+      newRes.discoveries = JSON.parse(discoveries.choices[0].message.content).discoveries;
       console.log(newRes.discoveries)  
       const newCase = new cases(newRes);
         newCase.lawSystem = lawSystem;

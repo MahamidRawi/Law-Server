@@ -403,7 +403,18 @@ const createDiscoveriesPrompt = (discoveries, summary, stln) => {
   - Summary : ${summary}
   - Truth : ${stln} // only you know it. You must not disclose it to the other side. It should aid you in detailing the discoveries. 
 
-  Add more details, numbers, everything to the discoveries array and return it as JSON, only array. Not object containing array, no nothing.
+  Your task is to add as much detail as possible to make it interesting in the 'exactContent' field of each of the 4 objects. You add more details (numbers, information) as well as structure (using '\\n' in the string). You add as much detail as possible for the user to investigate more and analyse since it's a lawyer/detective game simulation.
+  the array of new discoveries must be returned in this json format : 
+  you return the intial array (with the title, type, content, exactContent, date) but with the changed 'exactContent' fields.
+  Again, I don't want summaries, I want really high quality strings containing records, seperated things, transcripts, informations. as realistic as possible.
+  Example of expected detail level of exactContent : \"Joint Venture Agreement\n\nThis Joint Venture Agreement ('Agreement') is entered into as of January 1, 2023, by and between Wells Corporation, a Delaware corporation with its principal place of business located at 123 Main Street, Suite 800, Cityville, CV, 12345 ('Wells'), and Anderson Investments, a limited liability company organized and existing under the laws of the State of California, with its principal place of business at 456 Oak Avenue, Building B, Townsville, TS, 67890 ('Anderson').\n\n1. Purpose: The parties hereby agree to establish a joint venture for the purpose of developing, manufacturing, and marketing an innovative line of consumer electronics designed to integrate advanced technology with user-friendly interfaces.\n\n2. Contributions: Wells agrees to provide initial financial capital of USD 5,000,000 and its expertise in high-tech product development, including access to its patents and intellectual properties. Anderson agrees to contribute its marketing resources, existing distribution channels, customer relationships, and additional operational support valued at USD 5,000,000.\n\n3. Ownership and Distribution of Profits: The joint venture will operate as a new entity, TechAdvance Ventures, to be jointly owned by Wells and Anderson with each party holding a 50% equity stake. Profits and losses shall be shared equally, and detailed financial statements will be prepared quarterly to ensure transparency.\n\n4. Management and Operations: The joint venture will be managed by a Joint Management Committee consisting of three senior executives from each of Wells and Anderson. This committee will be responsible for strategic decisions and oversight of the day-to-day operations of the joint venture.\n\n5. Term and Termination: This Agreement shall commence on the date first above written and continue in full force and effect for a term of five years. Thereafter, it shall automatically renew for successive one-year terms unless terminated by either party with at least ninety (90) days prior written notice.\n\n6. Governing Law and Dispute Resolution: This Agreement shall be governed by and construed in accordance with the laws of the State of California. Any disputes arising from or related to this Agreement shall be resolved through binding arbitration in accordance with the rules of the American Arbitration Association.\n\nSigned:\nJohn Wells, CEO of Wells Corporation\nEmily Anderson, CEO of Anderson Investments\nDate: January 1, 2023"\
+  If there are any security footage docs included, inside the exactContent string, you put exact timestamps + description.
+  and even higher level of detail
+  {
+    discoveries : [
+      //array of the new 4 discoveries
+    ]
+  }
   `
 }
 
@@ -467,7 +478,7 @@ const conclusion = (caseInfo, settlement, privilegedConvo) => {
   console.log(privilegedConvo);
   const postograde = caseInfo.defense == caseInfo.oppositionName ? "prosecution" : "defense"
   return `{
-    "task": "Generate a JSON response for a law simulation. Evaluate the performance of a legal practitioner, ${postograde}, based on the provided inputs and criteria. Consider all aspects of ${postograde}'s conduct, strategy, and adherence to the legal standards within the specified jurisdiction.",
+    "task": "Generate a JSON response for a law simulation. Evaluate the performance of a legal practitioner, ${postograde}, based on the provided inputs and criteria. Consider all aspects of ${postograde}'s conduct, strategy, and adherence to the legal standards within the specified jurisdiction. IMPORTANT, PLEASE PAY ALOT OF ATTENTION WHEN CALCULATION THE COMPENSATION, AND WRITING THE SUMMARY. You ONLY GIVE WHAT WAS AGREED UPON AS ATTOURNEY FEES (between the attourney and client and betwen attourney and attourney in settlement",
     "inputs": {
       "privilegedConversation": "${privilegedConvo}",
       "caseInformation": "${caseInfo}",

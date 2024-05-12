@@ -333,7 +333,8 @@ console.log(privilegedConvo)
   } else {
   res = await openai.chat.completions.create({
       messages: [{ role: "user", content: conclusion(caseInfo, result.messageHistory, privilegedConvo)}],
-      model: "gpt-4",
+      model: "gpt-3.5-turbo-1106",
+      response_format: {type: 'json_object'}
   });
   finalVerdict = JSON.parse(res.choices[0].message.content);
   }
