@@ -409,7 +409,11 @@ const createDiscoveriesPrompt = (discoveries, summary, stln) => {
   Again, I don't want summaries, I want really high quality strings containing records, seperated things, transcripts, informations. as realistic as possible.
   Example of expected detail level of exactContent : \"Joint Venture Agreement\n\nThis Joint Venture Agreement ('Agreement') is entered into as of January 1, 2023, by and between Wells Corporation, a Delaware corporation with its principal place of business located at 123 Main Street, Suite 800, Cityville, CV, 12345 ('Wells'), and Anderson Investments, a limited liability company organized and existing under the laws of the State of California, with its principal place of business at 456 Oak Avenue, Building B, Townsville, TS, 67890 ('Anderson').\n\n1. Purpose: The parties hereby agree to establish a joint venture for the purpose of developing, manufacturing, and marketing an innovative line of consumer electronics designed to integrate advanced technology with user-friendly interfaces.\n\n2. Contributions: Wells agrees to provide initial financial capital of USD 5,000,000 and its expertise in high-tech product development, including access to its patents and intellectual properties. Anderson agrees to contribute its marketing resources, existing distribution channels, customer relationships, and additional operational support valued at USD 5,000,000.\n\n3. Ownership and Distribution of Profits: The joint venture will operate as a new entity, TechAdvance Ventures, to be jointly owned by Wells and Anderson with each party holding a 50% equity stake. Profits and losses shall be shared equally, and detailed financial statements will be prepared quarterly to ensure transparency.\n\n4. Management and Operations: The joint venture will be managed by a Joint Management Committee consisting of three senior executives from each of Wells and Anderson. This committee will be responsible for strategic decisions and oversight of the day-to-day operations of the joint venture.\n\n5. Term and Termination: This Agreement shall commence on the date first above written and continue in full force and effect for a term of five years. Thereafter, it shall automatically renew for successive one-year terms unless terminated by either party with at least ninety (90) days prior written notice.\n\n6. Governing Law and Dispute Resolution: This Agreement shall be governed by and construed in accordance with the laws of the State of California. Any disputes arising from or related to this Agreement shall be resolved through binding arbitration in accordance with the rules of the American Arbitration Association.\n\nSigned:\nJohn Wells, CEO of Wells Corporation\nEmily Anderson, CEO of Anderson Investments\nDate: January 1, 2023"\
   If there are any security footage docs included, inside the exactContent string, you put exact timestamps + description.
-  and even higher level of detail
+  and even higher level of detail.
+  Please structure the 'exactContent'
+  please do it well structured, not as one paragraph but with the details that appear in the type of document in question.
+  you can use "\\n" to structure the 'exactContent'
+  important : the testimonies of eye witnesses must be as a transcript, unless it is a declaration.
   {
     discoveries : [
       //array of the new 4 discoveries
@@ -478,7 +482,7 @@ const conclusion = (caseInfo, settlement, privilegedConvo) => {
   console.log(privilegedConvo);
   const postograde = caseInfo.defense == caseInfo.oppositionName ? "prosecution" : "defense"
   return `{
-    "task": "Generate a JSON response for a law simulation. Evaluate the performance of a legal practitioner, ${postograde}, based on the provided inputs and criteria. Consider all aspects of ${postograde}'s conduct, strategy, and adherence to the legal standards within the specified jurisdiction. IMPORTANT, PLEASE PAY ALOT OF ATTENTION WHEN CALCULATION THE COMPENSATION, AND WRITING THE SUMMARY. You ONLY GIVE WHAT WAS AGREED UPON AS ATTOURNEY FEES (between the attourney and client and betwen attourney and attourney in settlement",
+    "task": "Generate a JSON response for a law simulation. Evaluate the legal practitioner's performance, identified as ${postograde}, based on the provided inputs and criteria. Pay close attention to calculations regarding the compensation and the crafting of the summary. Ensure that the financial compensation reflects only the agreed-upon attorney fees (as per agreements between attorney-client and attorney-attorney in settlements).",
     "inputs": {
       "privilegedConversation": "${privilegedConvo}",
       "caseInformation": "${caseInfo}",
@@ -487,32 +491,32 @@ const conclusion = (caseInfo, settlement, privilegedConvo) => {
     },
     "evaluationCriteria": {
       "performanceScore": {
-        "description": "An integer from 0 to 100, reflecting legal acumen and conduct. Scores below 50 indicate inadequate performance, while scores above 75 suggest exceptional advocacy."
+        "description": "An integer from 0 to 100, reflecting the legal practitioner's acumen and conduct. Scores below 50 indicate inadequate performance, while scores above 75 suggest exceptional advocacy."
       },
       "reputationPoints": {
         "description": "An integer from -10 to +10, reflecting ethical standing and professionalism. Points are deducted for misconduct and added for commendable behavior."
       },
       "financialCompensation": {
-        "description": "The monetary amount agreed upon in the settlement or discussed in the privileged conversation, considering the context of the case outcome."
+        "description": "The monetary amount specifically agreed upon as attorney fees in the settlement or during privileged conversations, adjusted for the context of the case outcome."
       },
       "behavioralAssessment": {
-        "description": "Evaluate ${postograde}'s demeanor and participation in legal proceedings. A 'loss' status should be assigned if ${postograde} behaved poorly or was non-participative."
+        "description": "Evaluate ${postograde}'s demeanor and participation in legal proceedings. Assign a 'loss' status if the behavior was poor or non-participative."
       }
     },
     "requiredResponseFormat": {
       "score": "Integer score out of 100 reflecting overall performance.",
       "verdict": "Summary of the agreements in the settlement.",
-      "rptnpts": "Integer reputation points assessing ethical and professional behavior.",
-      "compensation": "Integer representing agreed upon fees in the settlement or those discussed in privileged conversations.",
-      "status": "${postograde}'s case outcome ('won' or 'lost').",
-      "justification": "Detailed reasoning behind the scores, compensation, and reputation points awarded, including specific references to behavior and legal arguments during the proceedings."
+      "reputationPoints": "Integer points assessing ethical and professional behavior.",
+      "compensation": "Integer representing the agreed-upon fees in the settlement or those discussed in privileged conversations.",
+      "caseOutcome": "${postograde}'s case outcome ('won' or 'lost').",
+      "justification": "Detailed reasoning behind the scores, compensation, and reputation points awarded, with specific references to behaviors and legal arguments during the proceedings."
     },
     "notes": {
-      "evaluationDetail": "The assessment must meticulously evaluate all aspects of ${postograde}'s performance during depositions and hearings according to the legal standards of the specified jurisdiction.",
-      "compensationClarification": "The financial compensation only includes the attorney fees as specified in the settlement or privileged conversation."
+      "evaluationDetail": "The assessment must meticulously evaluate all aspects of ${postograde}'s performance during depositions and hearings, adhering to the legal standards of the specified jurisdiction.",
+      "compensationClarification": "The financial compensation includes only the attorney fees as explicitly agreed in the settlement or during privileged conversations."
     }
-  }
-`
+  }`
+  
 }
 
 const opposingTeamTurn = (caseInfo, status, transcript, judge, name) => {
