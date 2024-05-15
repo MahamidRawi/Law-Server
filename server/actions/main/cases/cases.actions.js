@@ -118,6 +118,7 @@ const endHearing = async (hearingId, uid) => {
                   const response = await openai.chat.completions.create({
                       messages: [{ role: "system", content: verdict(hearing, caseFound, designatedJudge, depos) }],
                       model: "gpt-3.5-turbo-1106",
+                      response_format: {type: 'json_object'}
                   });
                   finalVerdict = JSON.parse(response.choices[0].message.content);
                   break; // If parsing succeeds, exit the loop

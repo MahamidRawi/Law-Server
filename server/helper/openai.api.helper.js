@@ -402,7 +402,7 @@ const createDiscoveriesPrompt = (discoveries, summary, stln) => {
   - Discoveries : ${discoveries}
   - Summary : ${summary}
   - Truth : ${stln} // only you know it. You must not disclose it to the other side. It should aid you in detailing the discoveries. 
-
+  I want 0 placeholders. You fill it with the necessary information.
   Your task is to add as much detail as possible to make it interesting in the 'exactContent' field of each of the 4 objects. You add more details (numbers, information) as well as structure (using '\\n' in the string). You add as much detail as possible for the user to investigate more and analyse since it's a lawyer/detective game simulation.
   the array of new discoveries must be returned in this json format : 
   you return the intial array (with the title, type, content, exactContent, date) but with the changed 'exactContent' fields.
@@ -497,16 +497,16 @@ const conclusion = (caseInfo, settlement, privilegedConvo) => {
         "description": "An integer from -10 to +10, reflecting ethical standing and professionalism. Points are deducted for misconduct and added for commendable behavior."
       },
       "financialCompensation": {
-        "description": "The monetary amount specifically agreed upon as attorney fees in the settlement or during privileged conversations, adjusted for the context of the case outcome."
+        "description": "The monetary amount specifically agreed upon as attorney fees in the settlement or during privileged conversations, adjusted for the context of the case outcome. if it was agreed in the settlement and in the conversation with the client, then do the sum of the two. Don't forget to convert for example 250k to 250000 integer, and not 250"
       },
       "behavioralAssessment": {
         "description": "Evaluate ${postograde}'s demeanor and participation in legal proceedings. Assign a 'loss' status if the behavior was poor or non-participative."
       }
     },
     "requiredResponseFormat": {
-      "score": "Integer score out of 100 reflecting overall performance.",
+      "score": Integer score out of 100 reflecting overall performance.,
       "verdict": "Summary of the agreements in the settlement.",
-      "reputationPoints": "Integer points assessing ethical and professional behavior.",
+      "reputationPoints": Integer points assessing ethical and professional behavior.,
       "compensation": "Integer representing the agreed-upon fees in the settlement or those discussed in privileged conversations.",
       "caseOutcome": "${postograde}'s case outcome ('won' or 'lost').",
       "justification": "Detailed reasoning behind the scores, compensation, and reputation points awarded, with specific references to behaviors and legal arguments during the proceedings."

@@ -38,7 +38,8 @@ const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
             try {
                 const response = await openai.chat.completions.create({
                     messages: [{ role: "system", content: issueSubpoenaPrompt(caseInfo, validSubpoenaType, subpoenaInfo.justification, subpoenaInfo.entity) }],
-                    model: "gpt-4",
+                    model: "gpt-3.5-turbo-1106",
+                    response_format: {type: 'json_object'}
                 });
 
                 const parsedRes = JSON.parse(response.choices[0].message.content);
@@ -189,20 +190,6 @@ const startDeposition = async (caseId, subpoenee) => {
         date
     }
     
-    if (result.attourney) {
-      try {
-      const res = await openai.chat.completions.create({
-        messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.attourney, foundUser, caseFound, message.message, deposition.messageHistory)}],
-        model: "gpt-4",
-    });
-    const parsedRes = JSON.parse(res.choices[0].message.content);
-
-    await cases.updateOne({_id: result.caseId}, {verdict: parsedRes, $push: {discoveries: newDiscovery}});
-    return {success: true}
-  } catch (err) {
-    throw new Error(err.message || 'An Error has Occured')
-  }
-    }
     await cases.updateOne({ _id: result.caseId, participants: { $elemMatch: { name: result.subpoenee.name, role: result.subpoenee.role } }}, { $set: { "participants.$.subpoena": false },  ...(newDiscovery.type === 'Settlement' ? [{
         $push: { dealHistory: newDiscovery.id }
       }] : []) });
@@ -224,9 +211,11 @@ const startDeposition = async (caseId, subpoenee) => {
       if (!caseFound) throw new Error('Deposition Not Found');
       const foundUser = await caseFound.participants.find(use => use.name == deposition.subpoenee.name && use.role == deposition.subpoenee.role);
     if (!foundUser) throw new Error('Participant Not Found');
+    const realUser = await users.findOne({_id: caseFound.owners[0]});
+    if (!realUser) throw newErr('Not Found', 404);
       const response = await openai.chat.completions.create({
-        messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.attourney, foundUser, caseFound, message.message, deposition.messageHistory)}],
-        model: "gpt-4",
+        messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.attourney, foundUser, caseFound, message.message, deposition.messageHistory, realUser.reputation)}],
+        model: "gpt-3.5-turbo-1106",
     });
       const aiMessage = JSON.parse(response.choices[0].message.content);
       const messageObj = {
@@ -353,8 +342,10 @@ console.log(privilegedConvo)
     }
 }
 
+console.log(finalVerdict.rptnpts)
+
 await users.findOneAndUpdate({ _id: uid }, {
-    $inc: { reputation: finalVerdict.rptnpts },
+    $inc: { reputation: finalVerdict.reputationPoints },
     $pull: { cases: caseInfo._id },
     $push: { caseHistory: caseInfo._id }
 });
