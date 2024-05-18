@@ -57,8 +57,8 @@ const createCase = async (uid, caseInfo) => {
         // delete newRes.solution;
         const discoveries = await openai.chat.completions.create({
           messages: [{role: "system", content: "You are the creator of the discoveries"}, { role: "user", content: createDiscoveriesPrompt(newRes.discoveries, caseSolution)}],
-  model: "gpt-3.5-turbo-1106",
-  response_format: {type: 'json_object'}
+  model: "gpt-4o",
+  response_format: { type: "json_object" },
       });
       console.log(discoveries.choices[0].message.content);
 
@@ -117,7 +117,7 @@ const endHearing = async (hearingId, uid) => {
               try {
                   const response = await openai.chat.completions.create({
                       messages: [{ role: "system", content: verdict(hearing, caseFound, designatedJudge, depos) }],
-                      model: "gpt-3.5-turbo-1106",
+                      model: "gpt-4o",
                       response_format: {type: 'json_object'}
                   });
                   finalVerdict = JSON.parse(response.choices[0].message.content);

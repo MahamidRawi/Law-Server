@@ -240,6 +240,8 @@ You are in a "settlement" section, trying to settle (not necessarily).- act foll
     "message": "Without repetitions, and long text. Very human length answer, Articulate a response that is insightful, authentically human, and strategically aligned with your role's objectives and the case's context. THINK ABOUT THE BUTTERFLY EFFECT, and slowly unveil a darker truth"
   }
 
+  strictly follow the json format
+
   ` : attourney ? `
   FOCUS : THE ONE Sending the inquiry is strictly the ${oppos}
   ### Character Role and Background:
@@ -507,8 +509,8 @@ const conclusion = (caseInfo, settlement, privilegedConvo) => {
       "score": Integer score out of 100 reflecting overall performance.,
       "verdict": "Summary of the agreements in the settlement.",
       "reputationPoints": Integer points assessing ethical and professional behavior.,
-      "compensation": "Integer representing the agreed-upon fees in the settlement or those discussed in privileged conversations.",
-      "caseOutcome": "${postograde}'s case outcome ('won' or 'lost').",
+      "compensation": "Integer representing the agreed-upon fees in the settlement or those discussed in privileged conversations. This number is only the attourney fees. Not the settlement amount. Please pay close attention to that",
+      "status": "${postograde}'s case outcome ('won' or 'lost').",
       "justification": "Detailed reasoning behind the scores, compensation, and reputation points awarded, with specific references to behaviors and legal arguments during the proceedings."
     },
     "notes": {

@@ -215,7 +215,8 @@ const startDeposition = async (caseId, subpoenee) => {
     if (!realUser) throw newErr('Not Found', 404);
       const response = await openai.chat.completions.create({
         messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.attourney, foundUser, caseFound, message.message, deposition.messageHistory, realUser.reputation)}],
-        model: "gpt-3.5-turbo-1106",
+        model: "gpt-4o",
+        response_format: {type: 'json_object'}
     });
       const aiMessage = JSON.parse(response.choices[0].message.content);
       const messageObj = {
@@ -322,10 +323,12 @@ console.log(privilegedConvo)
   } else {
   res = await openai.chat.completions.create({
       messages: [{ role: "user", content: conclusion(caseInfo, result.messageHistory, privilegedConvo)}],
-      model: "gpt-3.5-turbo-1106",
+      model: "gpt-4o",
       response_format: {type: 'json_object'}
   });
-  finalVerdict = JSON.parse(res.choices[0].message.content);
+  const finalVerdict1 = JSON.parse(res.choices[0].message.content);
+  finalVerdict = finalVerdict1
+  finalVerdict.rptnpts = finalVerdict1.reputationPoints
   }
   await cases.updateOne({_id: result.caseId}, {verdict: finalVerdict, $push: {discoveries: newDiscovery}});
   if (finalVerdict.compensation !== 0) {
