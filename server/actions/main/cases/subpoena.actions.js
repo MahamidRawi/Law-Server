@@ -33,12 +33,14 @@ const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
         const caseFound = await cases.findOne({ _id: caseInfo._id });
         if (!caseFound) throw new Error('Case Not Found');
 
+        const chats = await Deposition.find({caseId: caseInfo._id});
+
         const makeRequestAndParseResponse = async (attempt = 0) => {
             const maxRetries = 3;
             try {
                 const response = await openai.chat.completions.create({
-                    messages: [{ role: "system", content: issueSubpoenaPrompt(caseInfo, validSubpoenaType, subpoenaInfo.justification, subpoenaInfo.entity) }],
-                    model: "gpt-3.5-turbo-1106",
+                    messages: [{ role: "system", content: issueSubpoenaPrompt(caseInfo, validSubpoenaType, subpoenaInfo.justification, subpoenaInfo.entity, chats) }],
+                    model: "gpt-4o",
                     response_format: {type: 'json_object'}
                 });
 
@@ -46,6 +48,7 @@ const issueSubpoena = async (uid, caseInfo, subpoenaInfo) => {
                 console.log('Here is parsed Res : ', parsedRes);
                 return parsedRes;
             } catch (error) {
+              console.log(error)
                 if (error instanceof SyntaxError && attempt < maxRetries) {
                     
                     return makeRequestAndParseResponse(attempt + 1);
@@ -119,7 +122,7 @@ const fileMotion = async (uid, caseInfo, motionInfo) => {
             try {
                 const response = await openai.chat.completions.create({
                     messages: [{ role: "system", content: fileMotionPrompt(caseInfo, validMotion.name, motionInfo.justification, motionInfo.entity) }],
-                    model: "gpt-3.5-turbo-1106",
+                    model: "gpt-4o",
                 });
                 const parsedRes = JSON.parse(response.choices[0].message.content);
                 return parsedRes;
@@ -258,7 +261,7 @@ const startDeposition = async (caseId, subpoenee) => {
     if (!foundUser) throw new Error('Participant Not Found');
       const response = await openai.chat.completions.create({
         messages: [{ role: "user", content: SubpoenaMessagePrompt(deposition.attourney, foundUser, caseFound, message.message, deposition.messageHistory)}],
-        model: "gpt-3.5-turbo-1106",
+        model: "gpt-4o",
     });
       const aiMessage = JSON.parse(response.choices[0].message.content);
       const messageObj = {

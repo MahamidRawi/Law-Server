@@ -5,7 +5,6 @@ const user = mongoose.model('userModel');
 
 
 const alreadyExists = async (req, res, next) => {
-    console.log(req)
     const {username,email} = req.body.credentials
     try {
         const userFound = await user.find({$or: [{username}, {email}]});;
@@ -16,20 +15,31 @@ const alreadyExists = async (req, res, next) => {
 }
 
 const validate = (req, res, next) => {
+    const token = req.headers['x-access-token'];
 
-    const token = req.headers['x-access-token']
-    
-    if (!token) return res.status(401).json({ validated: false, errors: [{text:"No token was provided"}] });
+    if (!token) {
+        return res.status(401).json({ validated: false, errors: [{ text: "No token was provided" }] });
+    }
 
     jwt.verify(token, process.env.JWTPASS, async (err, decoded) => {
-        
-        if (err) return res.status(401).json({success: false, message: "Failed To Authenticate"});
-        const uFound = await user.findOne({_id: decoded.UID}).select('-password');
-        if (!uFound) res.status(401).json({success: false, message: "Failed To Authenticate"});
-        req.userId = decoded.UID
-        req.uInfo = uFound
-        return next();
+        if (err) {
+            return res.status(401).json({ success: false, message: "Failed To Authenticate" });
+        }
+
+        try {
+            const uFound = await user.findOne({ _id: decoded.UID }).select('-password');
+            if (!uFound) {
+                return res.status(401).json({ success: false, message: "Failed To Authenticate" });
+            }
+
+            req.userId = decoded.UID;
+            req.uInfo = uFound;
+            next();
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
     });
-}
+};
+
 
 module.exports = {alreadyExists, validate}

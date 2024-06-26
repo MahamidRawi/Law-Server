@@ -92,7 +92,7 @@ Notes:
 - [Optional] Additional comments or procedural notes related to the motion or its filing.`
 "date: new Date().toISOString().split('T')[0]";
 
-const issueSubpoenaPrompt = (caseInfo, type, justification, entity) => {
+const issueSubpoenaPrompt = (caseInfo, type, justification, entity, discussions) => {
     const prompt = type.participant ? `
     Conduct a thorough analysis of a subpoena request directed at a specific participant in the context of the given case details. Your primary objective is to critically assess the request based on the subpoena's type, the provided justification, its relevance and coherence with the case, and compliance with legal norms and standards.
 
@@ -120,23 +120,25 @@ const issueSubpoenaPrompt = (caseInfo, type, justification, entity) => {
             "name: "fictif name",
             "role": "role of participant",
             "shortDescription": "short description of the participant"
-        }. If in the list, this field must contain the following object : {'exactName':'exact name as stated', 'role': 'role of the participant as stated'} "
+        } // If in the list, this field must contain the following object : {'exactName':'exact name as stated', 'role': 'role of the participant as stated'} "
       }
     }
 ` : `
 Given the case information and the subpoena request details, the court is to decide on granting the subpoena. If the decision is to deny, provide the rationale. If granted, generate a fictitious document relevant to the case, adhering to the provided template with no placeholders, reflecting the complexity and thematic elements corresponding to the case's difficulty level.
 
 Case Information: ${caseInfo} // This should include the case's difficulty level.
+All discussions : ${discussions}
 Type of Subpoena: ${type.name}
 Justification: "${justification}"
 Targeted Entity: "${entity}"
+
 
 Evaluate the justification against the case's difficulty level. Consider the reality of legal processes, including potential corruption or other thematic elements based on the case's difficulty, to decide on granting the subpoena.
 Deny the subpoena if the user is trying to mislead / manipulate / move the case in a certain direction.
 Don't be easy on granting subpoenas. 
 if there is duplicates, deny the subpoena.
-
-Response structure:
+Please double check the case story line to guide (but don't reveal it whatsoever) to check if such a subpoena is even available : ${caseInfo.solution}
+Response structure, must be in JSON :
 {
   "granted": true or false,
   "rationale": "Provide this only if the subpoena is denied, explaining the decision.",
@@ -219,7 +221,6 @@ return openAiPrompt;
 }
 
 const SubpoenaMessagePrompt = (attourney, subpoenee, caseInfo, message, messageHistory, reputationpoints) => {
-  console.log('HERE WE ARE : ', attourney, subpoenee);
   const oppos = caseInfo.prosecution == caseInfo.oppositionName ? 'Defense attourney' : 'Prosecuting attourney'
   const prompt = subpoenee.ctc ? `
   You are : ${subpoenee.name} and your role is ${subpoenee.role} in the following case : ${caseInfo}
@@ -243,7 +244,7 @@ You are in a "settlement" section, trying to settle (not necessarily).- act foll
   strictly follow the json format
 
   ` : attourney ? `
-  FOCUS : THE ONE Sending the inquiry is strictly the ${oppos}
+  FOCUS : You must respond to ${oppos}
   ### Character Role and Background:
 - **Role**: "${subpoenee.role}".
 - **Background Information**: Provided as ${subpoenee}.
@@ -425,9 +426,8 @@ const createDiscoveriesPrompt = (discoveries, summary, stln) => {
 }
 
 const correspondingResponse = (caseInfo, judge, message, messageHistory) => {
-  console.log('HERE WE ARE : ', message)
   return `
-  You are the opposing council ${caseInfo.oppositionName} in the following case : ${caseInfo}
+  You are the opposing council : ${caseInfo.oppositionName} in the following case : ${caseInfo}
   judge information : ${judge.name}, with caracteristics : ${judge.caracteristics}
   For context, we are in closing arguments : 
 
@@ -481,45 +481,45 @@ Notes:
 }
 
 const conclusion = (caseInfo, settlement, privilegedConvo) => {
-  console.log(privilegedConvo);
-  const postograde = caseInfo.defense == caseInfo.oppositionName ? "prosecution" : "defense"
-  return `{
-    "task": "Generate a JSON response for a law simulation. Evaluate the legal practitioner's performance, identified as ${postograde}, based on the provided inputs and criteria. Pay close attention to calculations regarding the compensation and the crafting of the summary. Ensure that the financial compensation reflects only the agreed-upon attorney fees (as per agreements between attorney-client and attorney-attorney in settlements).",
-    "inputs": {
-      "privilegedConversation": "${privilegedConvo}",
-      "caseInformation": "${caseInfo}",
-      "jurisdiction": "${caseInfo.lawSystem}",
-      "settlementTranscript": "${settlement}"
+  console.log('privileged convo : ', privilegedConvo)
+  const practitionerRole = caseInfo.defense === caseInfo.oppositionName ? "prosecution" : "defense";
+  return JSON.stringify({
+    task: "Generate a JSON response for a law simulation. Evaluate the legal practitioner's performance, identified as " + practitionerRole + ", based on the provided inputs and criteria. Focus on calculations regarding the compensation and the crafting of the summary. The financial compensation should reflect only the agreed-upon attorney fees.",
+    inputs: {
+      privilegedConversation: privilegedConvo.messageHistory,
+      caseInformation: caseInfo,
+      jurisdiction: caseInfo.lawSystem,
+      settlementTranscript: settlement
     },
-    "evaluationCriteria": {
-      "performanceScore": {
-        "description": "An integer from 0 to 100, reflecting the legal practitioner's acumen and conduct. Scores below 50 indicate inadequate performance, while scores above 75 suggest exceptional advocacy."
+    evaluationCriteria: {
+      performanceScore: {
+        description: "An integer from 0 to 100, reflecting the legal practitioner's acumen and conduct. Scores below 50 indicate inadequate performance, while scores above 75 suggest exceptional advocacy."
       },
-      "reputationPoints": {
-        "description": "An integer from -10 to +10, reflecting ethical standing and professionalism. Points are deducted for misconduct and added for commendable behavior."
+      reputationPoints: {
+        description: "An integer from -10 to +10, reflecting ethical standing and professionalism. Points are deducted for misconduct and added for commendable behavior."
       },
-      "financialCompensation": {
-        "description": "The monetary amount specifically agreed upon as attorney fees in the settlement or during privileged conversations, adjusted for the context of the case outcome. if it was agreed in the settlement and in the conversation with the client, then do the sum of the two. Don't forget to convert for example 250k to 250000 integer, and not 250"
+      financialCompensation: {
+        description: "The monetary amount specifically agreed upon as attorney fees in the settlement and during privileged conversations. Ensure to sum amounts from both contexts and convert values like '250k' to 250000. Very important, you sum up the financial compensation agreed by both sides. Example 1 : if with the opposing council, the user agrees 'pro bono' in " + settlement + ", but he agrees 50k in " + privilegedConvo + "you give 50k (pro bono = 0). Example 2 : if the user agrees with the opposing council for 2k attourney fees, and with his client 4k attourney fees, in the end - 6000 attourney fees"
       },
-      "behavioralAssessment": {
-        "description": "Evaluate ${postograde}'s demeanor and participation in legal proceedings. Assign a 'loss' status if the behavior was poor or non-participative."
+      behavioralAssessment: {
+        description: "Evaluate " + practitionerRole + "'s demeanor and participation in legal proceedings. Assign a 'loss' status if the behavior was poor or non-participative."
       }
     },
-    "requiredResponseFormat": {
-      "score": Integer score out of 100 reflecting overall performance.,
-      "verdict": "Summary of the agreements in the settlement.",
-      "reputationPoints": Integer points assessing ethical and professional behavior.,
-      "compensation": "Integer representing the agreed-upon fees in the settlement or those discussed in privileged conversations. This number is only the attourney fees. Not the settlement amount. Please pay close attention to that",
-      "status": "${postograde}'s case outcome ('won' or 'lost').",
-      "justification": "Detailed reasoning behind the scores, compensation, and reputation points awarded, with specific references to behaviors and legal arguments during the proceedings."
+    requiredResponseFormat: {
+      score: "Integer score out of 100 reflecting overall performance.",
+      verdict: "Summary of the agreements in the settlement.",
+      reputationPoints: "Integer points assessing ethical and professional behavior.",
+      compensation: "Integer representing the agreed-upon fees in the settlement or those discussed in privileged conversations.",
+      status: practitionerRole + "'s case outcome ('won' or 'lost'). If the " + practitionerRole + "was able to get what his client wanted, consider it won.",
+      justification: "Detailed reasoning behind the scores, compensation, and reputation points awarded, with specific references to behaviors and legal arguments during the proceedings."
     },
-    "notes": {
-      "evaluationDetail": "The assessment must meticulously evaluate all aspects of ${postograde}'s performance during depositions and hearings, adhering to the legal standards of the specified jurisdiction.",
-      "compensationClarification": "The financial compensation includes only the attorney fees as explicitly agreed in the settlement or during privileged conversations."
+    notes: {
+      evaluationDetail: "The assessment must meticulously evaluate all aspects of " + practitionerRole + "'s performance during depositions and hearings, adhering to the legal standards of the specified jurisdiction.",
+      compensationClarification: "The financial compensation includes only the attorney fees as explicitly agreed in the settlement or during privileged conversations."
     }
-  }`
-  
-}
+  }, null, 2);
+};
+
 
 const opposingTeamTurn = (caseInfo, status, transcript, judge, name) => {
   // Determine the role to play based on the current status

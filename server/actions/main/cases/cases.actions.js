@@ -166,7 +166,7 @@ const startHearing = async (caseId, uid) => {
     const judge = designatedJudge[Math.floor(Math.random() * designatedJudge.length)].name
     const resp = uid !== caseFound.prosecution ? await openai.chat.completions.create({
       messages: [{ role: "system", content: prosecutionFirstMessage(caseFound) }],
-      model: "gpt-3.5-turbo-1106",
+      model: "gpt-4o",
   }) : false;
 
   const initialTranscript = caseFound.prosecution !== uid ? [
@@ -221,17 +221,23 @@ const handleMessage = async (hearingId, message, userId) => {
 
     const response = await openai.chat.completions.create({
       messages: [{ role: "system", content: systemMessage }],
-      model: "gpt-3.5-turbo-1106",
+      model: "gpt-4o",
+      response_format: {type: 'json_object'}
+
     });
 
     console.log(response.choices[0].message)
 
     const parsedResponse = JSON.parse(response.choices[0].message.content);
-    parsedResponse.map(msg => {
+    console.log('NEWW ONE', parsedResponse);
+    [parsedResponse].map(msg => {
       hearing.transcript.push(msg);
     });
+    console.log('HERE IS OBJECT : ', parsedResponse)
+    hearing.transcript.push(parsedResponse);
+    console.log(parsedResponse)
     const saved = await hearing.save()
-    return {message: parsedResponse, newHistory: saved.transcript}
+    return {message: [parsedResponse], newHistory: saved.transcript}
   } catch (err) {
     console.error(err);
     // Ensure newErr is a function that correctly formats your error responses.
@@ -265,7 +271,8 @@ const rest = async (hearingId, uid) => {
       
       const response = await openai.chat.completions.create({
         messages: [{ role: "system", content: systemMessage }],
-        model: "gpt-3.5-turbo-1106",
+        model: "gpt-4o",
+        response_format: {type: 'json_object'}
       });
       // console.log(response.choices[0].message.content);
       parsedResponse = JSON.parse(response.choices[0].message.content);

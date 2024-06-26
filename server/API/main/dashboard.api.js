@@ -30,9 +30,12 @@ router.get('/getMyCases', validate, async (req, res) => {
 });
 
 router.get('/getLawyers', validate, async (req, res) => {
-    const {users, success} = await getUsers();
-    console.log(users)
-    return res.status(success ? 200 : 500).json({users, success});
+    try {
+        const {users, success} = await getUsers();
+        return res.status(success ? 200 : 500).json({users, success});
+    } catch (err) {
+        return res.status(500).json({success: false, message: 'An Error has Occured'});
+    }
 });
 
 router.get('/getUserInfo', validate, async (req, res) => {

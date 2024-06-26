@@ -56,7 +56,6 @@ const LawyerInformationScreen: React.FC<LawyerInformationProps> = () => {
                                     {!participant ? (
                                         <>
                                             <button className="btn btn-primary mt-3" onClick={() => navigate('/Mail', { state: { targetMail: information.email } })}>Contact</button>
-                                            <button className="btn btn-primary mt-3">Case History</button>
                                             <button className="btn btn-primary mt-3" onClick={() => navigate('/Wallet', { state: { targetRoute: 'Transfer', walletNumber: information.walletAddress } })}>Transfer Funds</button>
                                         </>
                                     ) : (
