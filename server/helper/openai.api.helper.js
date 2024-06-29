@@ -486,7 +486,7 @@ const conclusion = (caseInfo, settlement, privilegedConvo) => {
   return JSON.stringify({
     task: "Generate a JSON response for a law simulation. Evaluate the legal practitioner's performance, identified as " + practitionerRole + ", based on the provided inputs and criteria. Focus on calculations regarding the compensation and the crafting of the summary. The financial compensation should reflect only the agreed-upon attorney fees.",
     inputs: {
-      privilegedConversation: privilegedConvo.messageHistory,
+      privilegedConversation: privilegedConvo ? privilegedConvo.messageHistory : [`There was failure to contact ${practitionerRole}'s client, which is very bad, as it shows decisions weren't taken with the aid of his client.`],
       caseInformation: caseInfo,
       jurisdiction: caseInfo.lawSystem,
       settlementTranscript: settlement

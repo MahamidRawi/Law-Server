@@ -12,6 +12,6 @@ require('dotenv').config();
 server.use('/auth/', AuthRouter);
 server.use('/main/', MainRouter);
 
-server.listen(3200, () => {loadDb(); console.log(process.env.JWTPASS)});
+server.listen(3200, () => {loadDb().catch(console.dir); console.log(process.env.JWTPASS)});
 
 //test

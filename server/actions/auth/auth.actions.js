@@ -36,6 +36,7 @@ const signUp = async (creds) => {
             }
             
     } catch (err) {
+        console.log(err)
         return reject({stc: 500, success: false, err, message: 'An Error has Occured'});
     }
 });
